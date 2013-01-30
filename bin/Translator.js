@@ -1,18 +1,21 @@
 /**
- * Comment here
+ * Translator Panel
  *
  * @author www.pcsg.de (Henning Leutz)
  *
- * @module
- * @package
- * @namespace
+ * @module package/quiqqer/translator/bin/Translator
+ * @package QUI.pcsg.quiqqer.js.package.translator
+ * @namespace QUI
  */
 
 define('package/quiqqer/translator/bin/Translator', [
 
-    "controls/Control"
+    "package/quiqqer/translator/bin/Panel"
 
-], function(QUI_Control)
+], function(TranslatorPanel)
 {
-
+    // opens the panel
+    QUI.Controls.get( 'content-panel' )[0].appendChild(
+        new TranslatorPanel()
+    );
 });

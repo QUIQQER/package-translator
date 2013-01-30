@@ -21,5 +21,11 @@
 
     "require": {
         "quiqqer/quiqqer" : "1.*"
+    },
+
+    "autoload": {
+        "psr-0" : {
+            "QUI" : "/lib/QUI/"
+        }
     }
 }
