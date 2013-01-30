@@ -7,6 +7,5 @@
         <field type="text">de_edit</field>
         <field type="text">en</field>
         <field type="text">en_edit</field>
-        <primary>id</primary>
     </table>
 </database>

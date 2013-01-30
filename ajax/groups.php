@@ -2,7 +2,7 @@
 
 function package_quiqqer_translator_ajax_groups()
 {
-    return \QUI\Translater::getGroupList();
+    return \QUI\Translator::getGroupList();
 }
 
 QUI::$Ajax->register(

@@ -17,21 +17,21 @@ namespace QUI;
 
 class Translator
 {
-    const TABLE = 'quiqqer_translate';
+    const TABLE = 'translate';
 
     /**
      * Setup - Übersetzungstabellen erstellen
      */
     static function setup()
     {
-        QUI::getDB()->createTableFields(self::TABLE, array(
+        \QUI::getDB()->createTableFields(self::TABLE, array(
              'groups'  => 'varchar(128) NOT NULL',
              'var'     => 'varchar(255) NOT NULL',
              'de'      => 'text NOT NULL',
              'de_edit' => 'text NULL'
         ));
 
-        QUI::getDB()->setIndex('pcsg_translate', 'groups');
+        \QUI::getDB()->setIndex( self::TABLE, 'groups' );
     }
 
     /**
@@ -42,10 +42,10 @@ class Translator
     static function addLang($lang)
     {
         if (strlen($lang) !== 2) {
-            throw new QException('Sprachkürzel nicht erlaubt');
+            throw new \QException('Sprachkürzel nicht erlaubt');
         }
 
-        QUI::getDB()->createTableFields(self::TABLE, array(
+        \QUI::getDB()->createTableFields(self::TABLE, array(
              $lang          => 'text NOT NULL',
              $lang .'_edit' => 'text NULL'
         ));
@@ -59,7 +59,7 @@ class Translator
      */
     static function export($groups)
     {
-        $group   = Utils_Security_Orthos::clearMySQL($groups);
+        $group   = \Utils_Security_Orthos::clearMySQL($groups);
         $entries = self::get($groups);
 
         $result = '<groups name="'. $group .'">'."\n";
@@ -92,11 +92,11 @@ class Translator
     static function import($file)
     {
         if (!file_exists($file)) {
-            throw new QException('Übersetzungsdatei existiert nicht.');
+            throw new \QException('Übersetzungsdatei existiert nicht.');
         }
 
-        $locales = Utils_Xml::getLocaleGroupsFromDom(
-            Utils_Xml::getDomFromXml( $file )
+        $locales = \Utils_Xml::getLocaleGroupsFromDom(
+            \Utils_Xml::getDomFromXml( $file )
         );
 
         $group = $locales['group'];
@@ -109,7 +109,7 @@ class Translator
             try
             {
                 self::add($group, $var);
-            } catch (QException $e)
+            } catch ( \QException $e )
             {
 
             }
@@ -124,7 +124,7 @@ class Translator
      */
     static function dir()
     {
-        return QUI::getLocale()->dir();
+        return \QUI::getLocale()->dir();
     }
 
     /**
@@ -137,7 +137,7 @@ class Translator
      */
     static function getTranslationFile($lang, $group)
     {
-        return QUI::getLocale()->getTranslationFile($lang, $group);
+        return \QUI::getLocale()->getTranslationFile($lang, $group);
     }
 
     /**
@@ -154,10 +154,10 @@ class Translator
 
         foreach ($langs as $lang)
         {
-            $folders[ $lang ] = $dir .'/'. Utils_String::toLower($lang) .'_'. Utils_String::toUpper($lang) .'/LC_MESSAGES/';
+            $folders[ $lang ] = $dir .'/'. \Utils_String::toLower($lang) .'_'. \Utils_String::toUpper($lang) .'/LC_MESSAGES/';
 
-            Utils_System_File::unlink($folders[ $lang ]);
-            Utils_System_File::mkdir( $folders[ $lang ] );
+            \Utils_System_File::unlink($folders[ $lang ]);
+            \Utils_System_File::mkdir( $folders[ $lang ] );
         }
 
         // Sprachdateien erstellen
@@ -167,7 +167,7 @@ class Translator
                 continue;
             }
 
-            $result = QUI::getDB()->select(array(
+            $result = \QUI::getDB()->select(array(
                 'select' => array(
                     $lang, $lang .'_edit', 'groups', 'var'
                 ),
@@ -195,29 +195,29 @@ class Translator
                 $ini     = $folders[ $lang ] . str_replace('/', '_', $entry['groups']) .'.ini';
                 $ini_str = $entry['var'] .'= "'. $value .'"';
 
-                Utils_System_File::mkfile($ini);
-                Utils_System_File::putLineToFile($ini, $ini_str);
+                \Utils_System_File::mkfile($ini);
+                \Utils_System_File::putLineToFile($ini, $ini_str);
 
                 // po (gettext) datei
                 $po = $folders[ $lang ] . str_replace('/', '_', $entry['groups']) .'.po';
                 $mo = $folders[ $lang ] . str_replace('/', '_', $entry['groups']) .'.mo';
 
-                Utils_System_File::mkfile($po);
+                \Utils_System_File::mkfile($po);
 
-                Utils_System_File::putLineToFile($po, 'msgid "'. $entry['var'] .'"');
-                Utils_System_File::putLineToFile($po, 'msgstr "'. $value .'"');
-                Utils_System_File::putLineToFile($po, '');
+                \Utils_System_File::putLineToFile($po, 'msgid "'. $entry['var'] .'"');
+                \Utils_System_File::putLineToFile($po, 'msgstr "'. $value .'"');
+                \Utils_System_File::putLineToFile($po, '');
             }
 
             // alle .po dateien einlesen und in mo umwandeln
             if (function_exists('gettext')) //@todo getText über Config ein ud ausschaltbar machen
             {
-                $po_files = Utils_System_File::readDir($folders[ $lang ]);
+                $po_files = \Utils_System_File::readDir($folders[ $lang ]);
 
                 foreach ($po_files as $po_file)
                 {
                     if (substr($po_file, -3) == '.po'){
-                       exec(Utils_Security_Orthos::clearShell('msgfmt '. $folders[ $lang ]. $po_file .' -o '. $folders[ $lang ]. substr($po_file, 0,-3).'.mo' ). ' 2>&1',$exec_error);
+                       exec( \Utils_Security_Orthos::clearShell('msgfmt '. $folders[ $lang ]. $po_file .' -o '. $folders[ $lang ]. substr($po_file, 0,-3).'.mo' ). ' 2>&1',$exec_error);
 
                     }
                 }
@@ -225,7 +225,7 @@ class Translator
         }
 
         if (!empty($exec_error)) { // @todo nicht in error log schreiben sondern an den Message Handler ins Admin übergeben
-            System_Log::writeRecursive($exec_error);
+            \System_Log::writeRecursive($exec_error);
         }
     }
 
@@ -241,19 +241,19 @@ class Translator
     {
         if (!$var)
         {
-            return QUI::getDB()->select(array(
+            return \QUI::getDB()->select(array(
                 'from' => self::TABLE,
                 'where' => array(
-                    'groups' => Utils_Security_Orthos::clearMySQL( $group )
+                    'groups' => \Utils_Security_Orthos::clearMySQL( $group )
                 )
             ));
         }
 
-        return QUI::getDB()->select(array(
+        return \QUI::getDB()->select(array(
             'from' => self::TABLE,
             'where' => array(
-                'groups' => Utils_Security_Orthos::clearMySQL( $group ),
-                'var'    => Utils_Security_Orthos::clearMySQL( $var )
+                'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
+                'var'    => \Utils_Security_Orthos::clearMySQL( $var )
             )
         ));
     }
@@ -285,13 +285,13 @@ class Translator
         $data = array(
             'from' => self::TABLE,
             'where' => array(
-                'groups' => Utils_Security_Orthos::clearMySQL( $groups )
+                'groups' => \Utils_Security_Orthos::clearMySQL( $groups )
             ),
             'limit' => $limit
         );
 
         // result mit limit
-        $result = QUI::getDB()->select($data);
+        $result = \QUI::getDB()->select($data);
 
         // count
         $data['count'] = 'groups';
@@ -300,7 +300,7 @@ class Translator
             unset($data['limit']);
         }
 
-        $count = QUI::getDB()->select($data);
+        $count = \QUI::getDB()->select($data);
 
         return array(
             'data'  => $result,
@@ -317,7 +317,7 @@ class Translator
      */
     static function getGroupList()
     {
-        $result = QUI::getDB()->select(array(
+        $result = \QUI::getDB()->select(array(
             'select' => 'groups',
             'from'   => self::TABLE,
             'group'  => 'groups'
@@ -325,7 +325,7 @@ class Translator
 
         $list = array();
 
-        foreach ($result as $entry) {
+        foreach ( $result as $entry ) {
             $list[] = $entry['groups'];
         }
 
@@ -341,20 +341,20 @@ class Translator
     static function add($group, $var)
     {
         if (empty($var) || empty($group)) {
-            throw new QException('Übersetzungsvariable konnte nicht angelegt werden.');
+            throw new \QException('Übersetzungsvariable konnte nicht angelegt werden.');
         }
 
         $result = self::get($group, $var);
 
         if (isset($result[0])) {
-            throw new QException('Übersetzungsvariable konnte nicht angelegt werden, diese Variable existiert bereits.');
+            throw new \QException('Übersetzungsvariable konnte nicht angelegt werden, diese Variable existiert bereits.');
         }
 
-        QUI::getDB()->addData(
+        \QUI::getDB()->addData(
             self::TABLE,
             array(
-                'groups' => Utils_Security_Orthos::clearMySQL( $group ),
-                'var'    => Utils_Security_Orthos::clearMySQL( $var )
+                'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
+                'var'    => \Utils_Security_Orthos::clearMySQL( $var )
             )
         );
     }
@@ -377,15 +377,15 @@ class Translator
                 continue;
             }
 
-            $_data[ $lang ] = Utils_Security_Orthos::clearMySQL($data[ $lang ], false);
+            $_data[ $lang ] = \Utils_Security_Orthos::clearMySQL($data[ $lang ], false);
         }
 
-        QUI::getDB()->updateData(
+        \QUI::getDB()->updateData(
             self::TABLE,
             $_data,
             array(
-                'groups' => Utils_Security_Orthos::clearMySQL( $group ),
-                'var'    => Utils_Security_Orthos::clearMySQL( $var )
+                'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
+                'var'    => \Utils_Security_Orthos::clearMySQL( $var )
             )
         );
     }
@@ -409,16 +409,16 @@ class Translator
             }
 
             if (strlen($lang) === 2) {
-                $_data[ $lang .'_edit' ] = Utils_Security_Orthos::clearMySQL($data[ $lang ], false);
+                $_data[ $lang .'_edit' ] = \Utils_Security_Orthos::clearMySQL($data[ $lang ], false);
             }
         }
 
-        QUI::getDB()->updateData(
+        \QUI::getDB()->updateData(
             self::TABLE,
             $_data,
             array(
-                'groups' => Utils_Security_Orthos::clearMySQL( $group ),
-                'var'    => Utils_Security_Orthos::clearMySQL( $var )
+                'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
+                'var'    => \Utils_Security_Orthos::clearMySQL( $var )
             )
         );
     }
@@ -431,9 +431,9 @@ class Translator
      */
     static function delete($group, $var)
     {
-        QUI::getDB()->deleteData(self::TABLE, array(
-            'groups' => Utils_Security_Orthos::clearMySQL( $group ),
-            'var'    => Utils_Security_Orthos::clearMySQL( $var )
+        \QUI::getDB()->deleteData(self::TABLE, array(
+            'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
+            'var'    => \Utils_Security_Orthos::clearMySQL( $var )
         ));
     }
 
@@ -444,7 +444,7 @@ class Translator
 	 */
     static function langs()
     {
-        $fields = QUI::getDB()->getFields(self::TABLE);
+        $fields = \QUI::getDB()->getFields(self::TABLE);
         $langs  = array();
 
         foreach ($fields as $entry)
@@ -470,7 +470,7 @@ class Translator
      */
     static function getNeedles()
     {
-        $fields = QUI::getDB()->getFields(self::TABLE);
+        $fields = \QUI::getDB()->getFields(self::TABLE);
         $langs  = array();
 
         foreach ($fields as $entry)
@@ -482,7 +482,7 @@ class Translator
             $langs[] = $entry;
         }
 
-        $result = QUI::getDB()->select(array(
+        $result = \QUI::getDB()->select(array(
             'from'  => self::TABLE,
             'where' => implode(' = "" OR ', $langs) .' = ""'
         ));
