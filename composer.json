@@ -1,0 +1,25 @@
+{
+	"name" : "quiqqer/translator",
+	"description" : "QUIQQER Translator",
+	"tags" : ["quiqqer", "translator"],
+	"version" : "0.0.1",
+	"author" : [{
+        "name": "Henning Leutz",
+        "email": "leutz@pcsg.de",
+        "homepage": "http://www.pcsg.de",
+        "role": "Developer"
+    }],
+
+	"repositories" : {
+        "type" : "git",
+      	"url"  : "ssh://git@rico/~/repositories/packages/translator.git"
+    },
+
+    "bugs" : {
+        "url" : "http://bugs.quiqqer.com/translator"
+    },
+
+    "require": {
+        "quiqqer/quiqqer" : "1.*"
+    }
+}
