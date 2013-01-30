@@ -25,7 +25,7 @@
 
     "autoload": {
         "psr-0" : {
-            "QUI" : "/lib/QUI/"
+            "QUI" : "lib/QUI/"
         }
     }
 }
