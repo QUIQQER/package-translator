@@ -15,7 +15,7 @@ namespace QUI;
  * @package com.pcsg.qui.locale
  */
 
-class Translater
+class Translator
 {
     const TABLE = 'quiqqer_translate';
 
