@@ -9,7 +9,7 @@ function package_quiqqer_translator_ajax_create()
 
     \QUI::getMessagesHandler()->addSuccess(
         \QUI::getLocale()->get(
-            'packages/translator',
+            'package/translator',
             'message.translation.create.successful'
         )
     );

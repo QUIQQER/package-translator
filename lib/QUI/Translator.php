@@ -87,7 +87,7 @@ class Translator
         {
             foreach ( $groups as $define => $entries )
             {
-                $result .= '<groups name="'. $group .'" type="'. $type .'"';
+                $result .= '<groups name="'. $group .'" datatype="'. $type .'"';
 
                 if ( $define != $group ) {
                     $result .= ' define="'. $define .'"';
@@ -152,47 +152,59 @@ class Translator
             );
         }
 
-        $locales = \Utils_Xml::getLocaleGroupsFromDom(
+        $groups = \Utils_Xml::getLocaleGroupsFromDom(
             \Utils_Xml::getDomFromXml( $file )
         );
 
-        $group  = $locales['group'];
-        $result = array();
-
-        foreach ( $locales['locales'] as $locale )
+        foreach ( $groups as $locales )
         {
-            $var = $locale['name'];
-            unset( $locale['name'] );
+            $group    = $locales['group'];
+            $datatype = '';
+            $result   = array();
 
-            try
-            {
-                self::add( $group, $var );
-            } catch ( \QException $e )
-            {
-
+            if ( isset( $locales['datatype'] ) ) {
+                $datatype = $locales['datatype'];
             }
 
-            // update only in the _edit fields
-            if ( $update_edit_fields )
+            foreach ( $locales['locales'] as $locale )
             {
-                $_locale = array();
+                $var = $locale['name'];
+                unset( $locale['name'] );
 
-                foreach ( $locale as $key => $entry ) {
-                    $_locale[ $key.'_edit' ] = $entry;
+                try
+                {
+                    self::add( $group, $var );
+                } catch ( \QException $e )
+                {
+
                 }
 
-                self::edit( $group, $var, $_locale );
-            } else
-            {
-                // set the original fields
-                self::update( $group, $var, $locale );
-            }
+                // update only in the _edit fields
+                if ( $update_edit_fields )
+                {
+                    $_locale = array();
 
-            $result[] = array(
-                'group'  => $group,
-            	'var'    => $var,
-                'locale' => $locale
-            );
+                    foreach ( $locale as $key => $entry ) {
+                        $_locale[ $key.'_edit' ] = $entry;
+                    }
+
+                    $_locale['datatype'] = $datatype;
+
+                    self::edit( $group, $var, $_locale );
+                } else
+                {
+                    // set the original fields
+                    $locale['datatype'] = $datatype;
+
+                    self::update( $group, $var, $locale );
+                }
+
+                $result[] = array(
+                    'group'  => $group,
+                	'var'    => $var,
+                    'locale' => $locale,
+                );
+            }
         }
 
         return $result;
@@ -218,6 +230,40 @@ class Translator
     static function getTranslationFile($lang, $group)
     {
         return \QUI::getLocale()->getTranslationFile($lang, $group);
+    }
+
+    /**
+     * Return the list of the translation files for a languag
+     *
+     * @var String $lang - Language -> eq: "de" or "en" ... and so on
+     */
+    static function getJSTranslationFiles($lang)
+    {
+        if ( strlen( $lang ) !== 2 ) {
+            return array();
+        }
+
+        $jsdir  = self::dir() .'/bin/';
+        $result = array();
+
+        $dirs = \Utils_System_File::readDir( $jsdir );
+
+        foreach ( $dirs as $dir )
+        {
+            $package_dir  = $jsdir . $dir;
+            $package_list = \Utils_System_File::readDir( $package_dir );
+
+            foreach ( $package_list as $package )
+            {
+                $lang_file = $package_dir . '/'. $package .'/'. $lang .'.js';
+
+                if ( file_exists( $lang_file ) ) {
+                    $result[ 'locale/'. $dir .'/'. $package ] = $lang_file;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -286,6 +332,7 @@ class Translator
             \Utils_System_File::mkdir( $folders[ $lang ] );
         }
 
+        $js_langs = array();
 
         // Sprachdateien erstellen
         foreach ( $langs as $lang )
@@ -296,13 +343,20 @@ class Translator
 
             $result = \QUI::getDB()->select(array(
                 'select' => array(
-                    $lang, $lang .'_edit', 'groups', 'var'
+                    $lang, $lang .'_edit', 'groups', 'var',
+                    'datatype', 'datadefine'
                 ),
                 'from' => \QUI::getDBTableName( self::TABLE )
             ));
 
             foreach ( $result as $entry )
             {
+                if ( $entry['datatype'] == 'js' )
+                {
+                    $js_langs[ $entry['groups'] ][ $lang ][] = $entry;
+                    continue;
+                }
+
                 $value = $entry[ $lang ];
 
                 if ( isset( $entry[ $lang.'_edit' ] ) &&
@@ -331,12 +385,56 @@ class Translator
                 $po = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.po';
                 $mo = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.mo';
 
-                \Utils_System_File::mkfile($po);
+                \Utils_System_File::mkfile( $po );
 
                 \Utils_System_File::putLineToFile( $po, 'msgid "'. $entry['var'] .'"' );
                 \Utils_System_File::putLineToFile( $po, 'msgstr "'. $value .'"' );
                 \Utils_System_File::putLineToFile( $po, '' );
             }
+
+            // create javascript lang files
+            $jsdir = $dir .'/bin/';
+            \Utils_System_File::mkdir( $jsdir );
+
+            foreach ( $js_langs as $group => $groupentry )
+            {
+                foreach ( $groupentry as $lang => $entries )
+                {
+                    $vars = array();
+
+                    foreach ( $entries as $entry )
+                    {
+                        $value = $entry[ $lang ];
+
+                        if ( isset( $entry[ $lang.'_edit' ] ) &&
+                             !empty( $entry[ $lang.'_edit' ]) )
+                        {
+                            $value = $entry[ $lang.'_edit' ]; // benutzer übersetzung
+                        }
+
+                        $vars[ $entry['var'] ] = $value;
+                    }
+
+                    $js  = '';
+                    $js .= "define('locale/". $group ."/". $lang ."', function()";
+                    $js .= '{';
+                        $js .= 'QUI.Locale.set("'. $lang .'", "'. $group .'", ';
+                        $js .= json_encode( $vars );
+                        $js .= ')';
+                    $js .= '});';
+
+                    // create package dir
+                    \Utils_System_File::mkdir( $jsdir . $group );
+
+                    if ( file_exists( $jsdir . $group .'/'. $lang .'.js' ) ) {
+                        unlink( $jsdir . $group .'/'. $lang .'.js' );
+                    }
+
+                    file_put_contents( $jsdir . $group .'/'. $lang .'.js', $js );
+                }
+            }
+
+            // \System_Log::writeRecursive( $js_langs, 'error' );
 
             // alle .po dateien einlesen und in mo umwandeln
             if ( function_exists( 'gettext' ) ) //@todo getText über Config ein und ausschaltbar machen
@@ -554,9 +652,9 @@ class Translator
     /**
      * Eintrag aktualisieren
      *
-     * @param unknown_type $group
-     * @param unknown_type $var
-     * @param unknown_type $data
+     * @param String $group
+     * @param String $var
+     * @param Array $data
      */
     static function update($group, $var, $data)
     {
@@ -570,6 +668,14 @@ class Translator
             }
 
             $_data[ $lang ] = $data[ $lang ];
+        }
+
+        if ( isset( $data[ 'datatype' ] ) ) {
+            $_data[ 'datatype' ] = $data[ 'datatype' ];
+        }
+
+        if ( isset( $data[ 'datadefine' ] ) ) {
+            $_data[ 'datadefine' ] = $data[ 'datadefine' ];
         }
 
         \QUI::getDB()->updateData(

@@ -1,5 +1,5 @@
 <locales>
-	<groups name="package/translator" type="js">
+	<groups name="package/translator" datatype="js">
 	    <locale name="add.window.title">
             <de><![CDATA[Variable hinzufügen:[group]]]></de>
             <en><![CDATA[Add Variable: [group]]]></en>
