@@ -29,7 +29,14 @@ function package_quiqqer_translator_ajax_delete($data)
         );
 
         \QUI::getMessagesHandler()->addSuccess(
-        	'Variable '. $entry['groups'] .' '. $entry['var'] .' wurde erfolgreich gelöscht'
+            \QUI::getLocale()->get(
+                'package/translator',
+                'message.translation.delet.successful',
+                array(
+                    'groups' => $entry['groups'],
+                    'var'    => $entry['var']
+                )
+            )
         );
     }
 }

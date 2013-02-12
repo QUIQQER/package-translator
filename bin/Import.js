@@ -41,11 +41,9 @@ define('package/quiqqer/translator/bin/Import', [
         {
             this.$Elm = new Element( 'div', {
                 'class' : 'qui-package-translator-import box smooth',
-                html : '<h1>Import von Übersetzungsdateien</h1>' +
+                html : '<h1>'+ QUI.Locale.get( 'package/translator', 'import.window.title' ) +'</h1>' +
                        '<div class="description">' +
-                           '<p>Importieren Sie Übersetzungsdateien schnell und einfach.</p>' +
-                           '<p>Laden Sie eine Datei per Drag and Drop oder Uploadformular hoch.</p>' +
-                           '<p>Diese Datei wird nach Übersetzungsvariablen durchsucht und in das System importiert.</p>' +
+                           QUI.Locale.get( 'package/translator', 'import.window.text' ) +
                        '</div>' +
                        '<div class="qui-package-translator-upload"></div>'
             });
@@ -96,7 +94,12 @@ define('package/quiqqer/translator/bin/Import', [
                         }
 
                         var entry;
-                        var message = '<p>Folgende Variablen wurden erfolgreich importiert: </p><ul>';
+                        var message = '<p>' +
+                                      QUI.Locale.get(
+                                          'package/translator',
+                                          'message.import.success'
+                                      ) +
+                                      ': </p><ul>';
 
                         for ( var i = 0, len = result.length; i < len; i++ )
                         {
@@ -135,7 +138,10 @@ define('package/quiqqer/translator/bin/Import', [
                 new Element('div', {
                     html : '<input type="checkbox" name="overwrite" id="overwrite+'+ this.getId() +'" checked="checked" />' +
                            '<label for="overwrite+'+ this.getId() +'">' +
-                               'Original Übersetzungen überschreiben.' +
+                               QUI.Locale.get(
+                                   'package/translator',
+                                   'import.window.text.debug.overwrite.vars'
+                               ) +
                            '</label>',
                     styles : {
                         'float' : 'left',
@@ -157,7 +163,7 @@ define('package/quiqqer/translator/bin/Import', [
 
             // Send
             new QUI.controls.buttons.Button({
-                text   : 'Datei importieren',
+                text   : QUI.Locale.get( 'package/translator', 'import.window.btn.upload' ),
                 textimage : URL_BIN_DIR +'16x16/upload.png',
                 Form   : Form,
                 styles : {

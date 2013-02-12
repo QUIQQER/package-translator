@@ -12,7 +12,10 @@ function package_quiqqer_translator_ajax_file_import($File, $overwrite)
     if ( !$File->getAttribute( 'filepath' ) )
     {
         \QUI::getMessagesHandler()->addError(
-        	'Datei konnte nicht gelesen werden'
+        	\QUI::getLocale()->get(
+        		'package/translator',
+        		'exception.file.could.not.read'
+        	)
         );
 
         return;

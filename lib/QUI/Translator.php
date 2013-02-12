@@ -33,8 +33,14 @@ class Translator
      */
     static function addLang($lang)
     {
-        if ( strlen( $lang ) !== 2 ) {
-            throw new \QException( 'Sprachkürzel nicht erlaubt' );
+        if ( strlen( $lang ) !== 2 )
+        {
+            throw new \QException(
+                \QUI::getLocale()->get(
+                	'package/translator',
+                	'exception.lang.shortcut.not.allowed'
+                )
+            );
         }
 
         \QUI::getDB()->createTableFields(
@@ -136,8 +142,14 @@ class Translator
      */
     static function import($file, $update_edit_fields=true)
     {
-        if ( !file_exists( $file ) ) {
-            throw new \QException( 'Übersetzungsdatei existiert nicht.' );
+        if ( !file_exists( $file ) )
+        {
+            throw new \QException(
+                \QUI::getLocale()->get(
+                    'package/translator',
+                    'exception.lang.file.not.exist'
+                )
+            );
         }
 
         $locales = \Utils_Xml::getLocaleGroupsFromDom(
@@ -511,7 +523,10 @@ class Translator
         if ( empty( $var ) || empty( $group ) )
         {
             throw new \QException(
-            	'Übersetzungsvariable konnte nicht angelegt werden. Gruppe oder Variablenname ist leer'
+                \QUI::getLocale()->get(
+                    'package/translator',
+                    'exception.empty.var.group'
+                )
             );
         }
 
@@ -520,7 +535,10 @@ class Translator
         if ( isset( $result[0] ) )
         {
             throw new \QException(
-            	'Übersetzungsvariable konnte nicht angelegt werden, diese Variable existiert bereits.'
+            	\QUI::getLocale()->get(
+            	    'package/translator',
+            	    'exception.var.exists'
+            	)
             );
         }
 

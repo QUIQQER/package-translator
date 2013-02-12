@@ -13,7 +13,9 @@ function package_quiqqer_translator_ajax_update($groups, $data)
     if ( !isset( $data['var'] ) )
     {
         throw new QException(
-        	'Übersetzung wurde nicht gefunden und konnt nicht aktualisiert werden',
+            \QUI::getLocale()->get(
+            	'package/tranlator', 'exception.translation.not.found.update'
+            ),
             404
         );
     }
@@ -23,7 +25,9 @@ function package_quiqqer_translator_ajax_update($groups, $data)
     if ( !isset( $result[0] ) )
     {
         throw new QException(
-        	'Übersetzung wurde nicht gefunden und konnt nicht aktualisiert werden',
+            \QUI::getLocale()->get(
+            	'package/tranlator', 'exception.translation.not.found.update'
+            ),
             404
         );
     }
@@ -32,7 +36,10 @@ function package_quiqqer_translator_ajax_update($groups, $data)
     \QUI\Translator::edit( $groups, $data['var'], $data );
 
     \QUI::getMessagesHandler()->addSuccess(
-        'Übersetzung wurde erfolgreich gespeichert'
+        \QUI::getLocale()->get(
+            'package/translator',
+            'message.translation.update.successful'
+        )
     );
 }
 

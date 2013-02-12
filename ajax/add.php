@@ -11,7 +11,14 @@ function package_quiqqer_translator_ajax_add($groups, $var)
     \QUI\Translator::add( $groups, $var );
 
     \QUI::getMessagesHandler()->addSuccess(
-    	'Variable '. $groups .' '. $var .' wurde erfolgreich hinzugefügt'
+    	\QUI::getLocale()->get(
+    		'package/translator',
+    		'message.var.add.successful',
+    	    array(
+                'groups' => $groups,
+    			'var'    => $var
+    	    )
+	    )
     );
 }
 

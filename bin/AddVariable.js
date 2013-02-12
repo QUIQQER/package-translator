@@ -23,23 +23,25 @@ define('package/quiqqer/translator/bin/AddVariable', [
             width  : 560,
             height : 200,
             group  : group,
-            title  : 'Variable hinzufügen: '+ group,
+            title  : QUI.Locale.get('package/translator', 'add.window.title', {
+                group : group
+            }),
             Translator  : Translator,
-            information : '<p>Fügen Sie eine neue Variable in die Gruppe <b>'+ group +'</b> für die Übersetzung hinzu.</p>' +
-                          '<p>Wenn Sie enter drücken oder auf den OK Button klicken wird die Variable angelegt und Sie können eine weitere Variable hinzufügen</p>',
-
+            information : QUI.Locale.get('package/translator', 'add.window.text', {
+                group : group
+            }),
             // no autoclose
             check  : function() {
                 return false;
             },
 
             cancel_button : {
-                text : 'schließen',
+                text      : QUI.Locale.get('package/translator', 'add.window.btn.close'),
                 textimage : URL_BIN_DIR +'16x16/cancel.png'
             },
 
             ok_button : {
-                text : 'hinzufügen',
+                text      : QUI.Locale.get('package/translator', 'add.window.btn.add'),
                 textimage : URL_BIN_DIR +'16x16/add.png'
             },
 

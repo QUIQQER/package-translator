@@ -1,15 +1,211 @@
 <locales>
-	<groups name="package/translator" define="tools/wortdepot/lang/de" type="js">
-	    <locale name="var.demo1">
-	        <de><![CDATA[Deutscher Text]]></de>
-	        <en><![CDATA[Englischer Text]]></en>
+	<groups name="package/translator" type="js">
+	    <locale name="add.window.title">
+            <de><![CDATA[Variable hinzufügen:[group]]]></de>
+            <en><![CDATA[Add Variable: [group]]]></en>
+        </locale>
+	    <locale name="add.window.text">
+	        <de><![CDATA[
+                <p>Fügen Sie eine neue Variable in die Gruppe <b>[group]</b> für die Übersetzung hinzu.</p>
+                <p>Wenn Sie enter drücken oder auf den OK Button klicken wird die Variable angelegt und Sie können eine weitere Variable hinzufügen</p>
+            ]]></de>
+	        <en><![CDATA[]]></en>
 	    </locale>
+	    <locale name="add.window.btn.close">
+            <de><![CDATA[schließen]]></de>
+            <en><![CDATA[close]]></en>
+        </locale>
+        <locale name="add.window.btn.add">
+            <de><![CDATA[hinzufügen]]></de>
+            <en><![CDATA[add]]></en>
+        </locale>
+
+        <locale name="del.window.text">
+            <de><![CDATA[Möchten Sie folgende Element wirklich löschen:]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="del.window.title">
+            <de><![CDATA[Übersetzungen löschen]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="del.window.text.information">
+            <de><![CDATA[Die Elemente sind unwiederruflich gelöscht.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
+        <locale name="import.window.title">
+            <de><![CDATA[Import von Übersetzungsdateien]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="import.window.text">
+            <de><![CDATA[
+                <p>Importieren Sie Übersetzungsdateien schnell und einfach.</p>
+                <p>Laden Sie eine Datei per Drag and Drop oder Uploadformular hoch.</p>
+                <p>Diese Datei wird nach Übersetzungsvariablen durchsucht und in das System importiert.</p>
+            ]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="import.window.text.debug.overwrite.vars">
+            <de><![CDATA[Original Übersetzungen überschreiben.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="import.window.btn.upload">
+            <de><![CDATA[Datei importieren]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="panel.title">
+            <de><![CDATA[Übersetzer]]></de>
+            <en><![CDATA[Translator]]></en>
+        </locale>
+        <locale name="export.window.title">
+            <de><![CDATA[Übersetzungen exportieren]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="export.window.text">
+            <de><![CDATA[Wie möchten Sie exportieren?]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="export.window.option.orig">
+            <de><![CDATA[Nur die original Übersetzungen exportieren]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="export.window.option.edit">
+            <de><![CDATA[Nur die editierten Übersetzungen exportieren]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
+        <locale name="grid.title.variable">
+            <de><![CDATA[Variable]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="grid.title.group">
+            <de><![CDATA[Gruppe]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="grid.title.type">
+            <de><![CDATA[Typ]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="grid.title.define">
+            <de><![CDATA[Define]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="btn.add.var.text">
+            <de><![CDATA[Variable(n) hinzufügen]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="btn.del.var.text">
+            <de><![CDATA[Variable(n) löschen]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
+        <locale name="btn.search.sheet.text">
+            <de><![CDATA[Suche starten]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="btn.search.title">
+            <de><![CDATA[Übersetzer durchsuchen]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="btn.search.alt">
+            <de><![CDATA[Übersetzer durchsuchen]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="btn.import.text">
+            <de><![CDATA[Import]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="btn.export.text">
+            <de><![CDATA[Export]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="btn.publish.text">
+            <de><![CDATA[Veröffentlichen]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="search.params.active">
+            <de><![CDATA[Sucheparameter sind aktiviert. Klicken Sie hier um die Suche zu beenden]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
+
+        <locale name="message.import.success">
+            <de><![CDATA[Folgende Variablen wurden erfolgreich importiert]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
 	</groups>
 
 	<groups name="package/translator" type="php">
-	    <locale name="var.demo1">
-	        <de><![CDATA[Deutscher Text]]></de>
-	        <en><![CDATA[Englischer Text]]></en>
+
+	    <locale name="exception.file.could.not.read">
+	        <de><![CDATA[Datei konnte nicht gelesen werden.]]></de>
+	        <en><![CDATA[]]></en>
 	    </locale>
+	    <locale name="exception.translation.not.found.update">
+            <de><![CDATA[Übersetzung wurde nicht gefunden und konnt nicht aktualisiert werden.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="exception.lang.shortcut.not.allowed">
+            <de><![CDATA[Sprachkürzel nicht erlaubt]]></de>
+            <en><![CDATA[Lang shortcut not allowed]]></en>
+        </locale>
+        <locale name="exception.lang.file.not.exist">
+            <de><![CDATA[Übersetzungsdatei existiert nicht.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="exception.empty.var.group">
+            <de><![CDATA[Übersetzungsvariable konnte nicht angelegt werden. Gruppe oder Variablenname ist leer]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="exception.var.exists">
+            <de><![CDATA[Übersetzungsvariable konnte nicht angelegt werden, diese Variable existiert bereits.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
+	    <locale name="message.var.add.successful">
+            <de><![CDATA[Variable [groups] [var] wurde erfolgreich hinzugefügt.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="message.translation.delet.successful">
+            <de><![CDATA[Variable [groups] [var] wurde erfolgreich gelöscht.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="message.translation.update.successful">
+            <de><![CDATA[Übersetzung wurde erfolgreich gespeichert.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
+        <locale name="template.search.to.title">
+            <de><![CDATA[Suche nach:]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="template.search.in.title">
+            <de><![CDATA[Suche in:]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="template.search.lang.title">
+            <de><![CDATA[Sprachen:]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
+        <locale name="template.search.groups">
+            <de><![CDATA[Gruppen]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="template.search.vars">
+            <de><![CDATA[Variablen]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="template.search.datatype">
+            <de><![CDATA[Daten-Typ]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="template.search.datadefine">
+            <de><![CDATA[Define]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+
+
 	</groups>
 </locales>

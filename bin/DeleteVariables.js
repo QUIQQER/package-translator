@@ -21,7 +21,7 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
         var group = Translator.getTranslationGroup(),
             Grid  = Translator.getGrid(),
 
-            message = 'Möchten Sie folgende Element wirklich löschen:'+
+            message = QUI.Locale.get( 'package/translator', 'del.window.text' ) +
                       '<ul style="margin-top: 10px">';
 
         for ( i = 0, len = data.length; i < len; i++ ) {
@@ -32,7 +32,7 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
 
         new QUI.controls.windows.Submit({
             name   : 'del_sel_items',
-            title  : 'Übersetzungen löschen',
+            title  : QUI.Locale.get( 'package/translator', 'del.window.title' ),
             icon   : URL_BIN_DIR +'16x16/trashcan_empty.png',
             width  : 500,
             height : 200,
@@ -40,7 +40,11 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
             data   : data,
             Translator  : Translator,
             textIcon    : URL_BIN_DIR +'32x32/trashcan_empty.png',
-            information : 'Die Elemente sind unwiederruflich gelöscht.',
+
+            information : QUI.Locale.get(
+                'package/translator',
+                'del.window.text.information'
+            ),
 
             events :
             {
