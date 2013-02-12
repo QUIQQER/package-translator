@@ -1,15 +1,15 @@
+<locales>
+	<groups name="package/translator" define="tools/wortdepot/lang/de" type="js">
+	    <locale name="var.demo1">
+	        <de><![CDATA[Deutscher Text]]></de>
+	        <en><![CDATA[Englischer Text]]></en>
+	    </locale>
+	</groups>
 
-<groups name="package/translator" define="tools/wortdepot/lang/de" type="js">
-    <locale name="var.demo1">
-        <de><![CDATA[Deutscher Text]]></de>
-        <en><![CDATA[Englischer Text]]></en>
-    </locale>
-</groups>
-
-
-<groups name="package/translator" type="php">
-    <locale name="var.demo1">
-        <de><![CDATA[Deutscher Text]]></de>
-        <en><![CDATA[Englischer Text]]></en>
-    </locale>
-</groups>
+	<groups name="package/translator" type="php">
+	    <locale name="var.demo1">
+	        <de><![CDATA[Deutscher Text]]></de>
+	        <en><![CDATA[Englischer Text]]></en>
+	    </locale>
+	</groups>
+</locales>
