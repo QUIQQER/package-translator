@@ -1,0 +1,38 @@
+
+<form name="translater-search" class="qui-translater-search-form" method="post">
+    {title text="Suche nach:"}
+    <div class="data-table">
+        <input type="text" value="" name="search" class="qui-translater-search-field" />
+    </div>
+
+    {title text="Suche in:"}
+    <div class="data-table">
+        <div class="checkbox-container">
+            <input type="checkbox" value="" name="groups" />
+            <label for="groups">Gruppen</label>
+        </div>
+        <div class="checkbox-container">
+            <input type="checkbox" value="" name="var" />
+            <label for="var">Variablen</label>
+        </div>
+        <div class="checkbox-container">
+            <input type="checkbox" value="" name="datatype" />
+            <label for="datatype">Daten-Typ</label>
+        </div>
+        <div class="checkbox-container">
+            <input type="checkbox" value="" name="datadefine" />
+            <label for="datadefine">Define</label>
+        </div>
+    </div>
+
+    {title text="Sprachen:"}
+    <div class="data-table">
+        {foreach from=$languages item=lang}
+        <div class="checkbox-container">
+            <input type="checkbox" value="{$lang}" name="lang" />
+            <label for="lang">{$lang}</label>
+        </div>
+        {/foreach}
+    </div>
+
+</form>

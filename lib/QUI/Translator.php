@@ -13,26 +13,18 @@ namespace QUI;
  *
  * @author www.pcsg.de (Henning Leutz)
  * @package com.pcsg.qui.locale
+ *
+ * mysql fix for old dev version
+ *
+ 	UPDATE translate
+    SET groups = REPLACE(groups, '\'', '') WHERE 1;
+    UPDATE translate
+    SET var = REPLACE(var, '\'', '') WHERE 1
  */
 
 class Translator
 {
     const TABLE = 'translate';
-
-    /**
-     * Setup - Übersetzungstabellen erstellen
-     */
-    static function setup()
-    {
-        \QUI::getDB()->createTableFields(self::TABLE, array(
-             'groups'  => 'varchar(128) NOT NULL',
-             'var'     => 'varchar(255) NOT NULL',
-             'de'      => 'text NOT NULL',
-             'de_edit' => 'text NULL'
-        ));
-
-        \QUI::getDB()->setIndex( self::TABLE, 'groups' );
-    }
 
     /**
      * Add / create a new language
@@ -41,44 +33,93 @@ class Translator
      */
     static function addLang($lang)
     {
-        if (strlen($lang) !== 2) {
-            throw new \QException('Sprachkürzel nicht erlaubt');
+        if ( strlen( $lang ) !== 2 ) {
+            throw new \QException( 'Sprachkürzel nicht erlaubt' );
         }
 
-        \QUI::getDB()->createTableFields(self::TABLE, array(
-             $lang          => 'text NOT NULL',
-             $lang .'_edit' => 'text NULL'
-        ));
+        \QUI::getDB()->createTableFields(
+            \QUI::getDBTableName( self::TABLE ),
+            array(
+                $lang          => 'text NOT NULL',
+                $lang .'_edit' => 'text NULL'
+            )
+        );
     }
 
     /**
      * Export a locale group as xml
      *
-     * @param String $groups - which group should be exported?
+     * @param String $group - which group should be exported?
+     * @param Bool $edit    - Eport edit fields or original? standard=true
      * @return String
      */
-    static function export($groups)
+    static function export($group, $edit=true)
     {
-        $group   = \Utils_Security_Orthos::clearMySQL($groups);
-        $entries = self::get($groups);
+        $entries = self::get( $group );
+        $pool    = array();
 
-        $result = '<groups name="'. $group .'">'."\n";
-
-        foreach ($entries as $entry)
+        foreach ( $entries as $entry )
         {
-            $result .= "\t".'<locale name="'. $entry['var'] .'">'."\n";
+            $type   = 'php';
+            $define = $group;
 
-            unset($entry['groups']);
-            unset($entry['var']);
-
-            foreach ($entry as $lang => $translation) {
-                $result .= "\t\t".'<'. $lang .'><![CDATA['. $translation .']]></'. $lang .'>'."\n";
+            if ( isset( $entry['datatype'] ) && !empty( $entry['datatype'] ) ) {
+                $type = $entry['datatype'];
             }
 
-            $result .= "\t".'</locale>'."\n";
+            if ( isset( $entry['datadefine'] ) && !empty( $entry['datadefine'] ) ) {
+                $define = $entry['datadefine'];
+            }
+
+            $pool[ $type ][ $define ][] = $entry;
         }
 
-        $result .= '</groups>'."\n";
+        $result = '';
+
+
+        foreach ( $pool as $type => $groups )
+        {
+            foreach ( $groups as $define => $entries )
+            {
+                $result .= '<groups name="'. $group .'" type="'. $type .'"';
+
+                if ( $define != $group ) {
+                    $result .= ' define="'. $define .'"';
+                }
+
+                $result .= '>'."\n";
+
+                foreach ( $entries as $entry )
+                {
+                    $result .= "\t".'<locale name="'. $entry['var'] .'">'."\n";
+
+                    foreach ( $entry as $lang => $translation )
+                    {
+                        if ( strlen( $lang ) == 2 )
+                        {
+                            if ( $edit &&
+                                 isset( $entry[ $lang .'_edit' ] ) &&
+                                 !empty( $entry[ $lang .'_edit' ] ))
+                            {
+                                $result .= "\t\t".'<'. $lang .'>';
+                                $result .= '<![CDATA['. $entry[ $lang. '_edit' ] .']]>';
+                                $result .= '</'. $lang .'>'."\n";
+
+                                continue;
+                            }
+
+                            $result .= "\t\t".'<'. $lang .'>';
+                            $result .= '<![CDATA['. $translation .']]>';
+                            $result .= '</'. $lang .'>'."\n";
+                        }
+                    }
+
+                    $result .= "\t".'</locale>'."\n";
+                }
+
+                $result .= '</groups>'."\n";
+            }
+        }
 
         return $result;
     }
@@ -86,36 +127,63 @@ class Translator
     /**
      * Import a locale xml file
      *
-     * @param String $file - path to the file
+     * @param String $file     - path to the file
+     * @param Bool $update_edit_fields - if true, the _edit fields would be updated
+     * 									 if false, the original fields would be updated
+     *
+     * @return Array - List of imported vars
      * @throws QException
      */
-    static function import($file)
+    static function import($file, $update_edit_fields=true)
     {
-        if (!file_exists($file)) {
-            throw new \QException('Übersetzungsdatei existiert nicht.');
+        if ( !file_exists( $file ) ) {
+            throw new \QException( 'Übersetzungsdatei existiert nicht.' );
         }
 
         $locales = \Utils_Xml::getLocaleGroupsFromDom(
             \Utils_Xml::getDomFromXml( $file )
         );
 
-        $group = $locales['group'];
+        $group  = $locales['group'];
+        $result = array();
 
-        foreach ($locales['locales'] as $locale)
+        foreach ( $locales['locales'] as $locale )
         {
             $var = $locale['name'];
-            unset($locale['name']);
+            unset( $locale['name'] );
 
             try
             {
-                self::add($group, $var);
+                self::add( $group, $var );
             } catch ( \QException $e )
             {
 
             }
 
-            self::update($group, $var, $locale);
+            // update only in the _edit fields
+            if ( $update_edit_fields )
+            {
+                $_locale = array();
+
+                foreach ( $locale as $key => $entry ) {
+                    $_locale[ $key.'_edit' ] = $entry;
+                }
+
+                self::edit( $group, $var, $_locale );
+            } else
+            {
+                // set the original fields
+                self::update( $group, $var, $locale );
+            }
+
+            $result[] = array(
+                'group'  => $group,
+            	'var'    => $var,
+                'locale' => $locale
+            );
         }
+
+        return $result;
     }
 
     /**
@@ -141,10 +209,54 @@ class Translator
     }
 
     /**
-     * Übersetzungsdateien für das Locale Objekt erstellen
+     * remove all dublicate entres from the translation table
+     *
+     * because:
+     * #1071 - Specified key was too long; max key length is 1000 bytes
+     *
+     * we cannot use unique keys :/
+     */
+    static function cleanup()
+    {
+        $PDO       = \QUI::getDataBase()->getPDO();
+        $bad_table = \QUI::getDBTableName( self::TABLE );
+
+        // check if dublicate entries exist
+        $Statement = $PDO->prepare(
+            'SELECT `groups`, `var`
+            FROM '. $bad_table .'
+            GROUP BY `groups`, `var`
+            HAVING count( * ) > 1'
+        );
+
+        $Statement->execute();
+
+        if ( !$Statement->fetch() ) {
+            return;
+        }
+
+        $Statement = $PDO->prepare(
+        	'CREATE TEMPORARY TABLE bad_temp_translation AS
+        	SELECT DISTINCT * FROM '. $bad_table
+        );
+        $Statement->execute();
+
+        $Statement = $PDO->prepare( 'DELETE FROM '. $bad_table );
+        $Statement->execute();
+
+        $Statement = $PDO->prepare( 'INSERT INTO '. $bad_table .' SELECT * FROM bad_temp_translation' );
+        $Statement->execute();
+    }
+
+    /**
+     * Create the locale files
      */
     static function create()
     {
+        // first step, a cleanup
+        // so we get no errors in gettext
+        self::cleanup();
+
         $langs = self::langs();
         $dir   = self::dir();
 
@@ -152,18 +264,21 @@ class Translator
         $folders    = array();
         $exec_error = array();
 
-        foreach ($langs as $lang)
+        foreach ( $langs as $lang )
         {
-            $folders[ $lang ] = $dir .'/'. \Utils_String::toLower($lang) .'_'. \Utils_String::toUpper($lang) .'/LC_MESSAGES/';
+            $folders[ $lang ] = $dir .'/'. \Utils_String::toLower($lang) .
+            						  '_'. \Utils_String::toUpper($lang) .
+            						  '/LC_MESSAGES/';
 
-            \Utils_System_File::unlink($folders[ $lang ]);
+            \Utils_System_File::unlink( $folders[ $lang ] );
             \Utils_System_File::mkdir( $folders[ $lang ] );
         }
 
+
         // Sprachdateien erstellen
-        foreach ($langs as $lang)
+        foreach ( $langs as $lang )
         {
-            if (strlen($lang) !== 2) {
+            if ( strlen( $lang ) !== 2 ) {
                 continue;
             }
 
@@ -171,61 +286,64 @@ class Translator
                 'select' => array(
                     $lang, $lang .'_edit', 'groups', 'var'
                 ),
-                'from' => self::TABLE
+                'from' => \QUI::getDBTableName( self::TABLE )
             ));
 
-            foreach ($result as $entry)
+            foreach ( $result as $entry )
             {
                 $value = $entry[ $lang ];
 
-                if (isset($entry[ $lang.'_edit' ]) && !empty($entry[ $lang.'_edit' ])) {
+                if ( isset( $entry[ $lang.'_edit' ] ) &&
+                     !empty( $entry[ $lang.'_edit' ]) )
+                {
                     $value = $entry[ $lang.'_edit' ]; // benutzer übersetzung
                 }
 
-                $value = str_replace('\\', '\\\\', $value);
-                $value = str_replace('"', '\"', $value);
-                $value = nl2br($value);
-                $value = str_replace("\n", '', $value);
+                $value = str_replace( '\\', '\\\\', $value );
+                $value = str_replace( '"', '\"', $value );
+                $value = nl2br( $value );
+                $value = str_replace( "\n", '', $value );
 
-                if ($value !== '' && $value !== ' ') {
-                    $value = trim($value);
+                if ( $value !== '' && $value !== ' ' ) {
+                    $value = trim( $value );
                 }
 
                 // ini Datei
-                $ini     = $folders[ $lang ] . str_replace('/', '_', $entry['groups']) .'.ini';
+                $ini     = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.ini';
                 $ini_str = $entry['var'] .'= "'. $value .'"';
 
-                \Utils_System_File::mkfile($ini);
-                \Utils_System_File::putLineToFile($ini, $ini_str);
+                \Utils_System_File::mkfile( $ini );
+                \Utils_System_File::putLineToFile( $ini, $ini_str );
 
                 // po (gettext) datei
-                $po = $folders[ $lang ] . str_replace('/', '_', $entry['groups']) .'.po';
-                $mo = $folders[ $lang ] . str_replace('/', '_', $entry['groups']) .'.mo';
+                $po = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.po';
+                $mo = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.mo';
 
                 \Utils_System_File::mkfile($po);
 
-                \Utils_System_File::putLineToFile($po, 'msgid "'. $entry['var'] .'"');
-                \Utils_System_File::putLineToFile($po, 'msgstr "'. $value .'"');
-                \Utils_System_File::putLineToFile($po, '');
+                \Utils_System_File::putLineToFile( $po, 'msgid "'. $entry['var'] .'"' );
+                \Utils_System_File::putLineToFile( $po, 'msgstr "'. $value .'"' );
+                \Utils_System_File::putLineToFile( $po, '' );
             }
 
             // alle .po dateien einlesen und in mo umwandeln
-            if (function_exists('gettext')) //@todo getText über Config ein ud ausschaltbar machen
+            if ( function_exists( 'gettext' ) ) //@todo getText über Config ein und ausschaltbar machen
             {
-                $po_files = \Utils_System_File::readDir($folders[ $lang ]);
+                $po_files = \Utils_System_File::readDir( $folders[ $lang ] );
 
-                foreach ($po_files as $po_file)
+                foreach ( $po_files as $po_file )
                 {
-                    if (substr($po_file, -3) == '.po'){
-                       exec( \Utils_Security_Orthos::clearShell('msgfmt '. $folders[ $lang ]. $po_file .' -o '. $folders[ $lang ]. substr($po_file, 0,-3).'.mo' ). ' 2>&1',$exec_error);
-
+                    if ( substr( $po_file, -3 ) == '.po' )
+                    {
+                        $exec = 'msgfmt '. $folders[ $lang ]. $po_file .' -o '. $folders[ $lang ] . substr( $po_file, 0,-3 ).'.mo' ;
+                        exec( \Utils_Security_Orthos::clearShell( $exec ) .' 2>&1', $exec_error );
                     }
                 }
             }
         }
 
-        if (!empty($exec_error)) { // @todo nicht in error log schreiben sondern an den Message Handler ins Admin übergeben
-            \System_Log::writeRecursive($exec_error);
+        if ( !empty( $exec_error ) ) {
+            \QUI::getMessagesHandler()->addError( $exec_error );
         }
     }
 
@@ -239,21 +357,21 @@ class Translator
      */
     static function get($group, $var=false)
     {
-        if (!$var)
+        if ( !$var )
         {
             return \QUI::getDB()->select(array(
-                'from' => self::TABLE,
+                'from' => \QUI::getDBTableName( self::TABLE ),
                 'where' => array(
-                    'groups' => \Utils_Security_Orthos::clearMySQL( $group )
+                    'groups' => $group
                 )
             ));
         }
 
         return \QUI::getDB()->select(array(
-            'from' => self::TABLE,
+            'from' => \QUI::getDBTableName( self::TABLE ),
             'where' => array(
-                'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
-                'var'    => \Utils_Security_Orthos::clearMySQL( $var )
+                'groups' => $group,
+                'var'    => $var
             )
         ));
     }
@@ -262,45 +380,95 @@ class Translator
      * Daten für die Tabelle bekommen
      *
      * @param String $groups - Gruppe
-     * @param Array $params  - optional (limit,
+     * @param Array $params  - optional array(limit => 10, page => 1)
+     * @param Array $search  - optional array(search => '%str%', fields => '')
      *
      * @return Array
      */
-    static function getData($groups, $params=array())
+    static function getData($groups, $params=array(), $search=false)
     {
         $max  = 10;
         $page = 1;
 
-        if (isset($params['limit'])) {
+        if ( isset( $params['limit'] ) ) {
             $max = (int)$params['limit'];
         }
 
-        if (isset($params['page'])) {
+        if ( isset( $params['page'] ) ) {
             $page = (int)$params['page'];
         }
 
         $page  = ($page - 1) ? $page - 1 : 0;
         $limit = ($page * $max) .','. $max;
 
-        $data = array(
-            'from' => self::TABLE,
-            'where' => array(
-                'groups' => \Utils_Security_Orthos::clearMySQL( $groups )
-            ),
-            'limit' => $limit
-        );
+        if ( $search && isset( $search['search'] ) )
+        {
+            $where  = array();
+            $search = array(
+                'type'  => '%LIKE%',
+                'value' => $search['search']
+            );
+
+            $db_fields = self::langs();
+
+            // default fields
+            $default = array(
+            	'groups'     => $search,
+            	'var'        => $search,
+            	'datatype'   => $search,
+            	'datadefine' => $search
+            );
+
+            foreach ( $db_fields as $lang )
+            {
+                if ( strlen( $lang ) == 2 ) {
+                    $default[ $lang ] = $search;
+                }
+            }
+
+            // search
+            if ( !isset( $search['fields'] ) || empty( $search['fields'] ) ) {
+                $fields = array();
+            }
+
+            foreach ( $fields as $field )
+            {
+                if ( isset( $default[ $field ] ) ) {
+                    $where[ $field ] = $search;
+                }
+            }
+
+            if ( empty( $where ) ) {
+                $where = $default;
+            }
+
+            $data = array(
+                'from'     => \QUI::getDBTableName( self::TABLE ),
+                'where_or' => $where,
+                'limit'    => $limit
+            );
+        } else
+        {
+            $data = array(
+                'from' => \QUI::getDBTableName( self::TABLE ),
+                'where' => array(
+                    'groups' => $groups
+                ),
+                'limit' => $limit
+            );
+        }
 
         // result mit limit
-        $result = \QUI::getDB()->select($data);
+        $result = \QUI::getDB()->select( $data );
 
         // count
         $data['count'] = 'groups';
 
-        if (isset($data['limit'])) {
+        if ( isset( $data['limit'] ) ) {
             unset($data['limit']);
         }
 
-        $count = \QUI::getDB()->select($data);
+        $count = \QUI::getDB()->select( $data );
 
         return array(
             'data'  => $result,
@@ -319,7 +487,7 @@ class Translator
     {
         $result = \QUI::getDB()->select(array(
             'select' => 'groups',
-            'from'   => self::TABLE,
+            'from'   => \QUI::getDBTableName( self::TABLE ),
             'group'  => 'groups'
         ));
 
@@ -340,21 +508,27 @@ class Translator
      */
     static function add($group, $var)
     {
-        if (empty($var) || empty($group)) {
-            throw new \QException('Übersetzungsvariable konnte nicht angelegt werden.');
+        if ( empty( $var ) || empty( $group ) )
+        {
+            throw new \QException(
+            	'Übersetzungsvariable konnte nicht angelegt werden. Gruppe oder Variablenname ist leer'
+            );
         }
 
-        $result = self::get($group, $var);
+        $result = self::get( $group, $var );
 
-        if (isset($result[0])) {
-            throw new \QException('Übersetzungsvariable konnte nicht angelegt werden, diese Variable existiert bereits.');
+        if ( isset( $result[0] ) )
+        {
+            throw new \QException(
+            	'Übersetzungsvariable konnte nicht angelegt werden, diese Variable existiert bereits.'
+            );
         }
 
         \QUI::getDB()->addData(
-            self::TABLE,
+            \QUI::getDBTableName( self::TABLE ),
             array(
-                'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
-                'var'    => \Utils_Security_Orthos::clearMySQL( $var )
+                'groups' => $group,
+                'var'    => $var
             )
         );
     }
@@ -371,21 +545,21 @@ class Translator
         $langs = self::langs();
         $_data = array();
 
-        foreach ($langs as $lang)
+        foreach ( $langs as $lang )
         {
-            if (!isset($data[ $lang ])) {
+            if ( !isset( $data[ $lang ] ) ) {
                 continue;
             }
 
-            $_data[ $lang ] = \Utils_Security_Orthos::clearMySQL($data[ $lang ], false);
+            $_data[ $lang ] = $data[ $lang ];
         }
 
         \QUI::getDB()->updateData(
-            self::TABLE,
+            \QUI::getDBTableName( self::TABLE ),
             $_data,
             array(
-                'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
-                'var'    => \Utils_Security_Orthos::clearMySQL( $var )
+                'groups' => $group,
+                'var'    => $var
             )
         );
     }
@@ -393,32 +567,53 @@ class Translator
     /**
      * User Edit
      *
-     * @param unknown_type $group
-     * @param unknown_type $var
-     * @param unknown_type $data
+     * @param String $group
+     * @param String $var
+     * @param String $data
      */
     static function edit($group, $var, $data)
     {
         $langs = self::langs();
         $_data = array();
 
-        foreach ($langs as $lang)
+        $development = \QUI::conf( 'globals', 'development' );
+
+        foreach ( $langs as $lang )
         {
-            if (!isset($data[ $lang ])) {
+            if ( $development )
+            {
+                if ( isset( $data[ $lang ] ) ) {
+                    $_data[ $lang ] = $data[ $lang ];
+                }
+
+                if ( isset( $data[ $lang .'_edit' ] ) ) {
+                    $_data[ $lang .'_edit' ] = $data[ $lang .'_edit' ];
+                }
+
                 continue;
             }
 
-            if (strlen($lang) === 2) {
-                $_data[ $lang .'_edit' ] = \Utils_Security_Orthos::clearMySQL($data[ $lang ], false);
+            if ( !isset( $data[ $lang ] ) ) {
+                continue;
             }
+
+            $_data[ $lang .'_edit' ] = $data[ $lang ];
+        }
+
+        if ( isset( $data[ 'datatype' ] ) ) {
+            $_data[ 'datatype' ] = $data[ 'datatype' ];
+        }
+
+        if ( isset( $data[ 'datadefine' ] ) ) {
+            $_data[ 'datadefine' ] = $data[ 'datadefine' ];
         }
 
         \QUI::getDB()->updateData(
-            self::TABLE,
+            \QUI::getDBTableName( self::TABLE ),
             $_data,
             array(
-                'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
-                'var'    => \Utils_Security_Orthos::clearMySQL( $var )
+                'groups' => $group,
+                'var'    => $var
             )
         );
     }
@@ -431,10 +626,13 @@ class Translator
      */
     static function delete($group, $var)
     {
-        \QUI::getDB()->deleteData(self::TABLE, array(
-            'groups' => \Utils_Security_Orthos::clearMySQL( $group ),
-            'var'    => \Utils_Security_Orthos::clearMySQL( $var )
-        ));
+        \QUI::getDB()->deleteData(
+            \QUI::getDBTableName( self::TABLE ),
+            array(
+                'groups' => $group,
+                'var'    => $var
+            )
+        );
     }
 
     /**
@@ -444,16 +642,31 @@ class Translator
 	 */
     static function langs()
     {
-        $fields = \QUI::getDB()->getFields(self::TABLE);
-        $langs  = array();
+        $fields = \QUI::getDB()->getFields(
+            \QUI::getDBTableName( self::TABLE )
+        );
 
-        foreach ($fields as $entry)
+        $langs = array();
+
+        foreach ( $fields as $entry )
         {
-            if ($entry == 'groups') {
+            if ( $entry == 'groups' ) {
                 continue;
             }
 
-            if ($entry == 'var') {
+            if ( $entry == 'var' ) {
+                continue;
+            }
+
+            if ( $entry == 'datatype' ) {
+                continue;
+            }
+
+            if ( $entry == 'datadefine' ) {
+                continue;
+            }
+
+            if ( strpos($entry, '_edit') !== false ) {
                 continue;
             }
 
@@ -470,12 +683,15 @@ class Translator
      */
     static function getNeedles()
     {
-        $fields = \QUI::getDB()->getFields(self::TABLE);
-        $langs  = array();
+        $fields = \QUI::getDB()->getFields(
+            \QUI::getDBTableName( self::TABLE )
+        );
 
-        foreach ($fields as $entry)
+        $langs = array();
+
+        foreach ( $fields as $entry )
         {
-            if ($entry == 'var' || $entry == 'groups') {
+            if ( $entry == 'var' || $entry == 'groups' ) {
                 continue;
             }
 
@@ -483,8 +699,8 @@ class Translator
         }
 
         $result = \QUI::getDB()->select(array(
-            'from'  => self::TABLE,
-            'where' => implode(' = "" OR ', $langs) .' = ""'
+            'from'  => \QUI::getDBTableName( self::TABLE ),
+            'where' => implode( ' = "" OR ', $langs ) .' = ""'
         ));
 
         return $result;
@@ -504,7 +720,7 @@ class Translator
      */
     static function getTBlocksFromString($string)
     {
-        if (strpos($string, '{/t}') === false) {
+        if ( strpos( $string, '{/t}' ) === false ) {
             return array();
         }
 
@@ -514,23 +730,23 @@ class Translator
 			'/{t([^}]*)}([^[{]*){\/t}/im',
 			function($params)
 			{
-                if (isset($params[1]) && !empty($params[1]))
+                if ( isset( $params[1] ) && !empty( $params[1] ) )
                 {
-                    $_params = explode(' ', trim($params[1]));
-                    $_params = str_replace(array('"', "'"), '', $_params);
+                    $_params = explode( ' ', trim( $params[1] ) );
+                    $_params = str_replace( array('"', "'"), '', $_params );
 
                     $group = '';
                     $var   = '';
 
-                    foreach ($_params as $param)
+                    foreach ( $_params as $param )
                     {
-                        $_param = explode('=', $param);
+                        $_param = explode( '=', $param );
 
-                        if ($_param[0] == 'groups') {
+                        if ( $_param[0] == 'groups' ) {
                             $group = $_param[1];
                         }
 
-                        if ($_param[0] == 'var') {
+                        if ( $_param[0] == 'var' ) {
                             $var = $_param[1];
                         }
                     }
@@ -543,10 +759,10 @@ class Translator
                     return;
                 }
 
-                $_param = explode(' ', $params[2]);
+                $_param = explode( ' ', $params[2] );
 
-                if (strpos($_param[0], '/') === false ||
-                    strpos($_param[1], ' ') !== false)
+                if ( strpos( $_param[0], '/') === false ||
+                     strpos( $_param[1], ' ') !== false )
                 {
                     \QUI\Translater::$_tmp[] = array(
                         'var' => $params[2]
@@ -572,8 +788,9 @@ class Translator
      */
     static function getLBlocksFromString($string)
     {
-    	if (strpos($string, '$L->get(') === false &&
-    		strpos($string, '$Locale->get(') === false) {
+    	if ( strpos( $string, '$L->get(' ) === false &&
+    		 strpos( $string, '$Locale->get(' ) === false)
+		{
     		return array();
     	}
 
@@ -583,9 +800,11 @@ class Translator
     		'/\$L(ocale)?->get\s*\(\s*\'([^)]*)\'\s*,\s*\'([^[)]*)\'\s*\)/im',
         	function($params)
         	{
-        		if (isset(	$params[2]) && !empty($params[2]) &&
-        					isset($params[3]) && !empty($params[3]) &&
-        					strpos($_param[2], '/') === false)
+        		if ( isset( $params[2] ) &&
+        		     isset( $params[3] ) &&
+        			 !empty( $params[2] ) &&
+        			 !empty( $params[3] ) &&
+        			 strpos( $_param[2], '/' ) === false )
         		{
     	    		\QUI\Translater::$_tmp[] = array(
         				'groups' => $params[2],
@@ -610,16 +829,16 @@ class Translator
     	// Doppelte Einträge löschen
     	$new_tmp = array();
 
-    	foreach($array as $tmp)
+    	foreach( $array as $tmp )
     	{
-    		if (!isset($new_tmp[$tmp['groups'].$tmp['var']])) {
-    			$new_tmp[$tmp['groups'].$tmp['var']] = $tmp;
+    		if ( !isset( $new_tmp[ $tmp['groups'] . $tmp['var'] ] ) ) {
+    			$new_tmp[ $tmp['groups'] . $tmp['var'] ] = $tmp;
     		}
     	}
 
     	$array = array();
 
-    	foreach ($new_tmp as $tmp) {
+    	foreach ( $new_tmp as $tmp ) {
     		$array[] = $tmp;
     	}
 

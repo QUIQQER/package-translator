@@ -1,15 +1,24 @@
 <?php
 
 /**
- * Eine Übersetzungsvariable hinzufügen
+ * Add a translation var
  *
  * @param String $groups
  * @param String $var
  */
-function ajax_translater_add($groups, $var)
+function package_quiqqer_translator_ajax_add($groups, $var)
 {
-    QUI_Locale_Translater::add($groups, $var);
+    \QUI\Translator::add( $groups, $var );
+
+    \QUI::getMessagesHandler()->addSuccess(
+    	'Variable '. $groups .' '. $var .' wurde erfolgreich hinzugefügt'
+    );
 }
-$ajax->register('ajax_translater_add', array('groups', 'var'));
+
+\QUI::$Ajax->register(
+	'package_quiqqer_translator_ajax_add',
+    array( 'groups', 'var' ),
+    'Permission::checkAdminUser'
+);
 
 ?>

@@ -14,8 +14,11 @@ define('package/quiqqer/translator/bin/Translator', [
 
 ], function(TranslatorPanel)
 {
-    // opens the panel
-    QUI.Controls.get( 'content-panel' )[0].appendChild(
-        new TranslatorPanel()
-    );
+    return function()
+    {
+        // opens the panel
+        QUI.Controls.get( 'content-panel' )[0].appendChild(
+            new TranslatorPanel()
+        );
+    };
 });

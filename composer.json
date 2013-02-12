@@ -2,7 +2,7 @@
 	"name" : "quiqqer/translator",
 	"description" : "QUIQQER Translator",
 	"tags" : ["quiqqer", "translator"],
-	"version" : "0.0.1",
+	"version" : "0.0.2",
 	"author" : [{
         "name": "Henning Leutz",
         "email": "leutz@pcsg.de",

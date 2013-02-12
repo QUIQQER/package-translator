@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database>
-    <table name="translate">
-        <field type="varchar(255)">groups</field>
-        <field type="varchar(255)">var</field>
-        <field type="text">de</field>
-        <field type="text">de_edit</field>
-        <field type="text">en</field>
-        <field type="text">en_edit</field>
-    </table>
+
+    <global>
+	    <table name="translate">
+	        <field type="varchar(255)">groups</field>
+	        <field type="varchar(255)">var</field>
+	        <field type="varchar(20)">datatype</field>
+	        <field type="varchar(200)">datadefine</field>
+	        <field type="text">de</field>
+	        <field type="text">de_edit</field>
+	        <field type="text">en</field>
+	        <field type="text">en_edit</field>
+	    </table>
+	</global>
+
 </database>

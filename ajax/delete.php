@@ -1,27 +1,43 @@
 <?php
 
 /**
- * Einen Eintrag löschen
+ * Deletes translations
  *
  * @param String $data - JSON Array
  */
-function ajax_translater_delete($data)
+function package_quiqqer_translator_ajax_delete($data)
 {
-    $data = json_decode($data, true);
+    $data = json_decode( $data, true );
 
-    foreach ($data as $entry)
+    if ( !is_array( $data ) ) {
+        return;
+    }
+
+    foreach ( $data as $entry )
     {
-        if (!isset($entry['groups'])) {
+        if ( !isset( $entry['groups'] ) ) {
             continue;
         }
 
-        if (!isset($entry['var'])) {
+        if ( !isset( $entry['var'] ) ) {
             continue;
         }
 
-        QUI_Locale_Translater::delete($entry['groups'], $entry['var']);
+        \QUI\Translator::delete(
+            $entry['groups'],
+            $entry['var']
+        );
+
+        \QUI::getMessagesHandler()->addSuccess(
+        	'Variable '. $entry['groups'] .' '. $entry['var'] .' wurde erfolgreich gelöscht'
+        );
     }
 }
-$ajax->register('ajax_translater_delete', array('data'));
+
+\QUI::$Ajax->register(
+	'package_quiqqer_translator_ajax_delete',
+    array( 'data' ),
+    'Permission::checkAdminUser'
+);
 
 ?>

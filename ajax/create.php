@@ -3,10 +3,19 @@
 /**
  * Übersetzungen erstellen
  */
-function ajax_translater_create()
+function package_quiqqer_translator_ajax_create()
 {
-    QUI_Locale_Translater::create();
+    \QUI\Translator::create();
+
+    \QUI::getMessagesHandler()->addSuccess(
+        'Übersetzungen wurden erfolgreich erstellt'
+    );
 }
-$ajax->register('ajax_translater_create');
+
+\QUI::$Ajax->register(
+	'package_quiqqer_translator_ajax_create',
+    false,
+    'Permission::checkAdminUser'
+);
 
 ?>
