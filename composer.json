@@ -1,5 +1,6 @@
 {
 	"name" : "quiqqer/translator",
+	"type" : "quiqqer-plugin",
 	"description" : "QUIQQER Translator",
 	"tags" : ["quiqqer", "translator"],
 	"version" : "0.0.2",
