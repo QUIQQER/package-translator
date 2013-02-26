@@ -3,7 +3,7 @@
 	"type" : "quiqqer-library",
 	"description" : "QUIQQER Translator",
 	"tags" : ["quiqqer", "translator"],
-	"version" : "0.0.2",
+	"version" : "0.0.3",
 	"author" : [{
         "name": "Henning Leutz",
         "email": "leutz@pcsg.de",
