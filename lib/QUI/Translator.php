@@ -152,6 +152,7 @@ class Translator
             );
         }
 
+        $result = array();
         $groups = \Utils_Xml::getLocaleGroupsFromDom(
             \Utils_Xml::getDomFromXml( $file )
         );
@@ -160,7 +161,6 @@ class Translator
         {
             $group    = $locales['group'];
             $datatype = '';
-            $result   = array();
 
             if ( isset( $locales['datatype'] ) ) {
                 $datatype = $locales['datatype'];
