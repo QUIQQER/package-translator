@@ -2,22 +2,19 @@
 	"name" : "quiqqer/translator",
 	"type" : "quiqqer-library",
 	"description" : "QUIQQER Translator",
-	"tags" : ["quiqqer", "translator"],
-	"version" : "0.0.3",
-	"author" : [{
+
+	"version" : "0.0.4",
+    "license" : "GPL-3.0+",
+
+	"authors" : [{
         "name": "Henning Leutz",
         "email": "leutz@pcsg.de",
         "homepage": "http://www.pcsg.de",
         "role": "Developer"
     }],
 
-	"repositories" : {
-        "type" : "git",
-      	"url"  : "ssh://git@rico/~/repositories/packages/translator.git"
-    },
-
-    "bugs" : {
-        "url" : "http://bugs.quiqqer.com/translator"
+    "support" : {
+        "email" : "support@pcsg.de"
     },
 
     "require": {
