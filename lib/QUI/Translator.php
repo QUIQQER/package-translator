@@ -24,7 +24,15 @@ namespace QUI;
 
 class Translator
 {
-    const TABLE = 'translate';
+    /**
+     * Return the real table name
+     *
+     * @return String
+     */
+    static function Table()
+    {
+        return \QUI::getDBTableName( 'translate' );
+    }
 
     /**
      * Add / create a new language
@@ -44,7 +52,7 @@ class Translator
         }
 
         \QUI::getDB()->createTableFields(
-            \QUI::getDBTableName( self::TABLE ),
+            self::Table(),
             array(
                 $lang          => 'text NOT NULL',
                 $lang .'_edit' => 'text NULL'
@@ -277,7 +285,7 @@ class Translator
     static function cleanup()
     {
         $PDO       = \QUI::getDataBase()->getPDO();
-        $bad_table = \QUI::getDBTableName( self::TABLE );
+        $bad_table = self::Table();
 
         // check if dublicate entries exist
         $Statement = $PDO->prepare(
@@ -346,7 +354,7 @@ class Translator
                     $lang, $lang .'_edit', 'groups', 'var',
                     'datatype', 'datadefine'
                 ),
-                'from' => \QUI::getDBTableName( self::TABLE )
+                'from' => self::Table()
             ));
 
             foreach ( $result as $entry )
@@ -470,7 +478,7 @@ class Translator
         if ( !$var )
         {
             return \QUI::getDB()->select(array(
-                'from' => \QUI::getDBTableName( self::TABLE ),
+                'from' => self::Table(),
                 'where' => array(
                     'groups' => $group
                 )
@@ -478,7 +486,7 @@ class Translator
         }
 
         return \QUI::getDB()->select(array(
-            'from' => \QUI::getDBTableName( self::TABLE ),
+            'from' => self::Table(),
             'where' => array(
                 'groups' => $group,
                 'var'    => $var
@@ -553,14 +561,14 @@ class Translator
             }
 
             $data = array(
-                'from'     => \QUI::getDBTableName( self::TABLE ),
+                'from'     => self::Table(),
                 'where_or' => $where,
                 'limit'    => $limit
             );
         } else
         {
             $data = array(
-                'from' => \QUI::getDBTableName( self::TABLE ),
+                'from' => self::Table(),
                 'where' => array(
                     'groups' => $groups
                 ),
@@ -597,7 +605,7 @@ class Translator
     {
         $result = \QUI::getDB()->select(array(
             'select' => 'groups',
-            'from'   => \QUI::getDBTableName( self::TABLE ),
+            'from'   => self::Table(),
             'group'  => 'groups'
         ));
 
@@ -641,7 +649,7 @@ class Translator
         }
 
         \QUI::getDB()->addData(
-            \QUI::getDBTableName( self::TABLE ),
+            self::Table(),
             array(
                 'groups' => $group,
                 'var'    => $var
@@ -679,7 +687,7 @@ class Translator
         }
 
         \QUI::getDB()->updateData(
-            \QUI::getDBTableName( self::TABLE ),
+            self::Table(),
             $_data,
             array(
                 'groups' => $group,
@@ -733,7 +741,7 @@ class Translator
         }
 
         \QUI::getDB()->updateData(
-            \QUI::getDBTableName( self::TABLE ),
+            self::Table(),
             $_data,
             array(
                 'groups' => $group,
@@ -751,7 +759,7 @@ class Translator
     static function delete($group, $var)
     {
         \QUI::getDB()->deleteData(
-            \QUI::getDBTableName( self::TABLE ),
+            self::Table(),
             array(
                 'groups' => $group,
                 'var'    => $var
@@ -767,7 +775,7 @@ class Translator
     static function langs()
     {
         $fields = \QUI::getDB()->getFields(
-            \QUI::getDBTableName( self::TABLE )
+            self::Table()
         );
 
         $langs = array();
@@ -808,7 +816,7 @@ class Translator
     static function getNeedles()
     {
         $fields = \QUI::getDB()->getFields(
-            \QUI::getDBTableName( self::TABLE )
+            self::Table()
         );
 
         $langs = array();
@@ -823,7 +831,7 @@ class Translator
         }
 
         $result = \QUI::getDB()->select(array(
-            'from'  => \QUI::getDBTableName( self::TABLE ),
+            'from'  => self::Table(),
             'where' => implode( ' = "" OR ', $langs ) .' = ""'
         ));
 
