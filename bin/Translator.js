@@ -17,7 +17,7 @@ define('package/quiqqer/translator/bin/Translator', [
     return function()
     {
         // opens the panel
-        QUI.Controls.get( 'content-panel' )[0].appendChild(
+        QUI.Workspace.appendPanel(
             new TranslatorPanel()
         );
     };

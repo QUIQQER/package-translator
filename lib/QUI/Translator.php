@@ -16,7 +16,7 @@ namespace QUI;
  *
  * mysql fix for old dev version
  *
- 	UPDATE translate
+     UPDATE translate
     SET groups = REPLACE(groups, '\'', '') WHERE 1;
     UPDATE translate
     SET var = REPLACE(var, '\'', '') WHERE 1
@@ -45,8 +45,8 @@ class Translator
         {
             throw new \QException(
                 \QUI::getLocale()->get(
-                	'package/translator',
-                	'exception.lang.shortcut.not.allowed'
+                    'package/translator',
+                    'exception.lang.shortcut.not.allowed'
                 )
             );
         }
@@ -209,7 +209,7 @@ class Translator
 
                 $result[] = array(
                     'group'  => $group,
-                	'var'    => $var,
+                    'var'    => $var,
                     'locale' => $locale,
                 );
             }
@@ -302,8 +302,8 @@ class Translator
         }
 
         $Statement = $PDO->prepare(
-        	'CREATE TEMPORARY TABLE bad_temp_translation AS
-        	SELECT DISTINCT * FROM '. $bad_table
+            'CREATE TEMPORARY TABLE bad_temp_translation AS
+            SELECT DISTINCT * FROM '. $bad_table
         );
         $Statement->execute();
 
@@ -332,9 +332,9 @@ class Translator
 
         foreach ( $langs as $lang )
         {
-            $folders[ $lang ] = $dir .'/'. \Utils_String::toLower($lang) .
-            						  '_'. \Utils_String::toUpper($lang) .
-            						  '/LC_MESSAGES/';
+            $folders[ $lang ] = $dir .'/'. \Utils_String::toLower( $lang ) .
+                                      '_'. \Utils_String::toUpper( $lang ) .
+                                      '/LC_MESSAGES/';
 
             \Utils_System_File::unlink( $folders[ $lang ] );
             \Utils_System_File::mkdir( $folders[ $lang ] );
@@ -363,6 +363,11 @@ class Translator
                 {
                     $js_langs[ $entry['groups'] ][ $lang ][] = $entry;
                     continue;
+                }
+
+                // locale/permissions must available in JS AND PHP
+                if ( $entry['groups'] == 'locale/permissions' ) {
+                    $js_langs[ $entry['groups'] ][ $lang ][] = $entry;
                 }
 
                 $value = $entry[ $lang ];
@@ -445,17 +450,16 @@ class Translator
             // \System_Log::writeRecursive( $js_langs, 'error' );
 
             // alle .po dateien einlesen und in mo umwandeln
-            if ( function_exists( 'gettext' ) ) //@todo getText über Config ein und ausschaltbar machen
-            {
-                $po_files = \Utils_System_File::readDir( $folders[ $lang ] );
+            $po_files = \Utils_System_File::readDir( $folders[ $lang ] );
 
-                foreach ( $po_files as $po_file )
+            foreach ( $po_files as $po_file )
+            {
+                if ( substr( $po_file, -3 ) == '.po' )
                 {
-                    if ( substr( $po_file, -3 ) == '.po' )
-                    {
-                        $exec = 'msgfmt '. $folders[ $lang ]. $po_file .' -o '. $folders[ $lang ] . substr( $po_file, 0,-3 ).'.mo' ;
-                        exec( \Utils_Security_Orthos::clearShell( $exec ) .' 2>&1', $exec_error );
-                    }
+                    self::phpmoConvert( $folders[ $lang ] . $po_file );
+
+                    //$exec = 'msgfmt '. $folders[ $lang ]. $po_file .' -o '. $folders[ $lang ] . substr( $po_file, 0,-3 ).'.mo' ;
+                    //exec( \Utils_Security_Orthos::clearShell( $exec ) .' 2>&1', $exec_error );
                 }
             }
         }
@@ -531,10 +535,10 @@ class Translator
 
             // default fields
             $default = array(
-            	'groups'     => $search,
-            	'var'        => $search,
-            	'datatype'   => $search,
-            	'datadefine' => $search
+                'groups'     => $search,
+                'var'        => $search,
+                'datatype'   => $search,
+                'datadefine' => $search
             );
 
             foreach ( $db_fields as $lang )
@@ -641,10 +645,10 @@ class Translator
         if ( isset( $result[0] ) )
         {
             throw new \QException(
-            	\QUI::getLocale()->get(
-            	    'package/translator',
-            	    'exception.var.exists'
-            	)
+                \QUI::getLocale()->get(
+                    'package/translator',
+                    'exception.var.exists'
+                )
             );
         }
 
@@ -771,7 +775,7 @@ class Translator
      * Welche Sprachen existieren
      *
      * @return Array
-	 */
+     */
     static function langs()
     {
         $fields = \QUI::getDB()->getFields(
@@ -859,9 +863,9 @@ class Translator
         self::$_tmp = array();
 
         preg_replace_callback(
-			'/{t([^}]*)}([^[{]*){\/t}/im',
-			function($params)
-			{
+            '/{t([^}]*)}([^[{]*){\/t}/im',
+            function($params)
+            {
                 if ( isset( $params[1] ) && !empty( $params[1] ) )
                 {
                     $_params = explode( ' ', trim( $params[1] ) );
@@ -903,11 +907,11 @@ class Translator
 
                 \QUI\Translater::$_tmp[] = array(
                     'groups' => $_param[0],
-                	'var'    => $_param[1],
+                    'var'    => $_param[1],
                 );
-			},
-			$string
-		);
+            },
+            $string
+        );
 
         return self::$_tmp;
     }
@@ -920,34 +924,34 @@ class Translator
      */
     static function getLBlocksFromString($string)
     {
-    	if ( strpos( $string, '$L->get(' ) === false &&
-    		 strpos( $string, '$Locale->get(' ) === false)
-		{
-    		return array();
-    	}
+        if ( strpos( $string, '$L->get(' ) === false &&
+             strpos( $string, '$Locale->get(' ) === false)
+        {
+            return array();
+        }
 
-    	self::$_tmp = array();
+        self::$_tmp = array();
 
-    	preg_replace_callback(
-    		'/\$L(ocale)?->get\s*\(\s*\'([^)]*)\'\s*,\s*\'([^[)]*)\'\s*\)/im',
-        	function($params)
-        	{
-        		if ( isset( $params[2] ) &&
-        		     isset( $params[3] ) &&
-        			 !empty( $params[2] ) &&
-        			 !empty( $params[3] ) &&
-        			 strpos( $_param[2], '/' ) === false )
-        		{
-    	    		\QUI\Translater::$_tmp[] = array(
-        				'groups' => $params[2],
-        				'var'    => $params[3],
-    	    		);
-        		}
-        	},
-    	    $string
-    	);
+        preg_replace_callback(
+            '/\$L(ocale)?->get\s*\(\s*\'([^)]*)\'\s*,\s*\'([^[)]*)\'\s*\)/im',
+            function($params)
+            {
+                if ( isset( $params[2] ) &&
+                     isset( $params[3] ) &&
+                     !empty( $params[2] ) &&
+                     !empty( $params[3] ) &&
+                     strpos( $_param[2], '/' ) === false )
+                {
+                    \QUI\Translater::$_tmp[] = array(
+                        'groups' => $params[2],
+                        'var'    => $params[3],
+                    );
+                }
+            },
+            $string
+        );
 
-    	return self::$_tmp;
+        return self::$_tmp;
     }
 
     /**
@@ -958,23 +962,310 @@ class Translator
      */
     static function deleteDoubleEntries($array)
     {
-    	// Doppelte Einträge löschen
-    	$new_tmp = array();
+        // Doppelte Einträge löschen
+        $new_tmp = array();
 
-    	foreach( $array as $tmp )
-    	{
-    		if ( !isset( $new_tmp[ $tmp['groups'] . $tmp['var'] ] ) ) {
-    			$new_tmp[ $tmp['groups'] . $tmp['var'] ] = $tmp;
-    		}
-    	}
+        foreach( $array as $tmp )
+        {
+            if ( !isset( $new_tmp[ $tmp['groups'] . $tmp['var'] ] ) ) {
+                $new_tmp[ $tmp['groups'] . $tmp['var'] ] = $tmp;
+            }
+        }
 
-    	$array = array();
+        $array = array();
 
-    	foreach ( $new_tmp as $tmp ) {
-    		$array[] = $tmp;
-    	}
+        foreach ( $new_tmp as $tmp ) {
+            $array[] = $tmp;
+        }
 
-    	return $array;
+        return $array;
+    }
+
+
+    /**
+     * First fallback for gettext
+     * based on php.mo 0.1 by Joss Crowcroft (http://www.josscrowcroft.com)
+     */
+
+    /**
+     * The main .po to .mo function
+     *
+     * @param unknown $input
+     * @param string $output
+     * @return boolean
+     */
+    static function phpmoConvert($input, $output=false)
+    {
+        if ( !$output ) {
+            $output = str_replace( '.po', '.mo', $input );
+        }
+
+        $hash = self::phpmoParsePoFile( $input );
+
+        if ( $hash === false ) {
+            return false;
+        }
+
+        self::phpmoWriteMoFile( $hash, $output );
+        return true;
+    }
+
+    /**
+     * Clean helper
+     *
+     * @param Array|String $x
+     * @return mixed
+     */
+    static function phpmoCleanHelper($x)
+    {
+        if ( is_array( $x ) )
+        {
+            foreach ( $x as $k => $v ) {
+                $x[$k] = self::phpmoCleanHelper( $v );
+            }
+        } else
+        {
+            if ( $x[0] == '"' ) {
+                $x = substr($x, 1, -1);
+            }
+
+            $x = str_replace( "\"\n\"", '', $x );
+            $x = str_replace( '$', '\\$', $x );
+        }
+
+        return $x;
+    }
+
+
+    /**
+     * Parse gettext .po files.
+     * @link http://www.gnu.org/software/gettext/manual/gettext.html#PO-Files
+     *
+     * @param {String} $in
+     */
+    static function phpmoParsePoFile($in)
+    {
+        // read .po file
+        $fh = fopen( $in, 'r' );
+
+        if ( $fh === false )
+        {
+            // Could not open file resource
+            return false;
+        }
+
+        // results array
+        $hash = array();
+
+        // temporary array
+        $temp = array();
+
+        // state
+        $state = null;
+        $fuzzy = false;
+
+        // iterate over lines
+        while( ( $line = fgets( $fh, 65536 ) ) !== false )
+        {
+            $line = trim( $line );
+
+            if ( $line === '' ) {
+                continue;
+            }
+
+            list ( $key, $data ) = preg_split( '/\s/', $line, 2 );
+
+            switch ( $key )
+            {
+                case '#,' : // flag...
+                    $fuzzy = in_array('fuzzy', preg_split('/,\s*/', $data));
+                case '#' : // translator-comments
+                case '#.' : // extracted-comments
+                case '#:' : // reference...
+                case '#|' : // msgid previous-untranslated-string
+                    // start a new entry
+                    if ( sizeof($temp) &&
+                         array_key_exists('msgid', $temp) &&
+                         array_key_exists('msgstr', $temp) )
+                    {
+                        if ( !$fuzzy ) {
+                            $hash[] = $temp;
+                        }
+
+                        $temp  = array();
+                        $state = null;
+                        $fuzzy = false;
+                    }
+                break;
+
+                case 'msgctxt' :
+                    // context
+                case 'msgid' :
+                    // untranslated-string
+                case 'msgid_plural' :
+                    // untranslated-string-plural
+                    $state = $key;
+                    $temp[ $state ] = $data;
+                break;
+                case 'msgstr' :
+                    // translated-string
+                    $state = 'msgstr';
+                    $temp[ $state ][] = $data;
+                break;
+
+                default:
+                    if ( strpos($key, 'msgstr[') !== false )
+                    {
+                        // translated-string-case-n
+                        $state = 'msgstr';
+                        $temp[ $state ][] = $data;
+                    } else
+                    {
+                        // continued lines
+                        switch ($state)
+                        {
+                            case 'msgctxt' :
+                            case 'msgid' :
+                            case 'msgid_plural' :
+                                $temp[$state] .= "\n" . $line;
+                            break;
+                            case 'msgstr' :
+                                $temp[ $state ][ sizeof($temp[$state]) - 1 ] .= "\n" . $line;
+                            break;
+                            default :
+                                // parse error
+                                fclose($fh);
+                                return false;
+                        }
+                    }
+                break;
+            }
+        }
+
+        fclose( $fh );
+
+        // add final entry
+        if ( $state == 'msgstr' ) {
+            $hash[] = $temp;
+        }
+
+        // Cleanup data, merge multiline entries, reindex hash for ksort
+        $temp = $hash;
+        $hash = array();
+
+        foreach ( $temp as $entry )
+        {
+            foreach ( $entry as $v )
+            {
+                $v = self::phpmoCleanHelper( $v );
+
+                // parse error
+                if ( $v === false ) {
+                    return false;
+                }
+            }
+
+            $hash[ $entry['msgid'] ] = $entry;
+        }
+
+        return $hash;
+    }
+
+    /**
+     * Write a GNU gettext style machine object.
+     *
+     * @link http://www.gnu.org/software/gettext/manual/gettext.html#MO-Files
+     *
+     * @param String $hash
+     * @param String $out - file path
+     */
+    static function phpmoWriteMoFile($hash, $out)
+    {
+        // sort by msgid
+        ksort( $hash, SORT_STRING );
+
+        // our mo file data
+        $mo = '';
+
+        // header data
+        $offsets = array ();
+        $ids     = '';
+        $strings = '';
+
+        foreach ( $hash as $entry )
+        {
+            $id = $entry['msgid'];
+
+            if ( isset( $entry['msgid_plural'] ) ) {
+                $id .= "\x00" . $entry['msgid_plural'];
+            }
+
+            // context is merged into id, separated by EOT (\x04)
+            if ( array_key_exists( 'msgctxt', $entry ) ) {
+                $id = $entry['msgctxt'] . "\x04" . $id;
+            }
+
+            // plural msgstrs are NUL-separated
+            $str = implode( "\x00", $entry['msgstr'] );
+
+            // keep track of offsets
+            $offsets[] = array(
+                strlen( $ids ),
+                strlen( $id ),
+                strlen( $strings ),
+                strlen( $str )
+            );
+            // plural msgids are not stored (?)
+            $ids .= $id . "\x00";
+            $strings .= $str . "\x00";
+        }
+
+        // keys start after the header (7 words) + index tables ($#hash * 4 words)
+        $key_start = 7 * 4 + sizeof( $hash ) * 4 * 4;
+
+        // values start right after the keys
+        $value_start = $key_start + strlen( $ids );
+
+        // first all key offsets, then all value offsets
+        $key_offsets   = array();
+        $value_offsets = array();
+
+        // calculate
+        foreach ($offsets as $v)
+        {
+            list ( $o1, $l1, $o2, $l2 ) = $v;
+
+            $key_offsets[]   = $l1;
+            $key_offsets[]   = $o1 + $key_start;
+            $value_offsets[] = $l2;
+            $value_offsets[] = $o2 + $value_start;
+        }
+
+        $offsets = array_merge( $key_offsets, $value_offsets );
+
+        // write header
+        $mo .= pack(
+            'Iiiiiii', 0x950412de, // magic number
+            0, // version
+            sizeof($hash), // number of entries in the catalog
+            7 * 4, // key index offset
+            7 * 4 + sizeof($hash) * 8, // value index offset,
+            0, // hashtable size (unused, thus 0)
+            $key_start // hashtable offset
+        );
+
+        // offsets
+        foreach ( $offsets as $offset ) {
+            $mo .= pack( 'i', $offset );
+        }
+
+        // ids
+        $mo .= $ids;
+
+        // strings
+        $mo .= $strings;
+
+        file_put_contents( $out, $mo );
     }
 }
 
