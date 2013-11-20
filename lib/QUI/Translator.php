@@ -254,12 +254,12 @@ class Translator
         $jsdir  = self::dir() .'/bin/';
         $result = array();
 
-        $dirs = \Utils_System_File::readDir( $jsdir );
+        $dirs = \QUI\Utils\System\File::readDir( $jsdir );
 
         foreach ( $dirs as $dir )
         {
             $package_dir  = $jsdir . $dir;
-            $package_list = \Utils_System_File::readDir( $package_dir );
+            $package_list = \QUI\Utils\System\File::readDir( $package_dir );
 
             foreach ( $package_list as $package )
             {
@@ -332,12 +332,12 @@ class Translator
 
         foreach ( $langs as $lang )
         {
-            $folders[ $lang ] = $dir .'/'. \Utils_String::toLower( $lang ) .
-                                      '_'. \Utils_String::toUpper( $lang ) .
+            $folders[ $lang ] = $dir .'/'. \QUI\Utils\String::toLower( $lang ) .
+                                      '_'. \QUI\Utils\String::toUpper( $lang ) .
                                       '/LC_MESSAGES/';
 
-            \Utils_System_File::unlink( $folders[ $lang ] );
-            \Utils_System_File::mkdir( $folders[ $lang ] );
+            \QUI\Utils\System\File::unlink( $folders[ $lang ] );
+            \QUI\Utils\System\File::mkdir( $folders[ $lang ] );
         }
 
         $js_langs = array();
@@ -391,23 +391,23 @@ class Translator
                 $ini     = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.ini';
                 $ini_str = $entry['var'] .'= "'. $value .'"';
 
-                \Utils_System_File::mkfile( $ini );
-                \Utils_System_File::putLineToFile( $ini, $ini_str );
+                \QUI\Utils\System\File::mkfile( $ini );
+                \QUI\Utils\System\File::putLineToFile( $ini, $ini_str );
 
                 // po (gettext) datei
                 $po = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.po';
                 $mo = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.mo';
 
-                \Utils_System_File::mkfile( $po );
+                \QUI\Utils\System\File::mkfile( $po );
 
-                \Utils_System_File::putLineToFile( $po, 'msgid "'. $entry['var'] .'"' );
-                \Utils_System_File::putLineToFile( $po, 'msgstr "'. $value .'"' );
-                \Utils_System_File::putLineToFile( $po, '' );
+                \QUI\Utils\System\File::putLineToFile( $po, 'msgid "'. $entry['var'] .'"' );
+                \QUI\Utils\System\File::putLineToFile( $po, 'msgstr "'. $value .'"' );
+                \QUI\Utils\System\File::putLineToFile( $po, '' );
             }
 
             // create javascript lang files
             $jsdir = $dir .'/bin/';
-            \Utils_System_File::mkdir( $jsdir );
+            \QUI\Utils\System\File::mkdir( $jsdir );
 
             foreach ( $js_langs as $group => $groupentry )
             {
@@ -437,7 +437,7 @@ class Translator
                     $js .= '});';
 
                     // create package dir
-                    \Utils_System_File::mkdir( $jsdir . $group );
+                    \QUI\Utils\System\File::mkdir( $jsdir . $group );
 
                     if ( file_exists( $jsdir . $group .'/'. $lang .'.js' ) ) {
                         unlink( $jsdir . $group .'/'. $lang .'.js' );
@@ -450,7 +450,7 @@ class Translator
             // \System_Log::writeRecursive( $js_langs, 'error' );
 
             // alle .po dateien einlesen und in mo umwandeln
-            $po_files = \Utils_System_File::readDir( $folders[ $lang ] );
+            $po_files = \QUI\Utils\System\File::readDir( $folders[ $lang ] );
 
             foreach ( $po_files as $po_file )
             {
