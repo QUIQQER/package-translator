@@ -52,6 +52,9 @@ function ajax_translater_template()
         $Engine->fetch(SYS_DIR .'ajax/translater/template.html')
     );
 }
-$ajax->register('ajax_translater_template')
 
-?>
+\QUI::$Ajax->register(
+    'ajax_translater_template',
+    false,
+    'Permission::checkAdminUser'
+);

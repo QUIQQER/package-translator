@@ -43,7 +43,7 @@ class Translator
     {
         if ( strlen( $lang ) !== 2 )
         {
-            throw new \QException(
+            throw new \QUI\Exception(
                 \QUI::getLocale()->get(
                     'package/translator',
                     'exception.lang.shortcut.not.allowed'
@@ -146,13 +146,13 @@ class Translator
      * 									 if false, the original fields would be updated
      *
      * @return Array - List of imported vars
-     * @throws QException
+     * @throws \QUI\Exception
      */
     static function import($file, $update_edit_fields=true)
     {
         if ( !file_exists( $file ) )
         {
-            throw new \QException(
+            throw new \QUI\Exception(
                 \QUI::getLocale()->get(
                     'package/translator',
                     'exception.lang.file.not.exist'
@@ -182,7 +182,7 @@ class Translator
                 try
                 {
                     self::add( $group, $var );
-                } catch ( \QException $e )
+                } catch ( \QUI\Exception $e )
                 {
 
                 }
@@ -632,7 +632,7 @@ class Translator
     {
         if ( empty( $var ) || empty( $group ) )
         {
-            throw new \QException(
+            throw new \QUI\Exception(
                 \QUI::getLocale()->get(
                     'package/translator',
                     'exception.empty.var.group'
@@ -644,7 +644,7 @@ class Translator
 
         if ( isset( $result[0] ) )
         {
-            throw new \QException(
+            throw new \QUI\Exception(
                 \QUI::getLocale()->get(
                     'package/translator',
                     'exception.var.exists'
@@ -1268,5 +1268,3 @@ class Translator
         file_put_contents( $out, $mo );
     }
 }
-
-?>

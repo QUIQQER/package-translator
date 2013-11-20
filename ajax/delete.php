@@ -42,9 +42,7 @@ function package_quiqqer_translator_ajax_delete($data)
 }
 
 \QUI::$Ajax->register(
-	'package_quiqqer_translator_ajax_delete',
+    'package_quiqqer_translator_ajax_delete',
     array( 'data' ),
     'Permission::checkAdminUser'
 );
-
-?>

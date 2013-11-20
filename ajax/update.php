@@ -12,9 +12,10 @@ function package_quiqqer_translator_ajax_update($groups, $data)
 
     if ( !isset( $data['var'] ) )
     {
-        throw new QException(
+        throw new \QUI\Exception(
             \QUI::getLocale()->get(
-            	'package/tranlator', 'exception.translation.not.found.update'
+                'package/tranlator',
+                'exception.translation.not.found.update'
             ),
             404
         );
@@ -24,9 +25,10 @@ function package_quiqqer_translator_ajax_update($groups, $data)
 
     if ( !isset( $result[0] ) )
     {
-        throw new QException(
+        throw new \QUI\Exception(
             \QUI::getLocale()->get(
-            	'package/tranlator', 'exception.translation.not.found.update'
+                'package/tranlator',
+                'exception.translation.not.found.update'
             ),
             404
         );
@@ -44,9 +46,7 @@ function package_quiqqer_translator_ajax_update($groups, $data)
 }
 
 \QUI::$Ajax->register(
-	'package_quiqqer_translator_ajax_update',
+    'package_quiqqer_translator_ajax_update',
     array( 'groups', 'data' ),
     'Permission::checkAdminUser'
 );
-
-?>

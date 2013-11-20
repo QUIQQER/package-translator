@@ -12,10 +12,10 @@ function package_quiqqer_translator_ajax_file_import($File, $overwrite)
     if ( !$File->getAttribute( 'filepath' ) )
     {
         \QUI::getMessagesHandler()->addError(
-        	\QUI::getLocale()->get(
-        		'package/translator',
-        		'exception.file.could.not.read'
-        	)
+            \QUI::getLocale()->get(
+                'package/translator',
+                'exception.file.could.not.read'
+            )
         );
 
         return;
@@ -36,9 +36,7 @@ function package_quiqqer_translator_ajax_file_import($File, $overwrite)
 }
 
 \QUI::$Ajax->register(
-	'package_quiqqer_translator_ajax_file_import',
+    'package_quiqqer_translator_ajax_file_import',
     array( 'File', 'overwrite' ),
     'Permission::checkAdminUser'
 );
-
-?>

@@ -16,9 +16,7 @@ function package_quiqqer_translator_ajax_create()
 }
 
 \QUI::$Ajax->register(
-	'package_quiqqer_translator_ajax_create',
+    'package_quiqqer_translator_ajax_create',
     false,
     'Permission::checkAdminUser'
 );
-
-?>

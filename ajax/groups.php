@@ -6,9 +6,7 @@ function package_quiqqer_translator_ajax_groups()
 }
 
 \QUI::$Ajax->register(
-	'package_quiqqer_translator_ajax_groups',
+    'package_quiqqer_translator_ajax_groups',
     false,
     'Permission::checkAdminUser'
 );
-
-?>

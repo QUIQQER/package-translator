@@ -1,12 +1,12 @@
 {
-	"name" : "quiqqer/translator",
-	"type" : "quiqqer-library",
-	"description" : "QUIQQER Translator",
+    "name" : "quiqqer/translator",
+    "type" : "quiqqer-library",
+    "description" : "QUIQQER Translator",
 
-	"version" : "0.1.0",
+    "version" : "0.1.0",
     "license" : "GPL-3.0+",
 
-	"authors" : [{
+    "authors" : [{
         "name": "Henning Leutz",
         "email": "leutz@pcsg.de",
         "homepage": "http://www.pcsg.de",
@@ -18,7 +18,8 @@
     },
 
     "require": {
-        "quiqqer/quiqqer" : "1.*"
+        "quiqqer/quiqqer" : "1.*",
+        "quiqqer/utils" : "1.*",
     },
 
     "autoload": {

@@ -18,19 +18,17 @@ function package_quiqqer_translator_ajax_export($group, $edit)
     $file = str_replace( '/', '_', $group );
 
     header( 'Expires: '. gmdate( "D, d M Y H:i:s" ) . " GMT");
-	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-	header( 'Pragma: no-cache' );
-	header( 'Content-type: text/xml' );
-	header( 'Content-Disposition: attachment; filename="'. $file .'.xml"' );
+    header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+    header( 'Pragma: no-cache' );
+    header( 'Content-type: text/xml' );
+    header( 'Content-Disposition: attachment; filename="'. $file .'.xml"' );
 
-	echo $str;
-	exit;
+    echo $str;
+    exit;
 }
 
 \QUI::$Ajax->register(
-	'package_quiqqer_translator_ajax_export',
+    'package_quiqqer_translator_ajax_export',
     array( 'group', 'edit' ),
     'Permission::checkAdminUser'
 );
-
-?>

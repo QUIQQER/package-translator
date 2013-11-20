@@ -30,9 +30,7 @@ function package_quiqqer_translator_ajax_import($data)
 }
 
 \QUI::$Ajax->register(
-	'package_quiqqer_translator_ajax_import',
+    'package_quiqqer_translator_ajax_import',
     array( 'data' ),
     'Permission::checkAdminUser'
 );
-
-?>

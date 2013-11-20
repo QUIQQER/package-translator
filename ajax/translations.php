@@ -41,9 +41,7 @@ function package_quiqqer_translator_ajax_translations($groups, $params, $search)
 }
 
 \QUI::$Ajax->register(
-	'package_quiqqer_translator_ajax_translations',
+    'package_quiqqer_translator_ajax_translations',
     array( 'groups', 'params', 'search' ),
     'Permission::checkAdminUser'
 );
-
-?>
