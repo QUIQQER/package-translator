@@ -447,7 +447,7 @@ class Translator
                 }
             }
 
-            // \System_Log::writeRecursive( $js_langs, 'error' );
+            // \QUI\System\Log::writeRecursive( $js_langs, 'error' );
 
             // alle .po dateien einlesen und in mo umwandeln
             $po_files = \QUI\Utils\System\File::readDir( $folders[ $lang ] );
