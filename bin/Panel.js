@@ -13,13 +13,13 @@ define('package/quiqqer/translator/bin/Panel', [
     "qui/controls/desktop/Panel",
     "qui/controls/buttons/Seperator",
     "qui/controls/buttons/Select",
-    "qui/controls/windows/Window",
+    "qui/controls/windows/Confirm",
     "Ajax",
-    "Locale"
+    "Locale",
 
     "css!package/quiqqer/translator/bin/Panel.css"
 
-], function(QUIPanel, QUIButtonSeperator, QUISelect, QUIWindow, Ajax, Locale)
+], function(QUIPanel, QUIButtonSeperator, QUISelect, QUIConfirm, Ajax, Locale)
 {
     return new Class({
 
@@ -182,7 +182,7 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             var id = this.getId();
 
-            new QUI.controls.windows.Submit({
+            new QUIConfirm({
                 title : Locale.get( 'package/translator', 'export.window.title' ),
                 text  : Locale.get( 'package/translator', 'export.window.text' ),
                 icon  : URL_BIN_DIR +'16x16/export.png',
