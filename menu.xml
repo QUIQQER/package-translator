@@ -2,7 +2,7 @@
 <menu>
     <item parent="/extras/"
           name="translator"
-          require="package/quiqqer/translator/bin/Translator"
+          require="package/quiqqer/translator/bin/Panel"
           icon="URL_BIN_DIR/16x16/flags/default.png"
     >
         Übersetzer
