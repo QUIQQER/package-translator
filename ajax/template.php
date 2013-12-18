@@ -7,36 +7,36 @@
  */
 function ajax_translater_template()
 {
-    $Engine   = QUI_Template::getEngine(true);
-    $projects = QUI::getProjects();
+    $Engine   = \QUI\Template::getEngine(true);
+    $projects = \QUI::getProjects();
 
-    $Plugins  = QUI::getPlugins();
+    $Plugins  = \QUI::getPlugins();
     $_plugins = $Plugins->getAvailablePlugins();
 
-    $list   = QUI_Locale_Translater::getGroupList();
+    $list   = \QUI\Translater::getGroupList();
     $groups = array();
 
     $groups['system'] = '';
 
-    foreach ($list as $entry) {
-        $groups[$entry] = '';
+    foreach ( $list as $entry ) {
+        $groups[ $entry ] = '';
     }
 
     // Plugins aufnehmen
-    foreach ($_plugins as $Plugin) {
+    foreach ( $_plugins as $Plugin ) {
         $groups[ 'plugin/'. $Plugin->getAttribute('name') ] = '';
     }
 
     // Projekte aufnehmen
-    foreach ($projects as $Project) {
+    foreach ( $projects as $Project ) {
         $groups[ 'project/'. $Plugin->getAttribute('name') ] = '';
     }
 
-    ksort($groups);
+    ksort( $groups );
 
     $result = array();
 
-    foreach ($groups as $key => $value)
+    foreach ( $groups as $key => $value )
     {
         $str = '{"'. str_replace('/', '":{"', $key);
         $str = $str .'" : ""'. str_repeat('}', substr_count($str, '{'));
@@ -48,7 +48,7 @@ function ajax_translater_template()
         'list' => json_encode($result)
     ));
 
-    return Utils_Security_Orthos::removeLineBreaks(
+    return \QUI\Utils\Security\Orthos::removeLineBreaks(
         $Engine->fetch(SYS_DIR .'ajax/translater/template.html')
     );
 }

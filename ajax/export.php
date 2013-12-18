@@ -12,7 +12,7 @@ function package_quiqqer_translator_ajax_export($group, $edit)
 {
     $str = \QUI\Translator::export(
         $group,
-        Utils_Bool::JSBool( $edit )
+        \QUI\Utils\Bool::JSBool( $edit )
     );
 
     $file = str_replace( '/', '_', $group );

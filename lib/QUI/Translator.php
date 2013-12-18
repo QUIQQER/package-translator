@@ -161,8 +161,8 @@ class Translator
         }
 
         $result = array();
-        $groups = \Utils_Xml::getLocaleGroupsFromDom(
-            \Utils_Xml::getDomFromXml( $file )
+        $groups = \QUI\Utils\XML::getLocaleGroupsFromDom(
+            \QUI\Utils\XML::getDomFromXml( $file )
         );
 
         foreach ( $groups as $locales )
@@ -459,7 +459,7 @@ class Translator
                     self::phpmoConvert( $folders[ $lang ] . $po_file );
 
                     //$exec = 'msgfmt '. $folders[ $lang ]. $po_file .' -o '. $folders[ $lang ] . substr( $po_file, 0,-3 ).'.mo' ;
-                    //exec( \Utils_Security_Orthos::clearShell( $exec ) .' 2>&1', $exec_error );
+                    //exec( \QUI\Utils\Security\Orthos::clearShell( $exec ) .' 2>&1', $exec_error );
                 }
             }
         }

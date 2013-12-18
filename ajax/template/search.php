@@ -7,7 +7,7 @@
  */
 function package_quiqqer_translator_ajax_template_search()
 {
-    $Engine = \QUI_Template::getEngine( true );
+    $Engine = \QUI\Template::getEngine( true );
 
     $languages = array();
     $result    = \QUI\Translator::langs();

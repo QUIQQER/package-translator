@@ -10,19 +10,21 @@
 
 define('package/quiqqer/translator/bin/Panel', [
 
-    "controls/desktop/Panel",
-    "controls/buttons/Seperator",
-    "controls/buttons/Select",
-    "controls/windows/Window",
+    "qui/controls/desktop/Panel",
+    "qui/controls/buttons/Seperator",
+    "qui/controls/buttons/Select",
+    "qui/controls/windows/Window",
+    "Ajax",
+    "Locale"
 
     "css!package/quiqqer/translator/bin/Panel.css"
 
-], function(QUI_Panel)
+], function(QUIPanel, QUIButtonSeperator, QUISelect, QUIWindow, Ajax, Locale)
 {
     return new Class({
 
-        Implements : [ QUI_Panel ],
-        Type       : 'QUI.package.quiqqer.translator.bin.Panel',
+        Extends : QUIPanel,
+        Type    : 'package/quiqqer/translator/bin/Panel',
 
         Binds : [
             'exportGroup',
@@ -56,10 +58,10 @@ define('package/quiqqer/translator/bin/Panel', [
         initialize: function(options)
         {
             // defaults
-            this.setAttribute( 'title', QUI.Locale.get( 'package/translator', 'panel.title' ) );
+            this.setAttribute( 'title', Locale.get( 'package/translator', 'panel.title' ) );
             this.setAttribute( 'icon', URL_BIN_DIR +'16x16/flags/default.png' );
 
-            this.init( options );
+            this.parent( options );
 
             this.addEvents({
                 'onCreate'  : this.$onCreate,
@@ -127,26 +129,24 @@ define('package/quiqqer/translator/bin/Panel', [
                 return;
             }
 
+            var self = this;
+
             this.Loader.show();
 
-            QUI.Ajax.get(
-
+            Ajax.get(
                 'package_quiqqer_translator_ajax_translations',
 
                 function(result, Request)
                 {
-                    var Translator = Request.getAttribute( 'Translator' );
+                    self.getGrid().setData( result.data );
+                    self.$gridBlur();
+                    self.$attentionBox();
 
-                    Translator.getGrid().setData( result.data );
-                    Translator.$gridBlur();
-                    Translator.$attentionBox();
-
-                    Translator.Loader.hide();
+                    self.Loader.hide();
                 },
 
                 {
                     'package'  : 'quiqqer/translator',
-                    Translator : this,
 
                     groups  : this.getTranslationGroup(),
                     params  : JSON.encode({
@@ -183,20 +183,20 @@ define('package/quiqqer/translator/bin/Panel', [
             var id = this.getId();
 
             new QUI.controls.windows.Submit({
-                title : QUI.Locale.get( 'package/translator', 'export.window.title' ),
-                text  : QUI.Locale.get( 'package/translator', 'export.window.text' ),
+                title : Locale.get( 'package/translator', 'export.window.title' ),
+                text  : Locale.get( 'package/translator', 'export.window.text' ),
                 icon  : URL_BIN_DIR +'16x16/export.png',
 
                 information : '<p>' +
                              '<input id="edit_false'+ id +'" type="radio" name="edit" value="0" />' +
                              '<label for="edit_false'+ id +'">'+
-                                 QUI.Locale.get( 'package/translator', 'export.window.option.orig' ) +
+                                 Locale.get( 'package/translator', 'export.window.option.orig' ) +
                              '</label>' +
                          '</p>' +
                          '<p>' +
                              '<input id="edit_true'+ id +'" type="radio" name="edit" value="1" checked="checked" />' +
                              '<label for="edit_true'+ id +'">' +
-                                 QUI.Locale.get( 'package/translator', 'export.window.option.edit' ) +
+                                 Locale.get( 'package/translator', 'export.window.option.edit' ) +
                              '</label>' +
                          '</p>',
 
@@ -240,15 +240,11 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         addVariable : function()
         {
-            require([
+            var self = this;
 
-                'package/quiqqer/translator/bin/AddVariable'
-
-            ], function(Add) {
-
-                Add( this );
-
-            }.bind( this ))
+            require(['package/quiqqer/translator/bin/AddVariable'], function(Add) {
+                Add( self );
+            });
         },
 
         /**
@@ -256,18 +252,13 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         deleteVariables : function(event)
         {
-            var Grid = this.getGrid(),
+            var self = this,
+                Grid = this.getGrid(),
                 data = Grid.getSelectedData();
 
-            require([
-
-                'package/quiqqer/translator/bin/DeleteVariables'
-
-            ], function(Del) {
-
-                Del( this, data );
-
-            }.bind( this ))
+            require(['package/quiqqer/translator/bin/DeleteVariables'], function(Del) {
+                Del( self, data );
+            });
         },
 
         /**
@@ -309,7 +300,7 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         $loadGrid : function()
         {
-            QUI.Ajax.get(
+            Ajax.get(
 
                 'package_quiqqer_translator_ajax_translations',
 
@@ -326,7 +317,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
 
                     cols.push({
-                        header    : QUI.Locale.get( 'package/translator', 'grid.title.variable' ),
+                        header    : Locale.get( 'package/translator', 'grid.title.variable' ),
                         dataIndex : 'var',
                         dataType  : 'string',
                         width     : 150,
@@ -336,7 +327,7 @@ define('package/quiqqer/translator/bin/Panel', [
                     if ( Translator.getAttribute( 'search' ) )
                     {
                         cols.push({
-                            header    : QUI.Locale.get( 'package/translator', 'grid.title.group' ),
+                            header    : Locale.get( 'package/translator', 'grid.title.group' ),
                             dataIndex : 'groups',
                             dataType  : 'string',
                             width     : 150
@@ -373,7 +364,7 @@ define('package/quiqqer/translator/bin/Panel', [
                     }
 
                     cols.push({
-                        header    : QUI.Locale.get( 'package/translator', 'grid.title.type' ),
+                        header    : Locale.get( 'package/translator', 'grid.title.type' ),
                         dataIndex : 'datatype',
                         dataType  : 'string',
                         width     : 50,
@@ -381,7 +372,7 @@ define('package/quiqqer/translator/bin/Panel', [
                     });
 
                     cols.push({
-                        header    : QUI.Locale.get( 'package/translator', 'grid.title.define' ),
+                        header    : Locale.get( 'package/translator', 'grid.title.define' ),
                         dataIndex : 'datadefine',
                         dataType  : 'string',
                         width     : 100,
@@ -398,14 +389,14 @@ define('package/quiqqer/translator/bin/Panel', [
                         filterInput : true,
                         buttons     : [{
                             name      : 'add',
-                            text      : QUI.Locale.get( 'package/translator', 'btn.add.var.text' ),
+                            text      : Locale.get( 'package/translator', 'btn.add.var.text' ),
                             textimage : URL_BIN_DIR +'16x16/add.png',
                             events    : {
                                 onClick : Translator.addVariable
                             }
                         }, {
                             name      : 'del',
-                            text      : QUI.Locale.get( 'package/translator', 'btn.del.var.text' ),
+                            text      : Locale.get( 'package/translator', 'btn.del.var.text' ),
                             textimage : URL_BIN_DIR +'16x16/trashcan_empty.png',
                             events    : {
                                 onMousedown : Translator.deleteVariables
@@ -477,8 +468,8 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             this.addButton({
                 name  : 'search',
-                title : QUI.Locale.get( 'package/translator', 'btn.search.title' ),
-                alt   : QUI.Locale.get( 'package/translator', 'btn.search.alt' ),
+                title : Locale.get( 'package/translator', 'btn.search.title' ),
+                alt   : Locale.get( 'package/translator', 'btn.search.alt' ),
                 icon  : URL_BIN_DIR +'16x16/search.png',
                 events : {
                     onClick : this.search
@@ -519,7 +510,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton({
                 name      : 'import',
-                text      : QUI.Locale.get( 'package/translator', 'btn.import.text' ),
+                text      : Locale.get( 'package/translator', 'btn.import.text' ),
                 textimage : URL_BIN_DIR +'16x16/import.png',
                 events : {
                     onClick : this.importTranslation
@@ -528,7 +519,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton({
                 name      : 'export',
-                text      : QUI.Locale.get( 'package/translator', 'btn.export.text' ),
+                text      : Locale.get( 'package/translator', 'btn.export.text' ),
                 textimage : URL_BIN_DIR +'16x16/export.png',
                 events : {
                     onClick : this.exportGroup
@@ -541,7 +532,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton({
                 name      : 'publish',
-                text      : QUI.Locale.get( 'package/translator', 'btn.publish.text' ),
+                text      : Locale.get( 'package/translator', 'btn.publish.text' ),
                 textimage : URL_BIN_DIR +'16x16/global.png',
                 events : {
                     onClick : this.publish
@@ -555,7 +546,7 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         $loadGroups : function()
         {
-            QUI.Ajax.get('package_quiqqer_translator_ajax_groups', function(result, Request)
+            Ajax.get('package_quiqqer_translator_ajax_groups', function(result, Request)
             {
                 var i, g, len, group;
 
@@ -663,7 +654,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             new QUI.classes.messages.Attention({
                 Translator : this,
-                message    : QUI.Locale.get( 'package/translator', 'search.params.active' ),
+                message    : Locale.get( 'package/translator', 'search.params.active' ),
                 events     :
                 {
                     onClick : function(Message, event)
@@ -818,7 +809,7 @@ define('package/quiqqer/translator/bin/Panel', [
             {
                 Sheet.addButton(
                     new QUI.controls.buttons.Button({
-                        text      : QUI.Locale.get( 'package/translator', 'btn.search.sheet.text' ),
+                        text      : Locale.get( 'package/translator', 'btn.search.sheet.text' ),
                         textimage : URL_BIN_DIR +'16x16/search.png',
                         events    :
                         {
