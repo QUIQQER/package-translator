@@ -12,15 +12,17 @@ define('package/quiqqer/translator/bin/Panel', [
 
     "qui/QUI",
     "qui/controls/desktop/Panel",
+    "qui/controls/buttons/Button",
     "qui/controls/buttons/Seperator",
     "qui/controls/buttons/Select",
     "qui/controls/windows/Confirm",
     "Ajax",
     "Locale",
+    "controls/grid/Grid",
 
     "css!package/quiqqer/translator/bin/Panel.css"
 
-], function(QUIPanel, QUIButtonSeperator, QUISelect, QUIConfirm, Ajax, Locale)
+], function(QUI, QUIPanel, QUIButton, QUIButtonSeperator, QUISelect, QUIConfirm, Ajax, Locale, Grid)
 {
     return new Class({
 
@@ -78,7 +80,7 @@ define('package/quiqqer/translator/bin/Panel', [
         /**
          * Return the actually grid
          *
-         * @return {false|QUI.controls.grid.Grid}
+         * @return {false|controls/grid/Grid}
          */
         getGrid : function()
         {
@@ -384,7 +386,7 @@ define('package/quiqqer/translator/bin/Panel', [
                         Translator.$Grid.destroy();
                     }
 
-                    Translator.$Grid = new QUI.controls.grid.Grid( Translator.$Container, {
+                    Translator.$Grid = new Grid( Translator.$Container, {
                         columnModel : cols,
                         pagination  : true,
                         filterInput : true,
@@ -641,40 +643,42 @@ define('package/quiqqer/translator/bin/Panel', [
                 return;
             }
 
-            var Bar  = this.getButtonBar();
+            var Bar  = this.getButtonBar(),
+                self = this;
 
             Bar.getChildren( 'translater/group/begin' ).disable();
             Bar.getChildren( 'translater/group/end' ).disable();
             Bar.getChildren( 'export' ).disable();
 
-            new QUI.classes.messages.Attention({
-                Translator : this,
-                message    : Locale.get( 'package/translator', 'search.params.active' ),
-                events     :
-                {
-                    onClick : function(Message, event)
+            require(['qui/controls/messages/Attention'], function(Attention)
+            {
+                new Attention({
+                    message    : Locale.get( 'package/translator', 'search.params.active' ),
+                    events     :
                     {
-                        var Translator = Message.getAttribute( 'Translator' );
+                        onClick : function(Message, event)
+                        {
+                            self.setAttribute( 'search', false );
+                            Message.destroy();
 
-                        Translator.setAttribute( 'search', false );
-                        Message.destroy();
+                            var Bar = self.getButtonBar();
 
-                        var Bar = Translator.getButtonBar();
+                            Bar.getChildren( 'translater/group/begin' ).enable();
+                            Bar.getChildren( 'translater/group/end' ).enable();
+                            Bar.getChildren( 'export' ).enable();
 
-                        Bar.getChildren( 'translater/group/begin' ).enable();
-                        Bar.getChildren( 'translater/group/end' ).enable();
-                        Bar.getChildren( 'export' ).enable();
-
-                        Translator.$loadGrid();
-                        Translator.resize();
+                            self.$loadGrid();
+                            self.resize();
+                        }
+                    },
+                    styles  : {
+                        margin : '0 0 20px',
+                        'border-width' : 1,
+                        cursor : 'pointer'
                     }
-                },
-                styles  : {
-                    margin : '0 0 20px',
-                    'border-width' : 1,
-                    cursor : 'pointer'
-                }
-            }).inject( this.getBody(), 'top' );
+                }).inject( this.getBody(), 'top' );
+            });
+
         },
 
         /**
@@ -743,7 +747,7 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             var newdata = this.getGrid().getDataByRow( params.row );
 
-            QUI.Ajax.post(
+            Ajax.post(
                 'package_quiqqer_translator_ajax_update',
                 false,
                 {
@@ -803,7 +807,7 @@ define('package/quiqqer/translator/bin/Panel', [
             Sheet.addEvent('onOpen', function(Sheet)
             {
                 Sheet.addButton(
-                    new QUI.controls.buttons.Button({
+                    new QUIButton({
                         text      : Locale.get( 'package/translator', 'btn.search.sheet.text' ),
                         textimage : URL_BIN_DIR +'16x16/search.png',
                         events    :
@@ -816,7 +820,7 @@ define('package/quiqqer/translator/bin/Panel', [
                     })
                 );
 
-                QUI.Ajax.get(
+                Ajax.get(
                     'package_quiqqer_translator_ajax_template_search',
                     this.$searchTemplate,
                     {
