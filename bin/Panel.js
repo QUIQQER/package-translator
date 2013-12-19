@@ -10,6 +10,7 @@
 
 define('package/quiqqer/translator/bin/Panel', [
 
+    "qui/QUI",
     "qui/controls/desktop/Panel",
     "qui/controls/buttons/Seperator",
     "qui/controls/buttons/Select",
@@ -207,8 +208,8 @@ define('package/quiqqer/translator/bin/Panel', [
                         var Body = Win.getBody(),
                             edit = Body.getElement( 'input[value="1"]' ).checked,
 
-                            url  = QUI.Ajax.$url +'?'+
-                                   QUI.Ajax.parseParams('package_quiqqer_translator_ajax_export', {
+                            url  = Ajax.$url +'?'+
+                                   Ajax.parseParams('package_quiqqer_translator_ajax_export', {
                                        'package'  : 'quiqqer/translator',
                                        group      : this.getTranslationGroup(),
                                        edit       : edit ? 1 : 0
@@ -470,18 +471,16 @@ define('package/quiqqer/translator/bin/Panel', [
                 name  : 'search',
                 title : Locale.get( 'package/translator', 'btn.search.title' ),
                 alt   : Locale.get( 'package/translator', 'btn.search.alt' ),
-                icon  : URL_BIN_DIR +'16x16/search.png',
+                icon  : 'icon-search',
                 events : {
                     onClick : this.search
                 }
             });
 
-            this.addButton(
-                new QUI.controls.buttons.Seperator()
-            );
+            this.addButton( new QUIButtonSeperator() );
 
             this.addButton(
-                new QUI.controls.buttons.Select({
+                new QUISelect({
                     name : 'translater/group/begin',
                     styles : {
                         width: 100
@@ -493,7 +492,7 @@ define('package/quiqqer/translator/bin/Panel', [
             );
 
             this.addButton(
-                new QUI.controls.buttons.Select({
+                new QUISelect({
                     name   : 'translater/group/end',
                     styles : {
                         width: 100
@@ -504,9 +503,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 })
             );
 
-            this.addButton(
-                new QUI.controls.buttons.Seperator()
-            );
+            this.addButton( new QUIButtonSeperator() );
 
             this.addButton({
                 name      : 'import',
@@ -526,9 +523,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 }
             });
 
-            this.addButton(
-                new QUI.controls.buttons.Seperator()
-            );
+            this.addButton( new QUIButtonSeperator() );
 
             this.addButton({
                 name      : 'publish',
