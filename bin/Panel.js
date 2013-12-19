@@ -339,7 +339,7 @@ define('package/quiqqer/translator/bin/Panel', [
                         Translator.$attentionBox();
                     }
 
-                    var dev = QUI.config('globals').development;
+                    var dev = QUIQQER_CONFIG.globals.development;
 
                     // Sprachen
                     for ( var i = 0, len = langs.length; i < len; i++ )
