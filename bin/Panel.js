@@ -510,7 +510,7 @@ define('package/quiqqer/translator/bin/Panel', [
             this.addButton({
                 name      : 'import',
                 text      : Locale.get( 'package/translator', 'btn.import.text' ),
-                textimage : URL_BIN_DIR +'16x16/import.png',
+                textimage : 'icon-upload',
                 events : {
                     onClick : this.importTranslation
                 }
@@ -519,7 +519,7 @@ define('package/quiqqer/translator/bin/Panel', [
             this.addButton({
                 name      : 'export',
                 text      : Locale.get( 'package/translator', 'btn.export.text' ),
-                textimage : URL_BIN_DIR +'16x16/export.png',
+                textimage : 'icon-download',
                 events : {
                     onClick : this.exportGroup
                 }
@@ -530,7 +530,7 @@ define('package/quiqqer/translator/bin/Panel', [
             this.addButton({
                 name      : 'publish',
                 text      : Locale.get( 'package/translator', 'btn.publish.text' ),
-                textimage : URL_BIN_DIR +'16x16/global.png',
+                textimage : 'icon-reply',
                 events : {
                     onClick : this.publish
                 }
