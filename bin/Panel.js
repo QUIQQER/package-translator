@@ -279,19 +279,15 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             this.getButtonBar()
                 .getChildren( 'publish' )
-                .setAttribute( 'textimage', URL_BIN_DIR +'images/loader.gif' );
+                .setAttribute( 'textimage', 'icon-refresh' );
 
-            require([
-
-                'package/quiqqer/translator/bin/Publish'
-
-            ], function(Publisher)
+            require(['package/quiqqer/translator/bin/Publish'], function(Publisher)
             {
                 Publisher.publish(this, function(result, Request)
                 {
                     Request.getAttribute( 'Translator' ).getButtonBar()
                         .getChildren( 'publish' )
-                        .setAttribute( 'textimage', URL_BIN_DIR +'16x16/global.png' );
+                        .setAttribute( 'textimage', 'icon-reply' );
 
                 });
 
