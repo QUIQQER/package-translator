@@ -429,9 +429,9 @@ class Translator
                     }
 
                     $js  = '';
-                    $js .= "define('locale/". $group ."/". $lang ."', function()";
+                    $js .= "define('locale/". $group ."/". $lang ."', ['Locale'], function(Locale)";
                     $js .= '{';
-                        $js .= 'QUI.Locale.set("'. $lang .'", "'. $group .'", ';
+                        $js .= 'Locale.set("'. $lang .'", "'. $group .'", ';
                         $js .= json_encode( $vars );
                         $js .= ')';
                     $js .= '});';
