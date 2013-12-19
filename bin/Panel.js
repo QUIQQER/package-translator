@@ -393,14 +393,14 @@ define('package/quiqqer/translator/bin/Panel', [
                         buttons     : [{
                             name      : 'add',
                             text      : Locale.get( 'package/translator', 'btn.add.var.text' ),
-                            textimage : URL_BIN_DIR +'16x16/add.png',
+                            textimage : 'icon-plus',
                             events    : {
                                 onClick : Translator.addVariable
                             }
                         }, {
                             name      : 'del',
                             text      : Locale.get( 'package/translator', 'btn.del.var.text' ),
-                            textimage : URL_BIN_DIR +'16x16/trashcan_empty.png',
+                            textimage : 'icon-trashcan',
                             events    : {
                                 onMousedown : Translator.deleteVariables
                             }
