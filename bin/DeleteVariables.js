@@ -10,9 +10,12 @@
 
 define('package/quiqqer/translator/bin/DeleteVariables', [
 
-    "package/quiqqer/translator/bin/Panel"
+    "package/quiqqer/translator/bin/Panel",
+    "Locale",
+    "Ajax",
+    "qui/controls/windows/Confirm"
 
-], function()
+], function(Panel, Locale, Ajax, QUIConfirm)
 {
     return function(Translator, data)
     {
@@ -21,7 +24,7 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
         var group = Translator.getTranslationGroup(),
             Grid  = Translator.getGrid(),
 
-            message = QUI.Locale.get( 'package/translator', 'del.window.text' ) +
+            message = Locale.get( 'package/translator', 'del.window.text' ) +
                       '<ul style="margin-top: 10px">';
 
         for ( i = 0, len = data.length; i < len; i++ ) {
@@ -30,18 +33,18 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
 
         message = message +'</ul>';
 
-        new QUI.controls.windows.Submit({
+        new QUIConfirm({
             name   : 'del_sel_items',
-            title  : QUI.Locale.get( 'package/translator', 'del.window.title' ),
-            icon   : URL_BIN_DIR +'16x16/trashcan_empty.png',
+            title  : Locale.get( 'package/translator', 'del.window.title' ),
+            icon   : 'icon-trash',
             width  : 500,
             height : 200,
             text   : message,
             data   : data,
             Translator  : Translator,
-            textIcon    : URL_BIN_DIR +'32x32/trashcan_empty.png',
+            textIcon    : 'icon-trash',
 
-            information : QUI.Locale.get(
+            information : Locale.get(
                 'package/translator',
                 'del.window.text.information'
             ),
@@ -64,7 +67,7 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
                     }
 
 
-                    QUI.Ajax.post(
+                    Ajax.post(
 
                         'package_quiqqer_translator_ajax_delete',
 

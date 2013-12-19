@@ -10,24 +10,27 @@
 
 define('package/quiqqer/translator/bin/AddVariable', [
 
-    "package/quiqqer/translator/bin/Panel"
+    "package/quiqqer/translator/bin/Panel",
+    "Locale",
+    "Ajax".
+    "qui/controls/windows/Confirm"
 
-], function()
+], function(Panel, Locale, Ajax, QUIConfirm)
 {
     return function(Translator)
     {
         var group = Translator.getTranslationGroup();
 
-        new QUI.controls.windows.Prompt({
+        new QUIConfirm({
             name   : 'add_new_translation',
             width  : 560,
             height : 200,
             group  : group,
-            title  : QUI.Locale.get('package/translator', 'add.window.title', {
+            title  : Locale.get('package/translator', 'add.window.title', {
                 group : group
             }),
             Translator  : Translator,
-            information : QUI.Locale.get('package/translator', 'add.window.text', {
+            information : Locale.get('package/translator', 'add.window.text', {
                 group : group
             }),
             // no autoclose
@@ -36,13 +39,13 @@ define('package/quiqqer/translator/bin/AddVariable', [
             },
 
             cancel_button : {
-                text      : QUI.Locale.get('package/translator', 'add.window.btn.close'),
-                textimage : URL_BIN_DIR +'16x16/cancel.png'
+                text      : Locale.get('package/translator', 'add.window.btn.close'),
+                textimage : 'icon-remove'
             },
 
             ok_button : {
-                text      : QUI.Locale.get('package/translator', 'add.window.btn.add'),
-                textimage : URL_BIN_DIR +'16x16/add.png'
+                text      : Locale.get('package/translator', 'add.window.btn.add'),
+                textimage : 'icon-plus'
             },
 
             events :
@@ -53,7 +56,7 @@ define('package/quiqqer/translator/bin/AddVariable', [
                         return;
                     }
 
-                    QUI.Ajax.post('package_quiqqer_translator_ajax_add', function()
+                    Ajax.post('package_quiqqer_translator_ajax_add', function()
                     {
 
                     }, {
