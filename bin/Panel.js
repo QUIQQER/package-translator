@@ -400,7 +400,7 @@ define('package/quiqqer/translator/bin/Panel', [
                         }, {
                             name      : 'del',
                             text      : Locale.get( 'package/translator', 'btn.del.var.text' ),
-                            textimage : 'icon-trashcan',
+                            textimage : 'icon-trash',
                             events    : {
                                 onMousedown : Translator.deleteVariables
                             }
