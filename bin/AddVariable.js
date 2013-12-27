@@ -12,7 +12,7 @@ define('package/quiqqer/translator/bin/AddVariable', [
 
     "package/quiqqer/translator/bin/Panel",
     "Locale",
-    "Ajax".
+    "Ajax",
     "qui/controls/windows/Confirm"
 
 ], function(Panel, Locale, Ajax, QUIConfirm)
