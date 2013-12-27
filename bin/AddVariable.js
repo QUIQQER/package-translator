@@ -13,7 +13,7 @@ define('package/quiqqer/translator/bin/AddVariable', [
     "package/quiqqer/translator/bin/Panel",
     "Locale",
     "Ajax",
-    "qui/controls/windows/Confirm"
+    "qui/controls/windows/Prompt"
 
 ], function(Panel, Locale, Ajax, QUIConfirm)
 {
@@ -21,7 +21,7 @@ define('package/quiqqer/translator/bin/AddVariable', [
     {
         var group = Translator.getTranslationGroup();
 
-        new QUIConfirm({
+        new QUIPrompt({
             name   : 'add_new_translation',
             width  : 560,
             height : 200,
