@@ -15,7 +15,7 @@ define('package/quiqqer/translator/bin/AddVariable', [
     "Ajax",
     "qui/controls/windows/Prompt"
 
-], function(Panel, Locale, Ajax, QUIConfirm)
+], function(Panel, Locale, Ajax, QUIPrompt)
 {
     return function(Translator)
     {
