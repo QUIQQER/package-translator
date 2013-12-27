@@ -23,6 +23,8 @@ define('package/quiqqer/translator/bin/AddVariable', [
 
         new QUIPrompt({
             name   : 'add_new_translation',
+            icon   : 'icon-plus-sign-alt',
+            titleicon : 'icon-plus-sign-alt',
             width  : 560,
             height : 200,
             group  : group,
