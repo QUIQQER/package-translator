@@ -12,26 +12,28 @@
 
 define('package/quiqqer/translator/bin/Import', [
 
-    'controls/Control',
+    'qui/controls/Control',
     'controls/upload/Form',
+    'Locale',
+    'qui/controls/buttons/Button',
 
     'css!package/quiqqer/translator/bin/Import.css'
 
-], function(QUI_Control)
+], function(QUIControl, UploadForm, Locale, QUIButton)
 {
     /**
-     * @calss QUI.package.quiqqer.translator.bin.Import
+     * @calss package/quiqqer/translator/bin/Import
      *
      * @param {Object} options - Control options
      */
     return new Class({
 
-        Implements : [ QUI_Control ],
-        Type       : 'QUI.package.quiqqer.translator.bin.Import',
+        Extends : QUIControl,
+        Type    : 'package/quiqqer/translator/bin/Import',
 
         initialize: function(options)
         {
-            this.init( options );
+            this.parent( options );
         },
 
         /**
@@ -41,9 +43,9 @@ define('package/quiqqer/translator/bin/Import', [
         {
             this.$Elm = new Element( 'div', {
                 'class' : 'qui-package-translator-import box smooth',
-                html : '<h1>'+ QUI.Locale.get( 'package/translator', 'import.window.title' ) +'</h1>' +
+                html : '<h1>'+ Locale.get( 'package/translator', 'import.window.title' ) +'</h1>' +
                        '<div class="description">' +
-                           QUI.Locale.get( 'package/translator', 'import.window.text' ) +
+                           Locale.get( 'package/translator', 'import.window.text' ) +
                        '</div>' +
                        '<div class="qui-package-translator-upload"></div>'
             });
@@ -58,7 +60,7 @@ define('package/quiqqer/translator/bin/Import', [
         {
             var Upload = this.$Elm.getElement( '.qui-package-translator-upload' );
 
-            var Form = new QUI.controls.upload.Form({
+            var Form = new UploadForm({
                 Drops  : [ this.$Elm ],
                 styles : {
                     margin : '20px 0 0',
@@ -95,7 +97,7 @@ define('package/quiqqer/translator/bin/Import', [
 
                         var entry;
                         var message = '<p>' +
-                                      QUI.Locale.get(
+                                      Locale.get(
                                           'package/translator',
                                           'message.import.success'
                                       ) +
@@ -138,7 +140,7 @@ define('package/quiqqer/translator/bin/Import', [
                 new Element('div', {
                     html : '<input type="checkbox" name="overwrite" id="overwrite+'+ this.getId() +'" checked="checked" />' +
                            '<label for="overwrite+'+ this.getId() +'">' +
-                               QUI.Locale.get(
+                               Locale.get(
                                    'package/translator',
                                    'import.window.text.debug.overwrite.vars'
                                ) +
@@ -162,8 +164,8 @@ define('package/quiqqer/translator/bin/Import', [
             Form.inject( Upload );
 
             // Send
-            new QUI.controls.buttons.Button({
-                text   : QUI.Locale.get( 'package/translator', 'import.window.btn.upload' ),
+            new QUIButton({
+                text   : Locale.get( 'package/translator', 'import.window.btn.upload' ),
                 textimage : URL_BIN_DIR +'16x16/upload.png',
                 Form   : Form,
                 styles : {
@@ -181,7 +183,6 @@ define('package/quiqqer/translator/bin/Import', [
                 Upload
             );
         }
-
     });
 
 });

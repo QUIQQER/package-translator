@@ -74,6 +74,6 @@ define('package/quiqqer/translator/bin/AddVariable', [
                     Win.getAttribute( 'Translator' ).refresh();
                 }
             }
-        }).create();
+        }).open();
     }
 });

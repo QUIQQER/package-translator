@@ -85,6 +85,6 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
                     );
                 }
             }
-        }).create();
+        }).open();
     }
 });

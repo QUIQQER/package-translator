@@ -5,7 +5,6 @@
  *
  * @module package/quiqqer/translator/bin/Panel
  * @package com.pcsg.qui.package.translator
- * @namespace QUI
  */
 
 define('package/quiqqer/translator/bin/Panel', [
