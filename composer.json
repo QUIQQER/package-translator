@@ -18,7 +18,7 @@
     },
 
     "require": {
-        "quiqqer/quiqqer" : "1.*",
+        "quiqqer/quiqqer" : "dev-master",
         "quiqqer/utils" : "dev-master"
     },
 
