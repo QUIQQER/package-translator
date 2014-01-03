@@ -19,7 +19,7 @@
 
     "require": {
         "quiqqer/quiqqer" : "1.*",
-        "quiqqer/utils" : "dev-master",
+        "quiqqer/utils" : "dev-master"
     },
 
     "autoload": {
