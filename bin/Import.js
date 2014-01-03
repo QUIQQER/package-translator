@@ -126,7 +126,9 @@ define('package/quiqqer/translator/bin/Import', [
 
                         message = message +'</ul>';
 
-                        QUI.MH.addSuccess( message );
+                        QUI.getMessageHandler(function(MH) {
+                            MH.addSuccess( message );
+                        });
                     }
                 }
             });
@@ -135,7 +137,7 @@ define('package/quiqqer/translator/bin/Import', [
             Form.setParam( 'onfinish', 'package_quiqqer_translator_ajax_file_import' );
             Form.setParam( 'overwrite', 1 );
 
-            if ( QUI.config( 'globals' ).development )
+            if ( QUIQQER_CONFIG.globals.development )
             {
                 new Element('div', {
                     html : '<input type="checkbox" name="overwrite" id="overwrite+'+ this.getId() +'" checked="checked" />' +

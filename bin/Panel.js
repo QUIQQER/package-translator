@@ -441,6 +441,23 @@ define('package/quiqqer/translator/bin/Panel', [
                     Translator.$gridBlur();
                     Translator.resize();
                     Translator.Loader.hide();
+
+                    // dev info
+                    if ( QUIQQER_CONFIG.globals.development )
+                    {
+                        QUI.getMessageHandler(function(MessageHandler)
+                        {
+                            MessageHandler.addInformation(
+                                'QUIQQER ist im Entwicklungsmodus, '+
+                                'daher werden im Übersetzer die lang_edit Spalten angezeigt<br />'+
+                                'Mehr Informationen im quiqqer/translator Wiki unter: '+
+                                '<a href="https://dev.quiqqer.com/quiqqer/package-translator/wikis/home" target="_blank">'+
+                                    'https://dev.quiqqer.com/quiqqer/package-translator/wikis/home'+
+                                '</a>'
+                            );
+                        });
+                    }
+
                 },
 
                 {
