@@ -23,6 +23,8 @@ define('package/quiqqer/translator/bin/Panel', [
 
 ], function(QUI, QUIPanel, QUIButton, QUIButtonSeperator, QUISelect, QUIConfirm, Ajax, Locale, Grid)
 {
+    "use strict";
+
     return new Class({
 
         Extends : QUIPanel,

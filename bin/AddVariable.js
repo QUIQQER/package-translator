@@ -17,6 +17,8 @@ define('package/quiqqer/translator/bin/AddVariable', [
 
 ], function(Panel, Locale, Ajax, QUIPrompt)
 {
+    "use strict";
+
     return function(Translator)
     {
         var group = Translator.getTranslationGroup();

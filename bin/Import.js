@@ -21,6 +21,8 @@ define('package/quiqqer/translator/bin/Import', [
 
 ], function(QUIControl, UploadForm, Locale, QUIButton)
 {
+    "use strict";
+
     /**
      * @calss package/quiqqer/translator/bin/Import
      *
