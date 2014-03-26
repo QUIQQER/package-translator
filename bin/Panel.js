@@ -63,14 +63,14 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             // defaults
             this.setAttribute( 'title', Locale.get( 'package/translator', 'panel.title' ) );
-            this.setAttribute( 'icon', URL_BIN_DIR +'16x16/flags/default.png' );
+            this.setAttribute( 'icon', 'icon-flag' );
 
             this.parent( options );
 
             this.addEvents({
-                'onCreate'  : this.$onCreate,
-                'onResize'  : this.$onResize,
-                'onRefresh' : this.$onRefresh
+                onCreate  : this.$onCreate,
+                onResize  : this.$onResize,
+                onRefresh : this.$onRefresh
             });
 
             this.$Container = null;
