@@ -23,8 +23,6 @@ define('package/quiqqer/translator/bin/Panel', [
 
 ], function(QUI, QUIPanel, QUIButton, QUIButtonSeperator, QUISelect, QUIConfirm, Ajax, Locale, Grid)
 {
-    "use strict";
-
     return new Class({
 
         Extends : QUIPanel,
@@ -63,14 +61,14 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             // defaults
             this.setAttribute( 'title', Locale.get( 'package/translator', 'panel.title' ) );
-            this.setAttribute( 'icon', 'icon-flag' );
+            this.setAttribute( 'icon', URL_BIN_DIR +'16x16/flags/default.png' );
 
             this.parent( options );
 
             this.addEvents({
-                onCreate  : this.$onCreate,
-                onResize  : this.$onResize,
-                onRefresh : this.$onRefresh
+                'onCreate'  : this.$onCreate,
+                'onResize'  : this.$onResize,
+                'onRefresh' : this.$onRefresh
             });
 
             this.$Container = null;

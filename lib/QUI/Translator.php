@@ -380,7 +380,7 @@ class Translator
 
                 $value = str_replace( '\\', '\\\\', $value );
                 $value = str_replace( '"', '\"', $value );
-                $value = nl2br( $value );
+                //$value = nl2br( $value );
                 $value = str_replace( "\n", '', $value );
 
                 if ( $value !== '' && $value !== ' ' ) {
@@ -388,7 +388,7 @@ class Translator
                 }
 
                 // ini Datei
-                $ini     = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.ini';
+                $ini     = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.ini.php';
                 $ini_str = $entry['var'] .'= "'. $value .'"';
 
                 \QUI\Utils\System\File::mkfile( $ini );
@@ -407,6 +407,7 @@ class Translator
 
             // create javascript lang files
             $jsdir = $dir .'/bin/';
+
             \QUI\Utils\System\File::mkdir( $jsdir );
 
             foreach ( $js_langs as $group => $groupentry )
