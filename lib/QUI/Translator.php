@@ -365,10 +365,18 @@ class Translator
                     continue;
                 }
 
+                // if php,js
+                if ( strpos( $entry['datatype'], 'js' ) !== false ) {
+                    $js_langs[ $entry['groups'] ][ $lang ][] = $entry;
+                }
+
+
                 // locale/permissions must available in JS AND PHP
+                /*
                 if ( $entry['groups'] == 'locale/permissions' ) {
                     $js_langs[ $entry['groups'] ][ $lang ][] = $entry;
                 }
+                */
 
                 $value = $entry[ $lang ];
 
