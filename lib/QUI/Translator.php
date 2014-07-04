@@ -396,8 +396,26 @@ class Translator
                 }
 
                 // ini Datei
+                $iniVar = $entry['var'];
+
+                // in php some keywords are not allowed, so we rewrite the key in `
+                // its better than destroy the ini file
+                switch ( $iniVar )
+                {
+                    case 'null':
+                    case 'yes':
+                    case 'no':
+                    case 'true':
+                    case 'false':
+                    case 'on':
+                    case 'off':
+                    case 'none':
+                        $iniVar = '`'. $iniVar .'`';
+                    break;
+                }
+
                 $ini     = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.ini.php';
-                $ini_str = $entry['var'] .'= "'. $value .'"';
+                $ini_str = $iniVar .'= "'. $value .'"';
 
                 \QUI\Utils\System\File::mkfile( $ini );
                 \QUI\Utils\System\File::putLineToFile( $ini, $ini_str );
