@@ -9,8 +9,6 @@
 
 define('package/quiqqer/translator/bin/Publish', ['Ajax'], function(Ajax)
 {
-    "use strict";
-
     return {
 
         publish : function(Translator, oncomplete)

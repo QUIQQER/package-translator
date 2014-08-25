@@ -1,10 +1,9 @@
+
 /**
  * Translator panel
  *
  * @author www.pcsg.de (Henning Leutz)
- *
  * @module package/quiqqer/translator/bin/Panel
- * @package com.pcsg.qui.package.translator
  */
 
 define('package/quiqqer/translator/bin/Panel', [
@@ -15,14 +14,32 @@ define('package/quiqqer/translator/bin/Panel', [
     "qui/controls/buttons/Seperator",
     "qui/controls/buttons/Select",
     "qui/controls/windows/Confirm",
+    "qui/utils/Elements",
     "Ajax",
     "Locale",
+    "Editors",
     "controls/grid/Grid",
 
     "css!package/quiqqer/translator/bin/Panel.css"
 
-], function(QUI, QUIPanel, QUIButton, QUIButtonSeperator, QUISelect, QUIConfirm, Ajax, Locale, Grid)
+], function()
 {
+    "use strict";
+
+    var QUI	      = arguments[ 0 ],
+        QUIPanel  = arguments[ 1 ],
+        QUIButton = arguments[ 2 ],
+        QUIButtonSeperator = arguments[ 3 ],
+        QUISelect          = arguments[ 4 ],
+        QUIConfirm         = arguments[ 5 ],
+        QUIElementUtils    = arguments[ 6 ],
+
+        Ajax    = arguments[ 7 ],
+        Locale  = arguments[ 8 ],
+        Editors = arguments[ 9 ],
+        Grid    = arguments[ 10 ];
+
+
     return new Class({
 
         Extends : QUIPanel,
@@ -66,14 +83,17 @@ define('package/quiqqer/translator/bin/Panel', [
             this.parent( options );
 
             this.addEvents({
-                'onCreate'  : this.$onCreate,
-                'onResize'  : this.$onResize,
-                'onRefresh' : this.$onRefresh
+                onCreate  : this.$onCreate,
+                onResize  : this.$onResize,
+                onRefresh : this.$onRefresh
             });
 
             this.$Container = null;
             this.$Grid      = null;
+            this.$Editor    = null;
             this.$groups    = {};
+
+            this.$EditorHeader = null;
         },
 
         /**
@@ -93,7 +113,9 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             this.Loader.show();
 
-            this.$Container = new Element( 'div' ).inject( this.getBody() );
+            this.$Container = new Element('div', {
+                'class' : 'qui-translater'
+            }).inject( this.getBody() );
 
             this.$loadButtons();
             this.$loadGroups.delay( 500, this );
@@ -111,14 +133,31 @@ define('package/quiqqer/translator/bin/Panel', [
             var Body = this.getBody(),
                 Grid = this.getGrid();
 
+
+            var bodyHeight = Body.getSize().y,
+                height     = bodyHeight;
+
+
             if ( this.getAttribute( 'search' ) )
             {
-                Grid.setHeight( Body.getSize().y - 90 );
+                height = height - 90;
             } else
             {
-                Grid.setHeight( Body.getSize().y - 40 );
+                height = height - 40;
             }
 
+            if ( this.$Editor )
+            {
+                height = 300;
+
+                this.$Editor.getElm().setStyles({
+                    height : bodyHeight - 410
+                });
+
+                this.$Editor.setHeight( bodyHeight - 410 );
+            }
+
+            Grid.setHeight( height );
             Grid.setWidth( Body.getSize().x - 40 );
         },
 
@@ -298,182 +337,172 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         $loadGrid : function()
         {
-            Ajax.get(
+            Ajax.get('package_quiqqer_translator_ajax_translations', function(translations, Request)
+            {
+                var Translator = Request.getAttribute( 'Translator' ),
+                    Body       = Translator.getBody(),
 
-                'package_quiqqer_translator_ajax_translations',
+                    cols  = [],
+                    langs = translations.langs,
 
-                function(translations, Request)
+                    height = Body.getSize().y - 40,
+                    width  = Body.getSize().x - 40;
+
+
+                cols.push({
+                    header    : Locale.get( 'package/translator', 'grid.title.variable' ),
+                    dataIndex : 'var',
+                    dataType  : 'string',
+                    width     : 150,
+                    editable  : true
+                });
+
+                if ( Translator.getAttribute( 'search' ) )
                 {
-                    var Translator = Request.getAttribute( 'Translator' ),
-                        Body       = Translator.getBody(),
-
-                        cols  = [],
-                        langs = translations.langs,
-
-                        height = Body.getSize().y - 40,
-                        width  = Body.getSize().x - 40;
-
-
                     cols.push({
-                        header    : Locale.get( 'package/translator', 'grid.title.variable' ),
-                        dataIndex : 'var',
+                        header    : Locale.get( 'package/translator', 'grid.title.group' ),
+                        dataIndex : 'groups',
                         dataType  : 'string',
-                        width     : 150,
+                        width     : 150
+                    });
+
+                    Translator.$attentionBox();
+                }
+
+                var dev = QUIQQER_CONFIG.globals.development;
+
+                // Sprachen
+                for ( var i = 0, len = langs.length; i < len; i++ )
+                {
+                    cols.push({
+                        header    : langs[ i ],
+                        dataIndex : langs[ i ],
+                        dataType  : 'string',
+                        width     : 300,
                         editable  : true
                     });
 
-                    if ( Translator.getAttribute( 'search' ) )
+                    if ( dev == 1 )
                     {
                         cols.push({
-                            header    : Locale.get( 'package/translator', 'grid.title.group' ),
-                            dataIndex : 'groups',
+                            header    : langs[ i ] +'_edit',
+                            dataIndex : langs[ i ] +'_edit',
                             dataType  : 'string',
-                            width     : 150
-                        });
-
-                        Translator.$attentionBox();
-                    }
-
-                    var dev = QUIQQER_CONFIG.globals.development;
-
-                    // Sprachen
-                    for ( var i = 0, len = langs.length; i < len; i++ )
-                    {
-                        cols.push({
-                            header    : langs[ i ],
-                            dataIndex : langs[ i ],
-                            dataType  : 'string',
-                            editType  : 'textarea',
                             width     : 300,
                             editable  : true
                         });
-
-                        if ( dev == 1 )
-                        {
-                            cols.push({
-                                header    : langs[ i ] +'_edit',
-                                dataIndex : langs[ i ] +'_edit',
-                                dataType  : 'string',
-                                editType  : 'textarea',
-                                width     : 300,
-                                editable  : true
-                            });
-                        }
                     }
-
-                    cols.push({
-                        header    : Locale.get( 'package/translator', 'grid.title.type' ),
-                        dataIndex : 'datatype',
-                        dataType  : 'string',
-                        width     : 50,
-                        editable  : true
-                    });
-
-                    cols.push({
-                        header    : Locale.get( 'package/translator', 'grid.title.define' ),
-                        dataIndex : 'datadefine',
-                        dataType  : 'string',
-                        width     : 100,
-                        editable  : true
-                    });
-
-                    if ( Translator.$Grid ) {
-                        Translator.$Grid.destroy();
-                    }
-
-                    Translator.$Grid = new Grid( Translator.$Container, {
-                        columnModel : cols,
-                        pagination  : true,
-                        filterInput : true,
-                        buttons     : [{
-                            name      : 'add',
-                            text      : Locale.get( 'package/translator', 'btn.add.var.text' ),
-                            textimage : 'icon-plus',
-                            events    : {
-                                onClick : Translator.addVariable
-                            }
-                        }, {
-                            name      : 'del',
-                            text      : Locale.get( 'package/translator', 'btn.del.var.text' ),
-                            textimage : 'icon-trash',
-                            events    : {
-                                onMousedown : Translator.deleteVariables
-                            }
-                        }],
-
-                        editable       : true,
-                        editondblclick : true,
-
-                        perPage     : Translator.getAttribute( 'limit' ),
-                        page        : Translator.getAttribute( 'page' ),
-                        sortOn      : Translator.getAttribute( 'field' ),
-                        width       : width,
-                        height      : height,
-                        onrefresh   : function(me)
-                        {
-                            var options = me.options;
-
-                            this.setAttribute( 'field', options.sortOn );
-                            this.setAttribute( 'order', options.sortBy );
-                            this.setAttribute( 'limit', options.perPage );
-                            this.setAttribute( 'page', options.page );
-
-                            this.refresh();
-
-                        }.bind( Translator ),
-
-                        alternaterows     : true,
-                        resizeColumns     : true,
-                        selectable        : true,
-                        multipleSelection : true,
-                        resizeHeaderOnly  : true
-                    });
-
-                    // Events
-                    Translator.$Grid.addEvents({
-                        onClick    : Translator.$gridClick,
-                        onDblClick : Translator.$gridDblClick,
-                        onBlur     : Translator.$gridBlur,
-                        onEditComplete : Translator.$onEditComplete
-                    });
-
-                    Translator.$Grid.setData( translations.data );
-                    Translator.$gridBlur();
-                    Translator.resize();
-                    Translator.Loader.hide();
-
-                    // dev info
-                    if ( QUIQQER_CONFIG.globals.development )
-                    {
-                        QUI.getMessageHandler(function(MessageHandler)
-                        {
-                            MessageHandler.addInformation(
-                                'QUIQQER ist im Entwicklungsmodus, '+
-                                'daher werden im Übersetzer die lang_edit Spalten angezeigt<br />'+
-                                'Mehr Informationen im quiqqer/translator Wiki unter: '+
-                                '<a href="https://dev.quiqqer.com/quiqqer/package-translator/wikis/home" target="_blank">'+
-                                    'https://dev.quiqqer.com/quiqqer/package-translator/wikis/home'+
-                                '</a>'
-                            );
-                        });
-                    }
-
-                },
-
-                {
-                    'package'  : 'quiqqer/translator',
-                    Translator : this,
-
-                    groups  : this.getTranslationGroup(),
-                    params  : JSON.encode({
-                        field : this.getAttribute( 'field' ),
-                        order : this.getAttribute( 'order' ),
-                        limit : this.getAttribute( 'limit' ),
-                        page  : this.getAttribute( 'page' )
-                    }),
-                    search : JSON.encode( this.getAttribute( 'search' ) )
                 }
-            );
+
+                cols.push({
+                    header    : Locale.get( 'package/translator', 'grid.title.type' ),
+                    dataIndex : 'datatype',
+                    dataType  : 'string',
+                    width     : 50,
+                    editable  : true
+                });
+
+                cols.push({
+                    header    : Locale.get( 'package/translator', 'grid.title.html' ),
+                    dataIndex : 'html',
+                    dataType  : 'bool',
+                    width     : 50,
+                    editable  : true
+                });
+
+                if ( Translator.$Grid ) {
+                    Translator.$Grid.destroy();
+                }
+
+                Translator.$Grid = new Grid( Translator.$Container, {
+                    columnModel : cols,
+                    pagination  : true,
+                    filterInput : true,
+                    buttons     : [{
+                        name      : 'add',
+                        text      : Locale.get( 'package/translator', 'btn.add.var.text' ),
+                        textimage : 'icon-plus',
+                        events    : {
+                            onClick : Translator.addVariable
+                        }
+                    }, {
+                        name      : 'del',
+                        text      : Locale.get( 'package/translator', 'btn.del.var.text' ),
+                        textimage : 'icon-trash',
+                        events    : {
+                            onMousedown : Translator.deleteVariables
+                        }
+                    }],
+
+                    editable       : false,
+                    editondblclick : false,
+
+                    perPage     : Translator.getAttribute( 'limit' ),
+                    page        : Translator.getAttribute( 'page' ),
+                    sortOn      : Translator.getAttribute( 'field' ),
+                    width       : width,
+                    height      : height,
+                    onrefresh   : function(me)
+                    {
+                        var options = me.options;
+
+                        this.setAttribute( 'field', options.sortOn );
+                        this.setAttribute( 'order', options.sortBy );
+                        this.setAttribute( 'limit', options.perPage );
+                        this.setAttribute( 'page', options.page );
+
+                        this.refresh();
+
+                    }.bind( Translator ),
+
+                    alternaterows     : true,
+                    resizeColumns     : true,
+                    selectable        : true,
+                    multipleSelection : true,
+                    resizeHeaderOnly  : true
+                });
+
+                // Events
+                Translator.$Grid.addEvents({
+                    onClick    : Translator.$gridClick,
+                    onDblClick : Translator.$gridDblClick,
+                    onBlur     : Translator.$gridBlur
+                });
+
+                Translator.$Grid.setData( translations.data );
+                Translator.$gridBlur();
+                Translator.resize();
+                Translator.Loader.hide();
+
+                // dev info
+                if ( QUIQQER_CONFIG.globals.development )
+                {
+                    QUI.getMessageHandler(function(MessageHandler)
+                    {
+                        MessageHandler.addInformation(
+                            'QUIQQER ist im Entwicklungsmodus, '+
+                            'daher werden im Übersetzer die lang_edit Spalten angezeigt<br />'+
+                            'Mehr Informationen im quiqqer/translator Wiki unter: '+
+                            '<a href="https://dev.quiqqer.com/quiqqer/package-translator/wikis/home" target="_blank">'+
+                                'https://dev.quiqqer.com/quiqqer/package-translator/wikis/home'+
+                            '</a>'
+                        );
+                    });
+                }
+
+            }, {
+                'package'  : 'quiqqer/translator',
+                Translator : this,
+
+                groups  : this.getTranslationGroup(),
+                params  : JSON.encode({
+                    field : this.getAttribute( 'field' ),
+                    order : this.getAttribute( 'order' ),
+                    limit : this.getAttribute( 'limit' ),
+                    page  : this.getAttribute( 'page' )
+                }),
+                search : JSON.encode( this.getAttribute( 'search' ) )
+            });
         },
 
         /**
@@ -720,17 +749,190 @@ define('package/quiqqer/translator/bin/Panel', [
         },
 
         /**
-         * dblclick on the grid
+         * dblclick on the grid -> edit entry
          *
          * @param {Object} data - grid selected data
          */
-        $gridDblClick : function(data)
+        $gridDblClick : function(data, event)
         {
-            /*
-            this.openGroup(
-                data.target.getDataByRow( data.row ).id
+            var self    = this,
+                Cell    = data.cell,
+                row     = data.row,
+                Grid    = this.getGrid(),
+                Content = this.getContent(),
+
+                gridData    = data.target.$data,
+                columnModel = data.target.$columnModel,
+                localeData  = gridData[ row ];
+
+            var index = QUIElementUtils.getChildIndex( Cell );
+
+            if ( index === 0 ) {
+                return;
+            }
+
+            Grid.setHeight( 300 );
+
+            var Column = columnModel[ index ];
+
+//            console.log( Column );
+//            console.log( Cell );
+//            console.log( localeData );
+//            console.log( data );
+//            console.info( index );
+//            console.log( Content );
+
+            if ( this.$Editor )
+            {
+                this.$gridDblClickHeaderCreate( localeData, Column, row );
+                this.$Editor.setContent( Cell.get('html') );
+
+                if ( ( localeData.html ).toInt() === 1 )
+                {
+                    this.$Editor.switchToWYSIWYG();
+                    this.$Editor.showToolbar();
+
+                } else
+                {
+                    this.$Editor.switchToSource();
+                    this.$Editor.hideToolbar();
+                }
+
+                this.$Editor.focus();
+
+                return;
+            }
+
+
+            this.Loader.show();
+
+            Editors.getEditor(null, function(Editor)
+            {
+                self.$Editor = Editor;
+
+                var height = Content.getSize().y - 410;
+
+                if ( height < 100 ) {
+                    height = 100;
+                }
+
+                self.$EditorHeader = new Element( 'div', {
+                    'class' : 'qui-translater-editable-header'
+                }).inject( Content );
+
+                self.$gridDblClickHeaderCreate( localeData, Column, row );
+
+                var EditorContainer = new Element( 'div', {
+                    'class' : 'qui-translater-editable',
+                    styles  : {
+                        height : height
+                    }
+                }).inject( Content );
+
+                // minimal toolbar
+                self.$Editor.setAttribute('buttons', {
+                    lines : [
+                        [[
+
+                        { type : 'button', button : 'Source' },
+                        { type : "seperator" },
+                        { type : "button", button : "Bold" },
+                        { type : "button", button : "Italic" },
+                        { type : "button", button : "Underline" },
+                        { type : "button", button : "Strike" },
+                        { type : "button", button : "Subscript" },
+                        { type : "button", button : "Superscript" },
+                        { type : "seperator" },
+                        { type : "button", button : "RemoveFormat" },
+                        { type : "seperator" },
+                        { type : "button", button : "NumberedList" },
+                        { type : "button", button : "BulletedList" },
+                        { type : "seperator" },
+                        { type : "button", button : "Outdent" },
+                        { type : "button", button : "Indent" },
+                        { type : "seperator" },
+                        { type : "button", button : "Blockquote" },
+                        { type : "button", button : "CreateDiv" },
+                        { type : "seperator" },
+                        { type : "button", button : "JustifyLeft" },
+                        { type : "button", button : "JustifyCenter" },
+                        { type : "button", button : "JustifyRight" },
+                        { type : "button", button : "JustifyBlock" },
+                        { type : "seperator" },
+                        { type : "button", button : "Link" },
+                        { type : "button", button : "Unlink" },
+                        { type : "button", button : "Image" }
+
+                        ]]
+                    ]
+                })
+
+                self.$Editor.addEvent('onLoaded', function()
+                {
+                    if ( ( localeData.html ).toInt() === 1 )
+                    {
+                        self.$Editor.switchToWYSIWYG();
+                        self.$Editor.showToolbar();
+
+                    } else
+                    {
+                        self.$Editor.switchToSource();
+                        self.$Editor.hideToolbar();
+                    }
+
+                    self.Loader.hide();
+                });
+
+                self.$Editor.inject( EditorContainer );
+                self.$Editor.setContent( Cell.get('html') );
+                self.$Editor.setHeight( height );
+            });
+        },
+
+        /**
+         * Jelper fpr edit header creation
+         *
+         * @param {Object} Data - row data
+         * @param {Object} Column - Grid column
+         * @param {Integer} row . Grid row
+         */
+        $gridDblClickHeaderCreate : function(Data, Column, row)
+        {
+            var self = this;
+
+            this.$EditorHeader.set(
+                'html',
+
+                '<div class="qui-translater-editable-header-text">' +
+                    'Bearbeiten von: <b>'+ Data.groups +' - '+ Data['var'] +' ('+ Column.header +')</b>'+
+                '</div>'
             );
-            */
+
+            new QUIButton({
+                textimage : 'icon-save',
+                text      : 'Speichern',
+                styles : {
+                    'float' : 'right'
+                },
+                events :
+                {
+                    onClick : function()
+                    {
+                        self.Loader.show();
+
+                        Data[ Column.dataIndex ] = self.$Editor.getContent();
+
+                        // refresh grid
+                        if ( typeof row !== 'undefined' ) {
+                            self.getGrid().setDataByRow( row, Data );
+                        }
+
+                        self.$saveData( Data, function() {
+                            self.Loader.hide();
+                        });
+                    }
+                }
+            }).inject( this.$EditorHeader );
         },
 
         /**
@@ -738,7 +940,7 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         $gridBlur : function()
         {
-            var Grid   = this.getGrid();
+            var Grid = this.getGrid();
 
             Grid.unselectAll();
             Grid.removeSections();
@@ -753,21 +955,20 @@ define('package/quiqqer/translator/bin/Panel', [
         /**
          * event: on grid edit complete
          *
-         * @param {Object} params - grid edit params
+         * @param {Object} data - row data
          */
-        $onEditComplete : function(params)
+        $saveData : function(data, callback)
         {
-            var newdata = this.getGrid().getDataByRow( params.row );
-
-            Ajax.post(
-                'package_quiqqer_translator_ajax_update',
-                false,
-                {
-                    'package' : 'quiqqer/translator',
-                    groups    : newdata.groups,
-                    data      : JSON.encode( newdata )
+            Ajax.post('package_quiqqer_translator_ajax_update', function()
+            {
+                if ( typeof callback !== 'undefined' ) {
+                    callback();
                 }
-            );
+            }, {
+                'package' : 'quiqqer/translator',
+                groups    : data.groups,
+                data      : JSON.encode( data )
+            });
         },
 
         /**
@@ -781,18 +982,14 @@ define('package/quiqqer/translator/bin/Panel', [
 
             Sheet.addEvent('onOpen', function(Sheet)
             {
-                require([
-
-                    'package/quiqqer/translator/bin/Import'
-
-                ], function(Import)
+                require(['package/quiqqer/translator/bin/Import'], function(Import)
                 {
                     var TranslatorImport = new Import({
                         events :
                         {
                             onUpload : function() {
-                                this.hide();
-                            }.bind( Sheet )
+                                Sheet.hide();
+                            }
                         }
                     });
 
@@ -832,15 +1029,11 @@ define('package/quiqqer/translator/bin/Panel', [
                     })
                 );
 
-                Ajax.get(
-                    'package_quiqqer_translator_ajax_template_search',
-                    this.$searchTemplate,
-                    {
-                        'package'  : 'quiqqer/translator',
-                        Translator : this,
-                        Sheet      : Sheet
-                    }
-                );
+                Ajax.get( 'package_quiqqer_translator_ajax_template_search', this.$searchTemplate, {
+                    'package'  : 'quiqqer/translator',
+                    Translator : this,
+                    Sheet      : Sheet
+                });
 
                 this.Loader.hide();
             }.bind( this ));

@@ -179,10 +179,21 @@ class Translator
                 $var = $locale['name'];
                 unset( $locale['name'] );
 
+
+                if ( !isset( $locale['html'] ) ) {
+                    $locale['html'] = 0;
+                }
+
+                if ( $locale['html'] ) {
+                    $locale['html'] = 1;
+                }
+
+
                 try
                 {
                     self::add( $group, $var );
-                } catch ( \QUI\Exception $e )
+
+                } catch ( \QUI\Exception $Exception )
                 {
 
                 }
@@ -197,8 +208,10 @@ class Translator
                     }
 
                     $_locale['datatype'] = $datatype;
+                    $_locale['html']     = $locale['html'];
 
                     self::edit( $group, $var, $_locale );
+
                 } else
                 {
                     // set the original fields
@@ -352,7 +365,7 @@ class Translator
             $result = \QUI::getDB()->select(array(
                 'select' => array(
                     $lang, $lang .'_edit', 'groups', 'var',
-                    'datatype', 'datadefine'
+                    'datatype', 'datadefine', 'html'
                 ),
                 'from' => self::Table()
             ));
@@ -717,6 +730,12 @@ class Translator
             $_data[ 'datadefine' ] = $data[ 'datadefine' ];
         }
 
+        $_data[ 'html' ] = 0;
+
+        if ( isset( $data[ 'html' ] ) && $data[ 'html' ] ) {
+            $_data[ 'html' ] = 1;
+        }
+
         \QUI::getDB()->updateData(
             self::Table(),
             $_data,
@@ -771,6 +790,12 @@ class Translator
             $_data[ 'datadefine' ] = $data[ 'datadefine' ];
         }
 
+        $_data[ 'html' ] = 0;
+
+        if ( isset( $data[ 'html' ] ) && $data[ 'html' ] ) {
+            $_data[ 'html' ] = 1;
+        }
+
         \QUI::getDB()->updateData(
             self::Table(),
             $_data,
@@ -821,6 +846,10 @@ class Translator
                 continue;
             }
 
+            if ( $entry == 'html' ) {
+                continue;
+            }
+
             if ( $entry == 'datatype' ) {
                 continue;
             }
@@ -854,7 +883,7 @@ class Translator
 
         foreach ( $fields as $entry )
         {
-            if ( $entry == 'var' || $entry == 'groups' ) {
+            if ( $entry == 'var' || $entry == 'groups' || $entry == 'html' ) {
                 continue;
             }
 

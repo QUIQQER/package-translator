@@ -1,17 +1,17 @@
 <locales>
-	<groups name="package/translator" datatype="js">
-	    <locale name="add.window.title">
+    <groups name="package/translator" datatype="js">
+        <locale name="add.window.title">
             <de><![CDATA[Variable hinzufügen:[group]]]></de>
             <en><![CDATA[Add Variable: [group]]]></en>
         </locale>
-	    <locale name="add.window.text">
-	        <de><![CDATA[
+        <locale name="add.window.text">
+            <de><![CDATA[
                 <p>Fügen Sie eine neue Variable in die Gruppe <b>[group]</b> für die Übersetzung hinzu.</p>
                 <p>Wenn Sie enter drücken oder auf den OK Button klicken wird die Variable angelegt und Sie können eine weitere Variable hinzufügen</p>
             ]]></de>
-	        <en><![CDATA[]]></en>
-	    </locale>
-	    <locale name="add.window.btn.close">
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="add.window.btn.close">
             <de><![CDATA[schließen]]></de>
             <en><![CDATA[close]]></en>
         </locale>
@@ -76,52 +76,52 @@
 
         <locale name="grid.title.variable">
             <de><![CDATA[Variable]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Variable]]></en>
         </locale>
         <locale name="grid.title.group">
             <de><![CDATA[Gruppe]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Groupe]]></en>
         </locale>
         <locale name="grid.title.type">
             <de><![CDATA[Typ]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Type]]></en>
         </locale>
-        <locale name="grid.title.define">
-            <de><![CDATA[Define]]></de>
-            <en><![CDATA[]]></en>
+        <locale name="grid.title.html">
+            <de><![CDATA[HTML]]></de>
+            <en><![CDATA[HTML]]></en>
         </locale>
         <locale name="btn.add.var.text">
             <de><![CDATA[Variable(n) hinzufügen]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Add variables]]></en>
         </locale>
         <locale name="btn.del.var.text">
             <de><![CDATA[Variable(n) löschen]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Delete variables]]></en>
         </locale>
 
         <locale name="btn.search.sheet.text">
             <de><![CDATA[Suche starten]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Start search]]></en>
         </locale>
         <locale name="btn.search.title">
             <de><![CDATA[Übersetzer durchsuchen]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Search translations]]></en>
         </locale>
         <locale name="btn.search.alt">
             <de><![CDATA[Übersetzer durchsuchen]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Search translations]]></en>
         </locale>
         <locale name="btn.import.text">
             <de><![CDATA[Import]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Import]]></en>
         </locale>
         <locale name="btn.export.text">
             <de><![CDATA[Export]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Export]]></en>
         </locale>
         <locale name="btn.publish.text">
             <de><![CDATA[Veröffentlichen]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Publish]]></en>
         </locale>
         <locale name="search.params.active">
             <de><![CDATA[Sucheparameter sind aktiviert. Klicken Sie hier um die Suche zu beenden]]></de>
@@ -134,15 +134,15 @@
             <en><![CDATA[]]></en>
         </locale>
 
-	</groups>
+    </groups>
 
-	<groups name="package/translator" type="php">
+    <groups name="package/translator" type="php">
 
-	    <locale name="exception.file.could.not.read">
-	        <de><![CDATA[Datei konnte nicht gelesen werden.]]></de>
-	        <en><![CDATA[]]></en>
-	    </locale>
-	    <locale name="exception.translation.not.found.update">
+        <locale name="exception.file.could.not.read">
+            <de><![CDATA[Datei konnte nicht gelesen werden.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="exception.translation.not.found.update">
             <de><![CDATA[Übersetzung wurde nicht gefunden und konnt nicht aktualisiert werden.]]></de>
             <en><![CDATA[]]></en>
         </locale>
@@ -163,7 +163,7 @@
             <en><![CDATA[]]></en>
         </locale>
 
-	    <locale name="message.var.add.successful">
+        <locale name="message.var.add.successful">
             <de><![CDATA[Variable [groups] [var] wurde erfolgreich hinzugefügt.]]></de>
             <en><![CDATA[]]></en>
         </locale>
@@ -207,5 +207,5 @@
         </locale>
 
 
-	</groups>
+    </groups>
 </locales>

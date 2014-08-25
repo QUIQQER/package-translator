@@ -7,3 +7,25 @@
 .qui-translater-search-field {
     margin: 10px;
 }
+
+.qui-translater-editable-header {
+    background: #dedede;
+    clear: both;
+    color: #555;
+    float: left;
+    margin: 20px 0 0 0;
+    padding: 10px;
+    width: 100%
+}
+
+.qui-translater-editable-header-text {
+    float: left;
+    line-height: 30px;
+}
+
+.qui-translater-editable {
+    clear: both;
+    float: left;
+    margin: 0;
+    width: 100%;
+}

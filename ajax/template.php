@@ -7,7 +7,7 @@
  */
 function ajax_translater_template()
 {
-    $Engine   = \QUI\Template::getEngine(true);
+    $Engine   = \QUI::getTemplateManager()->getEngine( true );
     $projects = \QUI::getProjects();
 
     $Plugins  = \QUI::getPlugins();

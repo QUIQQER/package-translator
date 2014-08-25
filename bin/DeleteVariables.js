@@ -17,8 +17,6 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
 
 ], function(Panel, Locale, Ajax, QUIConfirm)
 {
-    "use strict";
-
     return function(Translator, data)
     {
         var i, len;
