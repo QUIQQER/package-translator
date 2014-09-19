@@ -3,7 +3,7 @@
     "type" : "quiqqer-library",
     "description" : "QUIQQER Translator",
 
-    "version" : "dev-master",
+    "version" : "dev-dev",
     "license" : "GPL-3.0+",
 
     "authors" : [{
@@ -18,20 +18,13 @@
     },
 
     "require": {
-        "quiqqer/quiqqer" : "*",
+        "quiqqer/quiqqer" : "*@dev",
         "quiqqer/utils" : "dev-master"
     },
 
     "autoload": {
         "psr-0" : {
             "QUI" : "lib/"
-        }
-    },
-
-    "extra": {
-        "component": {
-            "files": ["bin/**"],
-            "name": "quiqqer/translator"
         }
     }
 }
