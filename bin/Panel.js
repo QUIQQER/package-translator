@@ -3,10 +3,10 @@
  * Translator panel
  *
  * @author www.pcsg.de (Henning Leutz)
- * @module package/quiqqer/translator/bin/Panel
+ * @module URL_OPT_DIR/quiqqer/translator/bin/Panel
  */
 
-define('package/quiqqer/translator/bin/Panel', [
+define([
 
     "qui/QUI",
     "qui/controls/desktop/Panel",
@@ -20,7 +20,7 @@ define('package/quiqqer/translator/bin/Panel', [
     "Editors",
     "controls/grid/Grid",
 
-    "css!package/quiqqer/translator/bin/Panel.css"
+    "css!URL_OPT_DIR/quiqqer/translator/bin/Panel.css"
 
 ], function()
 {
@@ -43,7 +43,7 @@ define('package/quiqqer/translator/bin/Panel', [
     return new Class({
 
         Extends : QUIPanel,
-        Type    : 'package/quiqqer/translator/bin/Panel',
+        Type    : 'URL_OPT_DIR/quiqqer/translator/bin/Panel',
 
         Binds : [
             'exportGroup',

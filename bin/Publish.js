@@ -3,12 +3,13 @@
  *
  * @author www.pcsg.de (Henning Leutz)
  *
- * @module package/quiqqer/translator/bin/Publish
- * @package com.pcsg.qui.package.translator
+ * @module URL_OPT_DIR/quiqqer/translator/bin/Publish
  */
 
-define('package/quiqqer/translator/bin/Publish', ['Ajax'], function(Ajax)
+define(['Ajax'], function(Ajax)
 {
+    "use strict";
+
     return {
 
         publish : function(Translator, oncomplete)

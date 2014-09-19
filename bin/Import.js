@@ -3,24 +3,24 @@
  *
  * @author www.pcsg.de (Henning Leutz)
  *
- * @module package/quiqqer/translator/bin/Import
- * @package com.pcsg.qui.package.translator
- * @namespace QUI
+ * @module URL_OPT_DIR/quiqqer/translator/bin/Import
  *
  * @event onUpload [ this ]
  */
 
-define('package/quiqqer/translator/bin/Import', [
+define([
 
     'qui/controls/Control',
     'controls/upload/Form',
     'Locale',
     'qui/controls/buttons/Button',
 
-    'css!package/quiqqer/translator/bin/Import.css'
+    'css!URL_OPT_DIR/quiqqer/translator/bin/Import.css'
 
 ], function(QUIControl, UploadForm, Locale, QUIButton)
 {
+    "use strict";
+
     /**
      * @calss package/quiqqer/translator/bin/Import
      *
@@ -29,7 +29,7 @@ define('package/quiqqer/translator/bin/Import', [
     return new Class({
 
         Extends : QUIControl,
-        Type    : 'package/quiqqer/translator/bin/Import',
+        Type    : 'URL_OPT_DIR/quiqqer/translator/bin/Import',
 
         initialize: function(options)
         {

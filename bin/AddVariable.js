@@ -3,20 +3,20 @@
  *
  * @author www.pcsg.de (Henning Leutz)
  *
- * @module package/quiqqer/translator/bin/AddVariable
- * @package com.pcsg.qui.package.translator
- * @namespace QUI
+ * @module URL_OPT_DIR/quiqqer/translator/bin/AddVariable
  */
 
-define('package/quiqqer/translator/bin/AddVariable', [
+define([
 
-    "package/quiqqer/translator/bin/Panel",
+    "URL_OPT_DIR/quiqqer/translator/bin/Panel",
     "Locale",
     "Ajax",
     "qui/controls/windows/Prompt"
 
 ], function(Panel, Locale, Ajax, QUIPrompt)
 {
+    "use strict";
+
     return function(Translator)
     {
         var group = Translator.getTranslationGroup();

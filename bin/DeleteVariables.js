@@ -2,21 +2,20 @@
  * Translator delete variables method
  *
  * @author www.pcsg.de (Henning Leutz)
- *
- * @module package/quiqqer/translator/bin/DeleteVariables
- * @package com.pcsg.qui.package.translator
- * @namespace QUI
+ * @module URL_OPT_DIR/quiqqer/translator/bin/DeleteVariables
  */
 
-define('package/quiqqer/translator/bin/DeleteVariables', [
+define([
 
-    "package/quiqqer/translator/bin/Panel",
+    "URL_OPT_DIR/quiqqer/translator/bin/Panel",
     "Locale",
     "Ajax",
     "qui/controls/windows/Confirm"
 
 ], function(Panel, Locale, Ajax, QUIConfirm)
 {
+    "use strict";
+
     return function(Translator, data)
     {
         var i, len;
