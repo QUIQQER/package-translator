@@ -475,7 +475,7 @@ define([
                 Translator.Loader.hide();
 
                 // dev info
-                if ( QUIQQER_CONFIG.globals.development )
+                if ( ( QUIQQER_CONFIG.globals.development ).toInt() )
                 {
                     QUI.getMessageHandler(function(MessageHandler)
                     {
@@ -771,16 +771,16 @@ define([
                 return;
             }
 
+            // html and typ only editable at development
+            var Column = columnModel[ index ],
+                dev    = ( QUIQQER_CONFIG.globals.development ).toInt();
+
+            if ( !dev && ( Column.dataIndex === 'html' || Column.dataIndex === 'datatype' ) ) {
+                return;
+            }
+
+
             Grid.setHeight( 300 );
-
-            var Column = columnModel[ index ];
-
-//            console.log( Column );
-//            console.log( Cell );
-//            console.log( localeData );
-//            console.log( data );
-//            console.info( index );
-//            console.log( Content );
 
             if ( this.$Editor )
             {
