@@ -1,23 +1,31 @@
+
 /**
  * Translator delete variables method
  *
+ * @module package/quiqqer/translator/bin/Import
  * @author www.pcsg.de (Henning Leutz)
  *
- * @module URL_OPT_DIR/quiqqer/translator/bin/Import
+ * @require qui/QUI
+ * @require qui/controls/Control
+ * @require controls/upload/Form
+ * @require Locale
+ * @require qui/controls/buttons/Button
+ * @require css!package/quiqqer/translator/bin/Import.css
  *
  * @event onUpload [ this ]
  */
 
 define([
 
+    'qui/QUI',
     'qui/controls/Control',
     'controls/upload/Form',
     'Locale',
     'qui/controls/buttons/Button',
 
-    'css!URL_OPT_DIR/quiqqer/translator/bin/Import.css'
+    'css!package/quiqqer/translator/bin/Import.css'
 
-], function(QUIControl, UploadForm, Locale, QUIButton)
+], function(QUI, QUIControl, UploadForm, Locale, QUIButton)
 {
     "use strict";
 
@@ -70,21 +78,21 @@ define([
                 events  :
                 {
                     /// drag drop events
-                    onDragenter: function(event, Elm, Upload)
+                    onDragenter: function(event, Elm)
                     {
                         if ( Elm.hasClass( 'qui-package-translator-import' ) ) {
                             Elm.addClass( 'dragdrop' );
                         }
                     },
 
-                    onDragend : function(event, Elm, Upload)
+                    onDragend : function(event, Elm)
                     {
                         if ( Elm.hasClass( 'qui-package-translator-import' ) ) {
                             Elm.removeClass( 'dragdrop' );
                         }
                     },
 
-                    onSubmit : function(Form)
+                    onSubmit : function()
                     {
                         this.fireEvent( 'upload', [ this ] );
                     }.bind( this ),
@@ -137,7 +145,7 @@ define([
             Form.setParam( 'onfinish', 'package_quiqqer_translator_ajax_file_import' );
             Form.setParam( 'overwrite', 1 );
 
-            if ( QUIQQER_CONFIG.globals.development )
+            if ( ( QUIQQER_CONFIG.globals.development ).toInt() )
             {
                 new Element('div', {
                     html : '<input type="checkbox" name="overwrite" id="overwrite+'+ this.getId() +'" checked="checked" />' +
@@ -181,9 +189,7 @@ define([
                         Btn.getAttribute( 'Form' ).submit();
                     }
                 }
-            }).inject(
-                Upload
-            );
+            }).inject( Upload );
         }
     });
 

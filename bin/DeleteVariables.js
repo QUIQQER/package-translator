@@ -1,13 +1,19 @@
+
 /**
  * Translator delete variables method
  *
+ * @module package/quiqqer/translator/bin/DeleteVariables
  * @author www.pcsg.de (Henning Leutz)
- * @module URL_OPT_DIR/quiqqer/translator/bin/DeleteVariables
+ *
+ * @require package/quiqqer/translator/bin/Panel
+ * @require Locale
+ * @require Ajax
+ * @require qui/controls/windows/Confirm
  */
 
 define([
 
-    "URL_OPT_DIR/quiqqer/translator/bin/Panel",
+    "package/quiqqer/translator/bin/Panel",
     "Locale",
     "Ajax",
     "qui/controls/windows/Confirm"
@@ -20,10 +26,7 @@ define([
     {
         var i, len;
 
-        var group = Translator.getTranslationGroup(),
-            Grid  = Translator.getGrid(),
-
-            message = Locale.get( 'package/translator', 'del.window.text' ) +
+        var message = Locale.get( 'package/translator', 'del.window.text' ) +
                       '<ul style="margin-top: 10px">';
 
         for ( i = 0, len = data.length; i < len; i++ ) {
@@ -40,13 +43,8 @@ define([
             height : 200,
             text   : message,
             data   : data,
-            Translator  : Translator,
             textIcon    : 'icon-trash',
-
-            information : Locale.get(
-                'package/translator',
-                'del.window.text.information'
-            ),
+            information : Locale.get( 'package/translator', 'del.window.text.information' ),
 
             events :
             {
@@ -65,25 +63,14 @@ define([
                         });
                     }
 
-
-                    Ajax.post(
-
-                        'package_quiqqer_translator_ajax_delete',
-
-                        function(result, Request)
-                        {
-                            Request.getAttribute( 'Translator' ).refresh();
-                        },
-
-                        {
-                            'package'  : 'quiqqer/translator',
-                            Translator : Translator,
-                            data       : JSON.encode( list ),
-                            Translator : Win.getAttribute( 'Translator' )
-                        }
-                    );
+                    Ajax.post('package_quiqqer_translator_ajax_delete', function() {
+                        Translator.refresh();
+                    }, {
+                        'package'  : 'quiqqer/translator',
+                        data       : JSON.encode( list )
+                    });
                 }
             }
         }).open();
-    }
+    };
 });

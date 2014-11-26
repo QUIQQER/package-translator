@@ -1,46 +1,98 @@
 
 <form name="translater-search" class="qui-translater-search-form" method="post">
-    {title group="package/translator" var="template.search.to.title"}
-    <div class="data-table">
-        <input type="text" value="" name="search" class="qui-translater-search-field" />
-    </div>
 
-    {title group="package/translator" var="template.search.in.title"}
-    <div class="data-table">
-        <div class="checkbox-container">
-            <input type="checkbox" value="" name="groups" />
-            <label for="groups">
-                {t}package/translator template.search.groups{/t}
-            </label>
-        </div>
-        <div class="checkbox-container">
-            <input type="checkbox" value="" name="var" />
-            <label for="var">
-                {t}package/translator template.search.vars{/t}
-            </label>
-        </div>
-        <div class="checkbox-container">
-            <input type="checkbox" value="" name="datatype" />
-            <label for="datatype">
-                {t}package/translator template.search.datatype{/t}
-            </label>
-        </div>
-        <div class="checkbox-container">
-            <input type="checkbox" value="" name="datadefine" />
-            <label for="datadefine">
-                {t}package/translator template.search.datadefine{/t}
-            </label>
-        </div>
-    </div>
+    <table class="data-table">
+    <thead>
+        <tr>
+            <th>
+                {t}package/translator template.search.to.title{/t}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="odd">
+            <td>
+                <label>
+                    <input type="text" value="" name="search" class="qui-translater-search-field" />
+                    {t}package/translator template.search.field.text{/t}
+                </label>
+            </td>
+        </tr>
+        <tr class="even">
+            <td>
+                <label>
+                    <input type="checkbox" value="" name="emptyTranslations" />
+                    {t}package/translator template.search.emptyTranslations.text{/t}
+                </label>
+            </td>
+        </tr>
+    </tbody>
+    </table>
 
-    {title group="package/translator" var="template.search.lang.title"}
-    <div class="data-table">
+    <table class="data-table">
+    <thead>
+        <tr>
+            <th>
+                {t}package/translator template.search.in.title{/t}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="odd">
+            <td>
+                <label>
+                    <input type="checkbox" value="" name="groups" />
+                    {t}package/translator template.search.groups{/t}
+                </label>
+            </td>
+        </tr>
+        <tr class="even">
+            <td>
+                <label>
+                    <input type="checkbox" value="" name="var" />
+                    {t}package/translator template.search.vars{/t}
+                </label>
+            </td>
+        </tr>
+        <tr class="odd">
+            <td>
+                <label>
+                    <input type="checkbox" value="" name="datatype" />
+                    {t}package/translator template.search.datatype{/t}
+                </label>
+            </td>
+        </tr>
+        <tr class="even">
+            <td>
+                <label>
+                    <input type="checkbox" value="" name="datadefine" />
+                    {t}package/translator template.search.datadefine{/t}
+                </label>
+            </td>
+        </tr>
+    </tbody>
+    </table>
+
+    <table class="data-table">
+    <thead>
+    <tr>
+        <th>
+            {t}package/translator template.search.lang.title{/t}
+        </th>
+    </tr>
+    </thead>
+    <tbody>
         {foreach from=$languages item=lang}
-        <div class="checkbox-container">
-            <input type="checkbox" value="{$lang}" name="lang" />
-            <label for="lang">{$lang}</label>
-        </div>
+        <tr class="{cycle values="odd,even"}">
+            <td>
+                <label>
+                    <input type="checkbox" value="{$lang}" name="lang" />
+                    {$lang}
+                </label>
+            </td>
+        </tr>
         {/foreach}
-    </div>
+    </tbody>
+    </table>
 
 </form>

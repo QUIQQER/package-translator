@@ -180,6 +180,16 @@
             <de><![CDATA[Suche nach:]]></de>
             <en><![CDATA[]]></en>
         </locale>
+
+        <locale name="template.search.field.text ">
+            <de><![CDATA[Suche]]></de>
+            <en><![CDATA[Search]]></en>
+        </locale>
+        <locale name="template.search.emptyTranslations.text">
+            <de><![CDATA[Nicht übersetzte Variablen suchen.]]></de>
+            <en><![CDATA[Search no translated variables.]]></en>
+        </locale>
+
         <locale name="template.search.in.title">
             <de><![CDATA[Suche in:]]></de>
             <en><![CDATA[]]></en>

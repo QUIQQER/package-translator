@@ -1,9 +1,10 @@
 /**
  * Publish the translations
  *
+ * @module package/quiqqer/translator/bin/Publish
  * @author www.pcsg.de (Henning Leutz)
  *
- * @module URL_OPT_DIR/quiqqer/translator/bin/Publish
+ * @require Ajax
  */
 
 define(['Ajax'], function(Ajax)

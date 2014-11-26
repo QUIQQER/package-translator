@@ -3,6 +3,9 @@
 /**
  * Return the translation list
  *
+ * @param String $groups
+ * @param String $params
+ * @param String $search
  * @return Array
  */
 function package_quiqqer_translator_ajax_translations($groups, $params, $search)

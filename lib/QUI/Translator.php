@@ -513,7 +513,7 @@ class Translator
      * Übersetzung bekommen
      *
      * @param String $group - Gruppe
-     * @param String $var   - Übersetzungsvariable, optional
+     * @param String|Bool $var   - Übersetzungsvariable, optional
      *
      * @return Array
      */
@@ -543,7 +543,7 @@ class Translator
      *
      * @param String $groups - Gruppe
      * @param Array $params  - optional array(limit => 10, page => 1)
-     * @param Array $search  - optional array(search => '%str%', fields => '')
+     * @param Array|Bool $search  - optional array(search => '%str%', fields => '')
      *
      * @return Array
      */
@@ -563,8 +563,26 @@ class Translator
         $page  = ($page - 1) ? $page - 1 : 0;
         $limit = ($page * $max) .','. $max;
 
-        if ( $search && isset( $search['search'] ) )
+
+        if ( $search && isset( $search['emptyTranslations'] ) )
         {
+            // search empty translations
+            $db_fields = self::langs();
+            $where     = array();
+
+            foreach ( $db_fields as $field ) {
+                $where[ $field ] = '';
+            }
+
+            $data = array(
+                'from'     => self::Table(),
+                'where_or' => $where,
+                'limit'    => $limit
+            );
+
+        } else if ( $search && isset( $search['search'] ) )
+        {
+            // search translations
             $where  = array();
             $search = array(
                 'type'  => '%LIKE%',
@@ -609,8 +627,10 @@ class Translator
                 'where_or' => $where,
                 'limit'    => $limit
             );
+
         } else
         {
+            // search complete group
             $data = array(
                 'from' => self::Table(),
                 'where' => array(
@@ -621,16 +641,16 @@ class Translator
         }
 
         // result mit limit
-        $result = \QUI::getDB()->select( $data );
+        $result = \QUI::getDataBase()->fetch( $data );
 
         // count
         $data['count'] = 'groups';
 
         if ( isset( $data['limit'] ) ) {
-            unset($data['limit']);
+            unset( $data['limit'] );
         }
 
-        $count = \QUI::getDB()->select( $data );
+        $count = \QUI::getDataBase()->fetch( $data );
 
         return array(
             'data'  => $result,

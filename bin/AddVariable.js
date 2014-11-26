@@ -1,14 +1,19 @@
+
 /**
  * Translator add variable method
  *
+ * @module package/quiqqer/translator/bin/AddVariable
  * @author www.pcsg.de (Henning Leutz)
  *
- * @module URL_OPT_DIR/quiqqer/translator/bin/AddVariable
+ * @require package/quiqqer/translator/bin/Panel
+ * @require Locale
+ * @require Ajax
+ * @require qui/controls/windows/Prompt
  */
 
 define([
 
-    "URL_OPT_DIR/quiqqer/translator/bin/Panel",
+    "package/quiqqer/translator/bin/Panel",
     "Locale",
     "Ajax",
     "qui/controls/windows/Prompt"
@@ -31,7 +36,6 @@ define([
             title  : Locale.get('package/translator', 'add.window.title', {
                 group : group
             }),
-            Translator  : Translator,
             information : Locale.get('package/translator', 'add.window.text', {
                 group : group
             }),
@@ -54,28 +58,25 @@ define([
             {
                 onEnter : function(result, Win)
                 {
-                    if ( result == '' ) {
+                    if ( result === '' ) {
                         return;
                     }
 
-                    Ajax.post('package_quiqqer_translator_ajax_add', function()
-                    {
-
+                    Ajax.post('package_quiqqer_translator_ajax_add', function() {
+                        // nothing
                     }, {
-                        'package'  : 'quiqqer/translator',
-                        Translator : Translator,
-                        groups     : group,
-                        'var'      : result
+                        'package' : 'quiqqer/translator',
+                        groups    : group,
+                        'var'     : result
                     });
 
                     Win.setValue( '' );
                 },
 
-                onClose : function(Win)
-                {
-                    Win.getAttribute( 'Translator' ).refresh();
+                onClose : function(Win) {
+                    Translator.refresh();
                 }
             }
         }).open();
-    }
+    };
 });
