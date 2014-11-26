@@ -1164,8 +1164,12 @@ define([
                 Form.getElements( '[type="checkbox"]' ).set( 'checked', true );
             }
 
-            if ( this.getAttribute( 'search' ) ) {
+            if ( this.getAttribute( 'search' ) )
+            {
                 elements.emptyTranslations.checked = this.getAttribute( 'search' ).emptyTranslations;
+            } else if ( !this.getAttribute( 'search' ) )
+            {
+                elements.emptyTranslations.checked = false;
             }
 
 
