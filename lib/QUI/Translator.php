@@ -565,6 +565,9 @@ class Translator
      */
     static function getData($groups, $params=array(), $search=false)
     {
+        $table     = self::Table();
+        $db_fields = self::langs();
+
         $max  = 10;
         $page = 1;
 
@@ -580,23 +583,51 @@ class Translator
         $limit = ($page * $max) .','. $max;
 
 
+        // PDO search emptyTranslations
         if ( $search && isset( $search['emptyTranslations'] ) )
         {
+            $PDO = QUI::getPDO();
+
             // search empty translations
-            $db_fields = self::langs();
-            $where     = array();
+            $whereParts = array();
 
             foreach ( $db_fields as $field ) {
-                $where[ $field ] = '';
+                $whereParts[] = "({$field} = '' AND {$field}_edit = '' )";
             }
 
-            $data = array(
-                'from'     => self::Table(),
-                'where_or' => $where,
-                'limit'    => $limit
-            );
+            $where = implode( ' OR ', $whereParts );
 
-        } else if ( $search && isset( $search['search'] ) )
+            $querySelect = "
+                SELECT *
+                FROM {$table}
+                WHERE {$where}
+                LIMIT {$limit}
+            ";
+
+            $queryCount = "
+                SELECT COUNT(*) as count
+                FROM {$table}
+            ";
+
+            $Statement = $PDO->prepare( $querySelect );
+            $Statement->execute();
+            $result = $Statement->fetchAll( \PDO::FETCH_ASSOC );
+
+            $Statement = $PDO->prepare( $queryCount );
+            $Statement->execute();
+            $count = $Statement->fetchAll( \PDO::FETCH_ASSOC );
+
+
+            return array(
+                'data'  => $result,
+                'page'  => $page + 1,
+                'count' => $count[0]['count'],
+                'total' => $count[0]['count']
+            );
+        }
+
+
+        if ( $search && isset( $search['search'] ) )
         {
             // search translations
             $where  = array();
@@ -605,7 +636,6 @@ class Translator
                 'value' => $search['search']
             );
 
-            $db_fields = self::langs();
 
             // default fields
             $default = array(
@@ -641,7 +671,7 @@ class Translator
             }
 
             $data = array(
-                'from'     => self::Table(),
+                'from'     => $table,
                 'where_or' => $where,
                 'limit'    => $limit
             );
@@ -650,7 +680,7 @@ class Translator
         {
             // search complete group
             $data = array(
-                'from' => self::Table(),
+                'from'  => $table,
                 'where' => array(
                     'groups' => $groups
                 ),
