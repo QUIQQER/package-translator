@@ -6,6 +6,11 @@
 
 namespace QUI;
 
+use QUI;
+use QUI\Utils\XML;
+use QUI\Utils\String as QUIString;
+use QUI\Utils\System\File as QUIFile;
+
 /**
  * QUIQQER Translater
  *
@@ -37,21 +42,22 @@ class Translator
     /**
      * Add / create a new language
      *
-     * @param String $lang
+     * @param String $lang - lang code, length must be 2 signs
+     * @throws \QUI\Exception
      */
     static function addLang($lang)
     {
         if ( strlen( $lang ) !== 2 )
         {
-            throw new \QUI\Exception(
-                \QUI::getLocale()->get(
+            throw new QUI\Exception(
+                QUI::getLocale()->get(
                     'package/translator',
                     'exception.lang.shortcut.not.allowed'
                 )
             );
         }
 
-        \QUI::getDB()->createTableFields(
+        QUI::getDataBase()->Table()->appendFields(
             self::Table(),
             array(
                 $lang          => 'text NOT NULL',
@@ -152,7 +158,7 @@ class Translator
     {
         if ( !file_exists( $file ) )
         {
-            throw new \QUI\Exception(
+            throw new QUI\Exception(
                 \QUI::getLocale()->get(
                     'package/translator',
                     'exception.lang.file.not.exist'
@@ -161,8 +167,8 @@ class Translator
         }
 
         $result = array();
-        $groups = \QUI\Utils\XML::getLocaleGroupsFromDom(
-            \QUI\Utils\XML::getDomFromXml( $file )
+        $groups = XML::getLocaleGroupsFromDom(
+            XML::getDomFromXml( $file )
         );
 
         foreach ( $groups as $locales )
@@ -193,7 +199,7 @@ class Translator
                 {
                     self::add( $group, $var );
 
-                } catch ( \QUI\Exception $Exception )
+                } catch ( QUI\Exception $Exception )
                 {
 
                 }
@@ -237,7 +243,7 @@ class Translator
      */
     static function dir()
     {
-        return \QUI::getLocale()->dir();
+        return QUI::getLocale()->dir();
     }
 
     /**
@@ -250,13 +256,14 @@ class Translator
      */
     static function getTranslationFile($lang, $group)
     {
-        return \QUI::getLocale()->getTranslationFile($lang, $group);
+        return QUI::getLocale()->getTranslationFile($lang, $group);
     }
 
     /**
      * Return the list of the translation files for a languag
      *
-     * @var String $lang - Language -> eq: "de" or "en" ... and so on
+     * @param String $lang - Language -> eq: "de" or "en" ... and so on
+     * @return Array
      */
     static function getJSTranslationFiles($lang)
     {
@@ -267,12 +274,12 @@ class Translator
         $jsdir  = self::dir() .'/bin/';
         $result = array();
 
-        $dirs = \QUI\Utils\System\File::readDir( $jsdir );
+        $dirs = QUIFile::readDir( $jsdir );
 
         foreach ( $dirs as $dir )
         {
             $package_dir  = $jsdir . $dir;
-            $package_list = \QUI\Utils\System\File::readDir( $package_dir );
+            $package_list = QUIFile::readDir( $package_dir );
 
             foreach ( $package_list as $package )
             {
@@ -345,12 +352,12 @@ class Translator
 
         foreach ( $langs as $lang )
         {
-            $folders[ $lang ] = $dir .'/'. \QUI\Utils\String::toLower( $lang ) .
-                                      '_'. \QUI\Utils\String::toUpper( $lang ) .
+            $folders[ $lang ] = $dir .'/'. QUIString::toLower( $lang ) .
+                                      '_'. QUIString::toUpper( $lang ) .
                                       '/LC_MESSAGES/';
 
-            \QUI\Utils\System\File::unlink( $folders[ $lang ] );
-            \QUI\Utils\System\File::mkdir( $folders[ $lang ] );
+            QUIFile::unlink( $folders[ $lang ] );
+            QUIFile::mkdir( $folders[ $lang ] );
         }
 
         $js_langs = array();
@@ -362,7 +369,7 @@ class Translator
                 continue;
             }
 
-            $result = \QUI::getDB()->select(array(
+            $result = \QUI::getDataBase()->fetch(array(
                 'select' => array(
                     $lang, $lang .'_edit', 'groups', 'var',
                     'datatype', 'datadefine', 'html'
@@ -430,24 +437,24 @@ class Translator
                 $ini     = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.ini.php';
                 $ini_str = $iniVar .'= "'. $value .'"';
 
-                \QUI\Utils\System\File::mkfile( $ini );
-                \QUI\Utils\System\File::putLineToFile( $ini, $ini_str );
+                QUIFile::mkfile( $ini );
+                QUIFile::putLineToFile( $ini, $ini_str );
 
                 // po (gettext) datei
                 $po = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.po';
                 $mo = $folders[ $lang ] . str_replace( '/', '_', $entry['groups'] ) .'.mo';
 
-                \QUI\Utils\System\File::mkfile( $po );
+                QUIFile::mkfile( $po );
 
-                \QUI\Utils\System\File::putLineToFile( $po, 'msgid "'. $entry['var'] .'"' );
-                \QUI\Utils\System\File::putLineToFile( $po, 'msgstr "'. $value .'"' );
-                \QUI\Utils\System\File::putLineToFile( $po, '' );
+                QUIFile::putLineToFile( $po, 'msgid "'. $entry['var'] .'"' );
+                QUIFile::putLineToFile( $po, 'msgstr "'. $value .'"' );
+                QUIFile::putLineToFile( $po, '' );
             }
 
             // create javascript lang files
             $jsdir = $dir .'/bin/';
 
-            \QUI\Utils\System\File::mkdir( $jsdir );
+            QUIFile::mkdir( $jsdir );
 
             foreach ( $js_langs as $group => $groupentry )
             {
@@ -477,7 +484,7 @@ class Translator
                     $js .= '});';
 
                     // create package dir
-                    \QUI\Utils\System\File::mkdir( $jsdir . $group );
+                    QUIFile::mkdir( $jsdir . $group );
 
                     if ( file_exists( $jsdir . $group .'/'. $lang .'.js' ) ) {
                         unlink( $jsdir . $group .'/'. $lang .'.js' );
@@ -490,7 +497,7 @@ class Translator
             // \QUI\System\Log::writeRecursive( $js_langs, 'error' );
 
             // alle .po dateien einlesen und in mo umwandeln
-            $po_files = \QUI\Utils\System\File::readDir( $folders[ $lang ] );
+            $po_files = QUIFile::readDir( $folders[ $lang ] );
 
             foreach ( $po_files as $po_file )
             {
@@ -505,7 +512,7 @@ class Translator
         }
 
         if ( !empty( $exec_error ) ) {
-            \QUI::getMessagesHandler()->addError( $exec_error );
+            QUI::getMessagesHandler()->addError( $exec_error );
         }
     }
 
@@ -521,7 +528,7 @@ class Translator
     {
         if ( !$var )
         {
-            return \QUI::getDB()->select(array(
+            return QUI::getDataBase()->fetch(array(
                 'from' => self::Table(),
                 'where' => array(
                     'groups' => $group
@@ -529,7 +536,7 @@ class Translator
             ));
         }
 
-        return \QUI::getDB()->select(array(
+        return \QUI::getDataBase()->fetch(array(
             'from' => self::Table(),
             'where' => array(
                 'groups' => $group,
@@ -607,8 +614,10 @@ class Translator
             }
 
             // search
-            if ( !isset( $search['fields'] ) || empty( $search['fields'] ) ) {
-                $fields = array();
+            $fields = array();
+
+            if ( isset( $search['fields'] ) && !empty( $search['fields'] ) ) {
+                $fields = $search['fields'];
             }
 
             foreach ( $fields as $field )
@@ -667,7 +676,7 @@ class Translator
      */
     static function getGroupList()
     {
-        $result = \QUI::getDB()->select(array(
+        $result = \QUI::getDataBase()->fetch(array(
             'select' => 'groups',
             'from'   => self::Table(),
             'group'  => 'groups'
@@ -687,13 +696,14 @@ class Translator
      *
      * @param String $group
      * @param String $var
+     * @throws \QUI\Exception
      */
     static function add($group, $var)
     {
         if ( empty( $var ) || empty( $group ) )
         {
-            throw new \QUI\Exception(
-                \QUI::getLocale()->get(
+            throw new QUI\Exception(
+                QUI::getLocale()->get(
                     'package/translator',
                     'exception.empty.var.group'
                 )
@@ -704,15 +714,15 @@ class Translator
 
         if ( isset( $result[0] ) )
         {
-            throw new \QUI\Exception(
-                \QUI::getLocale()->get(
+            throw new QUI\Exception(
+                QUI::getLocale()->get(
                     'package/translator',
                     'exception.var.exists'
                 )
             );
         }
 
-        \QUI::getDB()->addData(
+        QUI::getDataBase()->insert(
             self::Table(),
             array(
                 'groups' => $group,
@@ -756,7 +766,7 @@ class Translator
             $_data[ 'html' ] = 1;
         }
 
-        \QUI::getDB()->updateData(
+        \QUI::getDataBase()->update(
             self::Table(),
             $_data,
             array(
@@ -816,7 +826,7 @@ class Translator
             $_data[ 'html' ] = 1;
         }
 
-        \QUI::getDB()->updateData(
+        \QUI::getDataBase()->update(
             self::Table(),
             $_data,
             array(
@@ -834,7 +844,7 @@ class Translator
      */
     static function delete($group, $var)
     {
-        \QUI::getDB()->deleteData(
+        \QUI::getDataBase()->delete(
             self::Table(),
             array(
                 'groups' => $group,
@@ -850,7 +860,7 @@ class Translator
      */
     static function langs()
     {
-        $fields = \QUI::getDB()->getFields(
+        $fields = \QUI::getDataBase()->Table()->getFields(
             self::Table()
         );
 
@@ -895,7 +905,7 @@ class Translator
      */
     static function getNeedles()
     {
-        $fields = \QUI::getDB()->getFields(
+        $fields = \QUI::getDataBase()->Table()->getFields(
             self::Table()
         );
 
@@ -910,7 +920,7 @@ class Translator
             $langs[] = $entry;
         }
 
-        $result = \QUI::getDB()->select(array(
+        $result = \QUI::getDataBase()->fetch(array(
             'from'  => self::Table(),
             'where' => implode( ' = "" OR ', $langs ) .' = ""'
         ));
@@ -963,7 +973,7 @@ class Translator
                         }
                     }
 
-                    \QUI\Translater::$_tmp[] = array(
+                    self::$_tmp[] = array(
                         'groups' => $group,
                         'var'    => $var
                     );
@@ -976,12 +986,12 @@ class Translator
                 if ( strpos( $_param[0], '/') === false ||
                      strpos( $_param[1], ' ') !== false )
                 {
-                    \QUI\Translater::$_tmp[] = array(
+                    self::$_tmp[] = array(
                         'var' => $params[2]
                     );
                 }
 
-                \QUI\Translater::$_tmp[] = array(
+                self::$_tmp[] = array(
                     'groups' => $_param[0],
                     'var'    => $_param[1],
                 );
@@ -1016,9 +1026,9 @@ class Translator
                      isset( $params[3] ) &&
                      !empty( $params[2] ) &&
                      !empty( $params[3] ) &&
-                     strpos( $_param[2], '/' ) === false )
+                     strpos( $params[2], '/' ) === false )
                 {
-                    \QUI\Translater::$_tmp[] = array(
+                    self::$_tmp[] = array(
                         'groups' => $params[2],
                         'var'    => $params[3],
                     );
@@ -1066,8 +1076,8 @@ class Translator
     /**
      * The main .po to .mo function
      *
-     * @param unknown $input
-     * @param string $output
+     * @param String $input
+     * @param String|Bool $output
      * @return boolean
      */
     static function phpmoConvert($input, $output=false)
@@ -1112,12 +1122,12 @@ class Translator
         return $x;
     }
 
-
     /**
      * Parse gettext .po files.
      * @link http://www.gnu.org/software/gettext/manual/gettext.html#PO-Files
      *
      * @param {String} $in
+     * @return Bool|String
      */
     static function phpmoParsePoFile($in)
     {
@@ -1252,7 +1262,7 @@ class Translator
      *
      * @link http://www.gnu.org/software/gettext/manual/gettext.html#MO-Files
      *
-     * @param String $hash
+     * @param Array $hash
      * @param String $out - file path
      */
     static function phpmoWriteMoFile($hash, $out)
