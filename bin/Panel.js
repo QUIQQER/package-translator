@@ -389,7 +389,7 @@ define([
                     cols.push({
                         header    : langs[ i ],
                         dataIndex : langs[ i ],
-                        dataType  : 'string',
+                        dataType  : 'code',
                         width     : 300,
                         editable  : true
                     });
@@ -399,7 +399,7 @@ define([
                         cols.push({
                             header    : langs[ i ] +'_edit',
                             dataIndex : langs[ i ] +'_edit',
-                            dataType  : 'string',
+                            dataType  : 'code',
                             width     : 300,
                             editable  : true
                         });
@@ -807,7 +807,7 @@ define([
             if ( this.$Editor )
             {
                 this.$gridDblClickHeaderCreate( localeData, Column, row );
-                this.$Editor.setContent( Cell.get('html') );
+                this.$Editor.setContent( Cell.get('text') );
 
                 if ( ( localeData.html ).toInt() === 1 )
                 {
