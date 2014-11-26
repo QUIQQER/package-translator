@@ -11,7 +11,7 @@
  * @require qui/controls/windows/Confirm
  */
 
-define([
+define('package/quiqqer/translator/bin/DeleteVariables', [
 
     "package/quiqqer/translator/bin/Panel",
     "Locale",

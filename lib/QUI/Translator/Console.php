@@ -1,18 +1,21 @@
 <?php
 
 /**
- * This file contains QUI\Translator\Console
+ * This file contains \QUI\Translator\Console
  */
 
 namespace QUI\Translator;
 
+use QUI;
+use QUI\Translator;
+
 /**
+ * Creat translation via console
  *
- * @author hen
- *
+ * @author www.pcsg.de (Henning Leutz)
  */
 
-class Console extends \QUI\System\Console\Tool
+class Console extends QUI\System\Console\Tool
 {
     /**
      * Konstruktor
@@ -31,7 +34,7 @@ class Console extends \QUI\System\Console\Tool
     {
         $this->writeLn( 'Start Translation ...' );
 
-        \QUI\Translator::create();
+        Translator::create();
 
         $this->write( ' [ok]' );
         $this->writeLn( '' );

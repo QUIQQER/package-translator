@@ -11,7 +11,7 @@
  * @require qui/controls/windows/Prompt
  */
 
-define([
+define('package/quiqqer/translator/bin/AddVariable', [
 
     "package/quiqqer/translator/bin/Panel",
     "Locale",

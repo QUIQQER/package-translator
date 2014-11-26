@@ -19,7 +19,7 @@
  * @require css!package/quiqqer/translator/bin/Panel.css
  */
 
-define([
+define('package/quiqqer/translator/bin/Panel', [
 
     "qui/QUI",
     "qui/controls/desktop/Panel",
