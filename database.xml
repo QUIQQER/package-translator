@@ -8,10 +8,6 @@
             <field type="varchar(20)">datatype</field>
             <field type="varchar(200)">datadefine</field>
             <field type="int(1)">html</field>
-            <field type="text">de</field>
-            <field type="text">de_edit</field>
-            <field type="text">en</field>
-            <field type="text">en_edit</field>
         </table>
     </global>
 

@@ -40,6 +40,15 @@ class Translator
     }
 
     /**
+     * Translator setup
+     * it looks, which languages are exist and creat it
+     */
+    static function setup()
+    {
+
+    }
+
+    /**
      * Add / create a new language
      *
      * @param String $lang - lang code, length must be 2 signs
