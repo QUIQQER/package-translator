@@ -2,7 +2,6 @@
     "name" : "quiqqer/translator",
     "type" : "quiqqer-library",
     "description" : "QUIQQER Translator",
-
     "version" : "0.9.0",
     "license" : "GPL-3.0+",
 
@@ -19,7 +18,7 @@
 
     "require": {
         "quiqqer/quiqqer" : "1.*",
-        "quiqqer/utils" : "*@dev"
+        "quiqqer/utils" : "1.*"
     },
 
     "autoload": {
