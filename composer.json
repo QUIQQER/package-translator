@@ -3,7 +3,7 @@
     "type" : "quiqqer-library",
     "description" : "QUIQQER Translator",
 
-    "version" : "dev-dev",
+    "version" : "1.0.0",
     "license" : "GPL-3.0+",
 
     "authors" : [{
@@ -18,8 +18,8 @@
     },
 
     "require": {
-        "quiqqer/quiqqer" : "*@dev",
-        "quiqqer/utils" : "*@dev"
+        "quiqqer/quiqqer" : "~1",
+        "quiqqer/utils" : "*~1"
     },
 
     "autoload": {
