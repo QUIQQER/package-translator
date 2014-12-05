@@ -32,6 +32,14 @@ class Console extends QUI\System\Console\Tool
      */
     public function execute()
     {
+        if ( $this->getArgument('--newLanguage') )
+        {
+            $language = $this->getArgument('--newLanguage');
+            Translator::addLang( $language );
+
+            $this->writeLn( 'Add language to translator: '. $language );
+        }
+
         $this->writeLn( 'Start Translation ...' );
 
         Translator::create();
