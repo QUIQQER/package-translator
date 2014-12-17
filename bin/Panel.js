@@ -82,7 +82,7 @@ define('package/quiqqer/translator/bin/Panel', [
         options : {
             field  : '',
             order  : '',
-            limit  : 20,
+            limit  : 500,
             page   : 1,
             search : false
         },
