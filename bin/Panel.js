@@ -56,7 +56,7 @@ define('package/quiqqer/translator/bin/Panel', [
     return new Class({
 
         Extends : QUIPanel,
-        Type    : 'URL_OPT_DIR/quiqqer/translator/bin/Panel',
+        Type    : 'package/quiqqer/translator/bin/Panel',
 
         Binds : [
             'exportGroup',
@@ -188,31 +188,24 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.Loader.show();
 
-            Ajax.get(
-                'package_quiqqer_translator_ajax_translations',
+            Ajax.get( 'package_quiqqer_translator_ajax_translations', function(result)
+            {
+                self.getGrid().setData( result.data );
+                self.$gridBlur();
+                self.$attentionBox();
 
-                function(result)
-                {
-                    self.getGrid().setData( result.data );
-                    self.$gridBlur();
-                    self.$attentionBox();
-
-                    self.Loader.hide();
-                },
-
-                {
-                    'package'  : 'quiqqer/translator',
-
-                    groups  : this.getTranslationGroup(),
-                    params  : JSON.encode({
-                        field : this.getAttribute( 'field' ),
-                        order : this.getAttribute( 'order' ),
-                        limit : this.getAttribute( 'limit' ),
-                        page  : this.getAttribute( 'page' )
-                    }),
-                    search : JSON.encode( this.getAttribute( 'search' ) )
-                }
-            );
+                self.Loader.hide();
+            }, {
+                'package' : 'quiqqer/translator',
+                groups : this.getTranslationGroup(),
+                params : JSON.encode({
+                    field : this.getAttribute( 'field' ),
+                    order : this.getAttribute( 'order' ),
+                    limit : this.getAttribute( 'limit' ),
+                    page  : this.getAttribute( 'page' )
+                }),
+                search : JSON.encode( this.getAttribute( 'search' ) )
+            });
         },
 
         /**
@@ -723,7 +716,10 @@ define('package/quiqqer/translator/bin/Panel', [
                     {
                         onClick : function(Message)
                         {
+                            self.Loader.show();
+
                             self.setAttribute( 'search', false );
+                            self.setAttribute( 'page', 1 );
                             Message.destroy();
 
                             var Bar = self.getButtonBar();
@@ -1045,7 +1041,9 @@ define('package/quiqqer/translator/bin/Panel', [
                         textimage : 'icon-search',
                         events    :
                         {
-                            onClick : function() {
+                            onClick : function()
+                            {
+                                self.Loader.show();
                                 Sheet.getBody().getElement( 'form').fireEvent( 'submit' );
                             }
                         }

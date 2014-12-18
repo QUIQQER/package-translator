@@ -607,6 +607,7 @@ class Translator
             $queryCount = "
                 SELECT COUNT(*) as count
                 FROM {$table}
+                WHERE {$where}
             ";
 
             $Statement = $PDO->prepare( $querySelect );
