@@ -584,7 +584,7 @@ class Translator
 
 
         // PDO search emptyTranslations
-        if ( $search && isset( $search['emptyTranslations'] ) )
+        if ( $search && isset( $search['emptyTranslations'] ) && $search['emptyTranslations'] )
         {
             $PDO = QUI::getPDO();
 
