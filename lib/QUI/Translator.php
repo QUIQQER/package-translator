@@ -648,8 +648,10 @@ class Translator
 
             foreach ( $db_fields as $lang )
             {
-                if ( strlen( $lang ) == 2 ) {
+                if ( strlen( $lang ) == 2 )
+                {
                     $default[ $lang ] = $search;
+                    $default[ $lang .'_edit' ] = $search;
                 }
             }
 
@@ -670,7 +672,7 @@ class Translator
             if ( empty( $where ) ) {
                 $where = $default;
             }
-
+            
             $data = array(
                 'from'     => $table,
                 'where_or' => $where,
