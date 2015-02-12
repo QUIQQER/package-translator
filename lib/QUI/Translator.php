@@ -582,17 +582,6 @@ class Translator
         $page  = ($page - 1) ? $page - 1 : 0;
         $limit = ($page * $max) .','. $max;
 
-        if ( is_string( $search ) )
-        {
-            $search = trim( $search );
-
-        } else if ( is_array( $search ) )
-        {
-            foreach ( $search as $key => $value ) {
-                $search[ $key ] = trim( $value );
-            }
-        }
-
         // PDO search emptyTranslations
         if ( $search && isset( $search['emptyTranslations'] ) && $search['emptyTranslations'] )
         {
@@ -644,7 +633,7 @@ class Translator
             $where  = array();
             $search = array(
                 'type'  => '%LIKE%',
-                'value' => $search['search']
+                'value' => trim($search['search'])
             );
 
 
