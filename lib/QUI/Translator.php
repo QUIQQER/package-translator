@@ -582,6 +582,9 @@ class Translator
         $page  = ($page - 1) ? $page - 1 : 0;
         $limit = ($page * $max) .','. $max;
 
+        if ( $search ) {
+            $search = trim( $search );
+        }
 
         // PDO search emptyTranslations
         if ( $search && isset( $search['emptyTranslations'] ) && $search['emptyTranslations'] )
@@ -672,7 +675,7 @@ class Translator
             if ( empty( $where ) ) {
                 $where = $default;
             }
-            
+
             $data = array(
                 'from'     => $table,
                 'where_or' => $where,

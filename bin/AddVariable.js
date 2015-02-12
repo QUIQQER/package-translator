@@ -62,7 +62,8 @@ define('package/quiqqer/translator/bin/AddVariable', [
                         return;
                     }
 
-                    Ajax.post('package_quiqqer_translator_ajax_add', function() {
+                    Ajax.post('package_quiqqer_translator_ajax_add', function()
+                    {
                         // nothing
                     }, {
                         'package' : 'quiqqer/translator',
