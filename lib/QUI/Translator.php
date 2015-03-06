@@ -76,78 +76,113 @@ class Translator
     }
 
     /**
-     * Export a locale group as xml
+     * Export locale groups as xml
      *
-     * @param String $group - which group should be exported?
-     * @param Bool $edit    - Eport edit fields or original? standard=true
+     * @param String $group - which group should be exported? ("all" = Alle)
+     * @param Array $langs - Sprachen
+     * @param string $type - "original" oder "edit"
      * @return String
      */
-    static function export($group, $edit=true)
+    static function export($group, $langs, $type)
+    {
+        // Alle Gruppen
+        if ( $group === 'all' )
+        {
+            $groups = self::getGroupList();
+        } else
+        {
+            $groups = array( $group );
+        }
+
+        $result  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $result .= '<locales>' . "\n";
+
+        foreach ( $groups as $grp ) {
+            $result .= self::_createXMLContent( $grp, $langs, $type );
+        }
+
+        $result .= '</locales>';
+
+        $fileName = 'translator_export_' . md5( microtime() ) . '.xml';
+
+        // Temp-Datei erzeugen
+        file_put_contents( VAR_DIR . $fileName, $result );
+
+        return $fileName;
+    }
+
+    protected static function _createXMLContent($group, $langs, $type)
     {
         $entries = self::get( $group );
         $pool    = array();
 
         foreach ( $entries as $entry )
         {
-            $type   = 'php';
-            $define = $group;
-
-            if ( isset( $entry['datatype'] ) && !empty( $entry['datatype'] ) ) {
-                $type = $entry['datatype'];
+            // Undefinierte Gruppen ausschließen
+            if ( !isset( $entry[ 'groups' ] ) ) {
+                continue;
             }
 
-            if ( isset( $entry['datadefine'] ) && !empty( $entry['datadefine'] ) ) {
-                $define = $entry['datadefine'];
+            if ( mb_strpos( $entry[ 'groups' ], $group ) === false )
+            {
+                \QUI\System\Log::addError(
+                    'Translator Export: xml-Gruppe (' . $entry[ 'groups' ] . ')' .
+                    ' passt nicht zur Translator-Gruppe (' . $group . ')'
+                );
+
+                continue;
             }
 
-            $pool[ $type ][ $define ][] = $entry;
+            $type = 'php';
+
+            if ( isset( $entry[ 'datatype' ] ) && !empty( $entry[ 'datatype' ] ) ) {
+                $type = $entry[ 'datatype' ];
+            }
+
+            $pool[ $type ][] = $entry;
         }
 
         $result = '';
 
-
-        foreach ( $pool as $type => $groups )
+        foreach ( $pool as $type => $entries )
         {
-            foreach ( $groups as $define => $entries )
-            {
-                $result .= '<groups name="'. $group .'" datatype="'. $type .'"';
+            $result .= '<groups name="'. $group .'" datatype="'. $type .'">'."\n";
 
-                if ( $define != $group ) {
-                    $result .= ' define="'. $define .'"';
+            foreach ( $entries as $entry )
+            {
+                $result .= "\t".'<locale name="'. $entry[ 'var' ] .'"';
+
+                if ( isset( $entry[ 'html' ] ) && $entry[ 'html' ] == 1 ) {
+                    $result .= ' html="true"';
                 }
 
                 $result .= '>'."\n";
 
-                foreach ( $entries as $entry )
+                foreach ( $langs as $lang )
                 {
-                    $result .= "\t".'<locale name="'. $entry['var'] .'">'."\n";
+                    $result .= "\t\t" . '<' . $lang . '>';
+                    $result .= '<![CDATA[';
 
-                    foreach ( $entry as $lang => $translation )
+                    // @todo Ggf. Ausweichen auf Original?
+                    if ( $type === 'edit' )
                     {
-                        if ( strlen( $lang ) == 2 )
-                        {
-                            if ( $edit &&
-                                 isset( $entry[ $lang .'_edit' ] ) &&
-                                 !empty( $entry[ $lang .'_edit' ] ))
-                            {
-                                $result .= "\t\t".'<'. $lang .'>';
-                                $result .= '<![CDATA['. $entry[ $lang. '_edit' ] .']]>';
-                                $result .= '</'. $lang .'>'."\n";
-
-                                continue;
-                            }
-
-                            $result .= "\t\t".'<'. $lang .'>';
-                            $result .= '<![CDATA['. $translation .']]>';
-                            $result .= '</'. $lang .'>'."\n";
+                        if ( isset( $entry[ $lang . '_edit' ] ) ) {
+                            $result .= $entry[ $lang . '_edit' ];
+                        }
+                    } else
+                    {
+                        if ( isset( $entry[ $lang ] ) ) {
+                            $result .= $entry[ $lang ];
                         }
                     }
 
-                    $result .= "\t".'</locale>'."\n";
+                    $result .= ']]></' . $lang . '>' . "\n";
                 }
 
-                $result .= '</groups>'."\n";
+                $result .= "\t".'</locale>'."\n";
             }
+
+            $result .= '</groups>'."\n";
         }
 
         return $result;

@@ -65,6 +65,38 @@
             <de><![CDATA[Wie möchten Sie exportieren?]]></de>
             <en><![CDATA[]]></en>
         </locale>
+        <locale name="export.window.group">
+            <de><![CDATA[Gruppenwahl]]></de>
+            <en><![CDATA[Group choice]]></en>
+        </locale>
+        <locale name="export.window.group.current.label">
+            <de><![CDATA[Aktuelle Gruppe ([group])]]></de>
+            <en><![CDATA[Current group ([group])]]></en>
+        </locale>
+        <locale name="export.window.group.all.label">
+            <de><![CDATA[Alle Gruppen (Anzahl: [count])]]></de>
+            <en><![CDATA[All groups (count: [count])]]></en>
+        </locale>
+        <locale name="export.window.language">
+            <de><![CDATA[Sprachenwahl]]></de>
+            <en><![CDATA[Language choice]]></en>
+        </locale>
+        <locale name="export.window.type">
+            <de><![CDATA[Export-Typ]]></de>
+            <en><![CDATA[Export type]]></en>
+        </locale>
+        <locale name="export.window.type.original.label">
+            <de><![CDATA[Original]]></de>
+            <en><![CDATA[Original]]></en>
+        </locale>
+        <locale name="export.window.type.edit.label">
+            <de><![CDATA[Edit]]></de>
+            <en><![CDATA[Edit]]></en>
+        </locale>
+
+
+
+
         <locale name="export.window.option.orig">
             <de><![CDATA[Nur die original Übersetzungen exportieren]]></de>
             <en><![CDATA[]]></en>

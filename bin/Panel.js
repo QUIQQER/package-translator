@@ -101,10 +101,12 @@ define('package/quiqqer/translator/bin/Panel', [
                 onRefresh : this.$onRefresh
             });
 
-            this.$Container = null;
-            this.$Grid      = null;
-            this.$Editor    = null;
-            this.$groups    = {};
+            this.$Container  = null;
+            this.$Grid       = null;
+            this.$Editor     = null;
+            this.$groups     = {};
+            this.$groupcount = 0;
+            this.$langs      = [];
 
             this.$EditorHeader     = null;
             this.$devMessageShowed = false;
@@ -228,59 +230,112 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         exportGroup : function()
         {
-            var id = this.getId();
+            var id    = this.getId(),
+                group = this.getTranslationGroup(),
 
-            new QUIConfirm({
+                content = '<div class="translator-export-group">' +
+                              '<h3>' + Locale.get( 'package/translator', 'export.window.group' ) + '</h3>' +
+                              '<label for="translator-export-group-current">' +
+                                    Locale.get( 'package/translator', 'export.window.group.current.label', { group : group } ) +
+                              '</label>' +
+                              '<input id="translator-export-group-current" type="radio" name="export_group" value="' + group + '" checked="checked"/>' +
+                              '<label for="translator-export-group-all">' +
+                                    Locale.get( 'package/translator', 'export.window.group.all.label', { count : this.$groupcount } ) +
+                              '</label>' +
+                              '<input id="translator-export-group-all" type="radio" name="export_group" value="all"/>' +
+                           '</div>' +
+                           '<div class="translator-export-language">' +
+                              '<h3>' + Locale.get( 'package/translator', 'export.window.language' ) + '</h3>' +
+                           '</div>' +
+                           '<div class="translator-export-type">' +
+                                '<h3>' + Locale.get( 'package/translator', 'export.window.type' ) + '</h3>' +
+                                '<label for="translator-export-type-original">' +
+                                     Locale.get( 'package/translator', 'export.window.type.original.label' ) +
+                                '</label>' +
+                                '<input id="translator-export-type-original" type="radio" name="export_type" value="original" checked="checked"/>' +
+                                '<label for="translator-export-type-edit">' +
+                                     Locale.get( 'package/translator', 'export.window.type.edit.label' ) +
+                                '</label>' +
+                                '<input id="translator-export-type-edit" type="radio" name="export_type" value="edit"/>' +
+                           '</div>';
+
+            var ConfirmWindow = new QUIConfirm({
                 title : Locale.get( 'package/translator', 'export.window.title' ),
-                text  : Locale.get( 'package/translator', 'export.window.text' ),
-                icon  : URL_BIN_DIR +'16x16/export.png',
-
-                information : '<p>' +
-                             '<input id="edit_false'+ id +'" type="radio" name="edit" value="0" />' +
-                             '<label for="edit_false'+ id +'">'+
-                                 Locale.get( 'package/translator', 'export.window.option.orig' ) +
-                             '</label>' +
-                         '</p>' +
-                         '<p>' +
-                             '<input id="edit_true'+ id +'" type="radio" name="edit" value="1" checked="checked" />' +
-                             '<label for="edit_true'+ id +'">' +
-                                 Locale.get( 'package/translator', 'export.window.option.edit' ) +
-                             '</label>' +
-                         '</p>',
+                icon  : 'icon-download',
 
                 events :
                 {
                     onSubmit : function(Win)
                     {
-                        var Body = Win.getBody(),
-                            edit = Body.getElement( 'input[value="1"]' ).checked,
+                        var i, len;
+                        var Body   = Win.getContent(),
+                            grp    = Body.getElement( '.translator-export-group input#translator-export-group-current' ),
+                            langs  = Body.getElements( '.translator-export-language input' ),
+                            type   = Body.getElement( '.translator-export-type input#translator-export-type-original'),
+                            _group = 'all',
+                            _langs = [],
+                            _type  = 'original';
 
-                            url  = Ajax.$url +'?'+
-                                   Ajax.parseParams('package_quiqqer_translator_ajax_export', {
-                                       'package'  : 'quiqqer/translator',
-                                       group      : this.getTranslationGroup(),
-                                       edit       : edit ? 1 : 0
-                                   });
-
-                        // create a iframe
-                        if ( !document.id('download-frame') )
-                        {
-                            new Element('iframe#download-frame', {
-                                styles : {
-                                    position : 'absolute',
-                                    width    : 100,
-                                    height   : 100,
-                                    left     : -400,
-                                    top      : -400
-                                }
-                            }).inject( document.body );
+                        // Gruppe
+                        if ( grp.checked ) {
+                            _group = group;
                         }
 
-                        document.id('download-frame').set( 'src', url );
+                        // Sprachen
+                        for ( i = 0, len = langs.length; i < len; i++ )
+                        {
+                            if ( !langs[ i ].checked ) {
+                                continue;
+                            }
 
-                    }.bind( this )
+                            _langs.push ( langs[ i ].value );
+                        }
+
+                        // Typ
+                        if ( !type.checked ) {
+                            _type = 'edit';
+                        }
+
+                        require(['DownloadManager'], function(DownloadManager)
+                        {
+                            DownloadManager.download( 'package_quiqqer_translator_ajax_export', {
+                                'package' : 'quiqqer/translator',
+                                group     : _group,
+                                langs     : JSON.encode( _langs ),
+                                type      : _type
+                            });
+                        });
+                    }
                 }
-            }).create();
+            });
+
+            ConfirmWindow.create();
+            ConfirmWindow.setContent( content );
+
+            // Sprachen reinladen
+            var l,
+                Langs  = ConfirmWindow.getContent().getElement( '.translator-export-language' ),
+                langs  = this.$langs;
+
+            for ( var i = 0, len = langs.length; i < len; i++ )
+            {
+                l = langs[ i ];
+
+                new Element( 'input', {
+                    type    : 'checkbox',
+                    name    : 'export_language',
+                    value   : l,
+                    id      : 'translator-export-lang-' + l,
+                    checked : 'checked'
+                }).inject( Langs );
+
+                new Element( 'label', {
+                    'for' : 'translator-export-lang-' + l,
+                    html  : l
+                }).inject( Langs );
+            }
+
+            ConfirmWindow.open();
         },
 
         /**
@@ -496,6 +551,8 @@ define('package/quiqqer/translator/bin/Panel', [
                     });
                 }
 
+                self.$langs = langs;
+
             }, {
                 'package' : 'quiqqer/translator',
                 groups : this.getTranslationGroup(),
@@ -574,7 +631,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 name      : 'export',
                 text      : Locale.get( 'package/translator', 'btn.export.text' ),
                 textimage : 'icon-download',
-                disabled  : true,
+                disabled  : false,
                 events : {
                     onClick : this.exportGroup
                 }
@@ -623,7 +680,8 @@ define('package/quiqqer/translator/bin/Panel', [
                     }
                 }
 
-                self.$groups = groups;
+                self.$groups     = groups;
+                self.$groupcount = result.length;
 
                 for ( g in groups )
                 {
