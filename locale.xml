@@ -34,8 +34,8 @@
         </locale>
 
         <locale name="import.window.title">
-            <de><![CDATA[Import von Übersetzungsdateien]]></de>
-            <en><![CDATA[]]></en>
+            <de><![CDATA[Import von Übersetzungen]]></de>
+            <en><![CDATA[Import of translations]]></en>
         </locale>
         <locale name="import.window.text">
             <de><![CDATA[
@@ -92,6 +92,10 @@
         <locale name="export.window.type.edit.label">
             <de><![CDATA[Edit]]></de>
             <en><![CDATA[Edit]]></en>
+        </locale>
+        <locale name="export.window.type.edit.overwrite.label">
+            <de><![CDATA[Bei leerem Edit-Feld Originalwert nehmen]]></de>
+            <en><![CDATA[Use original value in case of empty edit field value]]></en>
         </locale>
 
 

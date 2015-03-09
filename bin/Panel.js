@@ -233,30 +233,34 @@ define('package/quiqqer/translator/bin/Panel', [
             var id    = this.getId(),
                 group = this.getTranslationGroup(),
 
-                content = '<div class="translator-export-group">' +
+                content = '<div class="qui-translator-export-group">' +
                               '<h3>' + Locale.get( 'package/translator', 'export.window.group' ) + '</h3>' +
-                              '<label for="translator-export-group-current">' +
-                                    Locale.get( 'package/translator', 'export.window.group.current.label', { group : group } ) +
+                              '<input id="qui-translator-export-group-current" type="radio" name="export_group" value="' + group + '" checked="checked"/>' +
+                              '<label for="qui-translator-export-group-current">' +
+                                  Locale.get( 'package/translator', 'export.window.group.current.label', { group : group } ) +
                               '</label>' +
-                              '<input id="translator-export-group-current" type="radio" name="export_group" value="' + group + '" checked="checked"/>' +
-                              '<label for="translator-export-group-all">' +
-                                    Locale.get( 'package/translator', 'export.window.group.all.label', { count : this.$groupcount } ) +
+                              '<input id="qui-translator-export-group-all" type="radio" name="export_group" value="all"/>' +
+                              '<label for="qui-translator-export-group-all">' +
+                                  Locale.get( 'package/translator', 'export.window.group.all.label', { count : this.$groupcount } ) +
                               '</label>' +
-                              '<input id="translator-export-group-all" type="radio" name="export_group" value="all"/>' +
                            '</div>' +
-                           '<div class="translator-export-language">' +
+                           '<div class="qui-translator-export-language">' +
                               '<h3>' + Locale.get( 'package/translator', 'export.window.language' ) + '</h3>' +
                            '</div>' +
-                           '<div class="translator-export-type">' +
+                           '<div class="qui-translator-export-type">' +
                                 '<h3>' + Locale.get( 'package/translator', 'export.window.type' ) + '</h3>' +
-                                '<label for="translator-export-type-original">' +
-                                     Locale.get( 'package/translator', 'export.window.type.original.label' ) +
+                                '<input id="qui-translator-export-type-original" type="radio" name="export_type" value="original" checked="checked"/>' +
+                                '<label for="qui-translator-export-type-original">' +
+                                    Locale.get( 'package/translator', 'export.window.type.original.label' ) +
                                 '</label>' +
-                                '<input id="translator-export-type-original" type="radio" name="export_type" value="original" checked="checked"/>' +
-                                '<label for="translator-export-type-edit">' +
-                                     Locale.get( 'package/translator', 'export.window.type.edit.label' ) +
+                                '<input id="qui-translator-export-type-edit" type="radio" name="export_type" value="edit"/>' +
+                                '<label for="qui-translator-export-type-edit">' +
+                                    Locale.get( 'package/translator', 'export.window.type.edit.label' ) +
                                 '</label>' +
-                                '<input id="translator-export-type-edit" type="radio" name="export_type" value="edit"/>' +
+                                '<input id="qui-translator-export-type-edit-overwrite" type="checkbox" name="export_type_overwrite" checked="checked"/>' +
+                                '<label for="qui-translator-export-type-edit-overwrite">' +
+                                    Locale.get( 'package/translator', 'export.window.type.edit.overwrite.label' ) +
+                                '</label>' +
                            '</div>';
 
             var ConfirmWindow = new QUIConfirm({
@@ -268,13 +272,14 @@ define('package/quiqqer/translator/bin/Panel', [
                     onSubmit : function(Win)
                     {
                         var i, len;
-                        var Body   = Win.getContent(),
-                            grp    = Body.getElement( '.translator-export-group input#translator-export-group-current' ),
-                            langs  = Body.getElements( '.translator-export-language input' ),
-                            type   = Body.getElement( '.translator-export-type input#translator-export-type-original'),
-                            _group = 'all',
-                            _langs = [],
-                            _type  = 'original';
+                        var Body      = Win.getContent(),
+                            grp       = Body.getElement( '#qui-translator-export-group-current' ),
+                            langs     = Body.getElements( '.qui-translator-export-language input' ),
+                            type      = Body.getElement( '#qui-translator-export-type-original'),
+                            overwrite = Body.getElement( '#qui-translator-export-type-edit-overwrite'),
+                            _group    = 'all',
+                            _langs    = [],
+                            _type     = 'original';
 
                         // Gruppe
                         if ( grp.checked ) {
@@ -292,8 +297,15 @@ define('package/quiqqer/translator/bin/Panel', [
                         }
 
                         // Typ
-                        if ( !type.checked ) {
-                            _type = 'edit';
+                        if ( !type.checked )
+                        {
+                            if( !overwrite.checked )
+                            {
+                                _type = 'edit';
+                            } else
+                            {
+                                _type = 'edit_overwrite';
+                            }
                         }
 
                         require(['DownloadManager'], function(DownloadManager)
@@ -314,7 +326,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             // Sprachen reinladen
             var l,
-                Langs  = ConfirmWindow.getContent().getElement( '.translator-export-language' ),
+                Langs  = ConfirmWindow.getContent().getElement( '.qui-translator-export-language' ),
                 langs  = this.$langs;
 
             for ( var i = 0, len = langs.length; i < len; i++ )
@@ -325,15 +337,36 @@ define('package/quiqqer/translator/bin/Panel', [
                     type    : 'checkbox',
                     name    : 'export_language',
                     value   : l,
-                    id      : 'translator-export-lang-' + l,
+                    id      : 'qui-translator-export-lang-' + l,
                     checked : 'checked'
                 }).inject( Langs );
 
                 new Element( 'label', {
-                    'for' : 'translator-export-lang-' + l,
+                    'for' : 'qui-translator-export-lang-' + l,
                     html  : l
                 }).inject( Langs );
             }
+
+            // Edit-Option
+            var OrigOption     = ConfirmWindow.getContent().getElement( '#qui-translator-export-type-original'),
+                EditOption     = ConfirmWindow.getContent().getElement( '#qui-translator-export-type-edit' ),
+                Overwrite      = ConfirmWindow.getContent().getElement( '#qui-translator-export-type-edit-overwrite'),
+                OverwriteLabel = ConfirmWindow.getContent().getElement( 'label[for="qui-translator-export-type-edit-overwrite"]' );
+
+            Overwrite.setStyle( 'display', 'none' );
+            OverwriteLabel.setStyle( 'display', 'none' );
+
+            EditOption.addEvent( 'click', function(event)
+            {
+                Overwrite.setStyle( 'display', '' );
+                OverwriteLabel.setStyle( 'display', '' );
+            });
+
+            OrigOption.addEvent( 'click', function(event)
+            {
+                Overwrite.setStyle( 'display', 'none' );
+                OverwriteLabel.setStyle( 'display', 'none' );
+            });
 
             ConfirmWindow.open();
         },
@@ -621,7 +654,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 name      : 'import',
                 text      : Locale.get( 'package/translator', 'btn.import.text' ),
                 textimage : 'icon-upload',
-                disabled  : true,
+                disabled  : false,
                 events : {
                     onClick : this.importTranslation
                 }
@@ -1055,30 +1088,110 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             this.Loader.show();
 
-            var Sheet = this.createSheet();
+            var self              = this,
+                devMode           = ( QUIQQER_CONFIG.globals.development ).toInt(),
+                overwriteOriginal = false;
 
-            Sheet.addEvent('onOpen', function(Sheet)
+            require( [ 'controls/upload/Form' ], function(UploadForm)
             {
-                require(['package/quiqqer/translator/bin/Import'], function(Import)
-                {
-                    var TranslatorImport = new Import({
-                        events :
-                        {
-                            onUpload : function() {
-                                Sheet.hide();
-                            }
+                var Popup = new QUIConfirm({
+                    icon   : 'icon-file-upload',
+                    title  : Locale.get( 'quiqqer/translator', 'import.window.title' ),
+                    events :
+                    {
+                        onSubmit : function(Win) {
+                            LogoUploadForm.submit();
                         }
-                    });
-
-                    TranslatorImport.inject( Sheet.getBody() );
-                    TranslatorImport.initUpload();
+                    }
                 });
 
-                this.Loader.hide();
+                Popup.create();
+//
+//                Popup.setContent(
+//                    '<p>' + Locale.get( 'namerobot/dbeditor', 'import.window.description' ) + '<p>'
+//                );
 
-            }.bind( this ));
+                var LogoUploadForm = new UploadForm({
+                    multible   : false,
+                    sendbutton : false,
+//                maxuploads : 5,
+                    uploads    : 1,
+                    styles     : {
+                        clear  : 'both',
+                        float  : 'left',
+                        margin : 0,
+                        width  : '100%'
+                    },
+                    events     :
+                    {
+                        onComplete : function(Control, File, result) {
+                            Popup.close();
+                        },
 
-            Sheet.show();
+                        onAdd : function(Control, File)
+                        {
+                            if ( typeof FileReader === 'undefined' ) {
+                                return;
+                            }
+
+                            var Reader = new FileReader();
+
+                            Reader.readAsDataURL( File );
+                        },
+
+                        onError : function(Control, Error)
+                        {
+                            QUI.getMessageHandler(function(MH)
+                            {
+                                MH.addError(
+                                    Error.getAttribute( 'message' ),
+                                    self.$ImgDrop
+                                );
+                            });
+                        }
+                    }
+                });
+
+                LogoUploadForm.setParam(
+                    'onfinish',
+                    'package_quiqqer_translator_ajax_import'
+                );
+
+                LogoUploadForm.setParam( 'package', 'quiqqer/translator' );
+                LogoUploadForm.setParam( 'overwriteOriginal', overwriteOriginal );
+
+                LogoUploadForm.inject( Popup.getContent() );
+
+                Popup.open();
+
+                self.Loader.hide();
+            });
+
+
+//            var Sheet = this.createSheet();
+//
+//            Sheet.addEvent('onOpen', function(Sheet)
+//            {
+//                require(['package/quiqqer/translator/bin/Import'], function(Import)
+//                {
+//                    var TranslatorImport = new Import({
+//                        events :
+//                        {
+//                            onUpload : function() {
+//                                Sheet.hide();
+//                            }
+//                        }
+//                    });
+//
+//                    TranslatorImport.inject( Sheet.getBody() );
+//                    TranslatorImport.initUpload();
+//                });
+//
+//                this.Loader.hide();
+//
+//            }.bind( this ));
+//
+//            Sheet.show();
         },
 
         /**

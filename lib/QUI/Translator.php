@@ -103,15 +103,15 @@ class Translator
 
         $result .= '</locales>';
 
-        $fileName = 'translator_export_' . md5( microtime() ) . '.xml';
+        $fileName = VAR_DIR . 'translator_export_' . md5( microtime() ) . '.xml';
 
         // Temp-Datei erzeugen
-        file_put_contents( VAR_DIR . $fileName, $result );
+        file_put_contents( $fileName, $result );
 
         return $fileName;
     }
 
-    protected static function _createXMLContent($group, $langs, $type)
+    protected static function _createXMLContent($group, $langs, $editType)
     {
         $entries = self::get( $group );
         $pool    = array();
@@ -163,19 +163,36 @@ class Translator
                     $result .= "\t\t" . '<' . $lang . '>';
                     $result .= '<![CDATA[';
 
-                    // @todo Ggf. Ausweichen auf Original?
-                    if ( $type === 'edit' )
+                    switch ( $editType )
                     {
-                        if ( isset( $entry[ $lang . '_edit' ] ) ) {
-                            $result .= $entry[ $lang . '_edit' ];
-                        }
-                    } else
-                    {
-                        if ( isset( $entry[ $lang ] ) ) {
-                            $result .= $entry[ $lang ];
-                        }
-                    }
+                        case 'edit':
+                            if ( isset( $entry[ $lang . '_edit' ] ) &&
+                                 !empty( $entry[ $lang . '_edit' ] ) )
+                            {
+                                $result .= $entry[ $lang . '_edit' ];
+                            }
+                        break;
 
+                        case 'edit_overwrite':
+                            if ( isset( $entry[ $lang . '_edit' ] ) &&
+                                 !empty( $entry[ $lang . '_edit' ] ) )
+                            {
+                                $result .= $entry[ $lang . '_edit' ];
+                            } else if ( isset( $entry[ $lang ] ) &&
+                                        !empty( $entry[ $lang ] ) )
+                            {
+                                $result .= $entry[ $lang ];
+                            }
+                        break;
+
+                        default:
+                            if ( isset( $entry[ $lang ] ) &&
+                                 !empty( $entry[ $lang ] ) )
+                            {
+                                $result .= $entry[ $lang ];
+                            }
+                    }
+                    
                     $result .= ']]></' . $lang . '>' . "\n";
                 }
 
@@ -198,8 +215,10 @@ class Translator
      * @return Array - List of imported vars
      * @throws \QUI\Exception
      */
-    static function import($file, $update_edit_fields=true)
+    static function import($file, $overwriteOriginal=false)
     {
+        \QUI\System\Log::writeRecursive( $file );
+
         if ( !file_exists( $file ) )
         {
             throw new QUI\Exception(
@@ -210,10 +229,14 @@ class Translator
             );
         }
 
+        \QUI\System\Log::writeRecursive( "getting dom from xml: $file" );
+
         $result = array();
         $groups = XML::getLocaleGroupsFromDom(
             XML::getDomFromXml( $file )
         );
+
+        \QUI\System\Log::writeRecursive( $groups );return array();
 
         foreach ( $groups as $locales )
         {

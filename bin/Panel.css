@@ -39,3 +39,49 @@
     margin: 0;
     width: 100%;
 }
+
+.qui-translator-export-group {
+    float: left;
+    margin-right: 5%;
+    min-width: 150px;
+    width: 35%
+}
+
+.qui-translator-export-group input {
+    clear: left;
+    float: left;
+}
+
+.qui-translator-export-group label {
+    clear: right;
+    float: left;
+    line-height: 25px;
+}
+
+.qui-translator-export-language {
+    float: left;
+    margin-right: 5%;
+    min-width: 150px;
+    width: 25%
+}
+
+.qui-translator-export-type {
+    float: left;
+    min-width: 150px;
+    width: 30%
+}
+
+.qui-translator-export-type input {
+    clear: left;
+    float: left;
+}
+
+.qui-translator-export-type label {
+    clear: right;
+    float: left;
+    line-height: 25px;
+}
+
+.qui-translator-export-type label[for="qui-translator-export-type-edit-overwrite"] {
+    width: 80%;
+}
