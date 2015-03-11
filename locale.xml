@@ -8,20 +8,28 @@
         <locale name="add.window.text" html="true">
             <de><![CDATA[
                 <p>Fügen Sie eine neue Übersetzungs-Variable hinzu.</p><br/>
-                <p>Wenn Sie dazu eine neue Gruppe anlegen wollen, editieren Sie einfach das Gruppenfeld.</p>
+                <p>Wenn Sie dazu eine neue Gruppe anlegen wollen, editieren Sie einfach die Haupt- oder Untergruppe.</p>
             ]]></de>
             <en><![CDATA[
                 <p>Add a new translation variable.</p><br/>
-                <p>If you also want to add a new group, just edit the group field.</p>
+                <p>If you also want to add a new group, just edit the main or sub group.</p>
             ]]></en>
         </locale>
-        <locale name="add.window.group.placeholder">
-            <de><![CDATA[Gruppe]]></de>
-            <en><![CDATA[Group]]></en>
+        <locale name="add.window.maingroup.placeholder">
+            <de><![CDATA[Hauptgruppe]]></de>
+            <en><![CDATA[Main group]]></en>
         </locale>
-        <locale name="add.window.group.label">
-            <de><![CDATA[Gruppe]]></de>
-            <en><![CDATA[Group]]></en>
+        <locale name="add.window.maingroup.label">
+            <de><![CDATA[Hauptgruppe]]></de>
+            <en><![CDATA[Main group]]></en>
+        </locale>
+        <locale name="add.window.subgroup.placeholder">
+            <de><![CDATA[Untergruppe]]></de>
+            <en><![CDATA[Sub group]]></en>
+        </locale>
+        <locale name="add.window.subgroup.label">
+            <de><![CDATA[Untergruppe]]></de>
+            <en><![CDATA[Sub group]]></en>
         </locale>
         <locale name="add.window.variable.placeholder">
             <de><![CDATA[Variable]]></de>
@@ -83,11 +91,7 @@
         </locale>
         <locale name="export.window.title">
             <de><![CDATA[Übersetzungen exportieren]]></de>
-            <en><![CDATA[]]></en>
-        </locale>
-        <locale name="export.window.text">
-            <de><![CDATA[Wie möchten Sie exportieren?]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Export translations]]></en>
         </locale>
         <locale name="export.window.group">
             <de><![CDATA[Gruppenwahl]]></de>
@@ -139,7 +143,7 @@
             <en><![CDATA[HTML]]></en>
         </locale>
         <locale name="btn.add.var.text">
-            <de><![CDATA[Variable(n) hinzufügen]]></de>
+            <de><![CDATA[Variable hinzufügen]]></de>
             <en><![CDATA[Add variables]]></en>
         </locale>
         <locale name="btn.del.var.text">

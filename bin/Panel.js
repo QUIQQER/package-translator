@@ -738,7 +738,6 @@ define('package/quiqqer/translator/bin/Panel', [
                     }
                 }
 
-
                 if ( Sel1.firstChild() ) {
                     Sel1.setValue( Sel1.firstChild().getAttribute( 'value' ) );
                 }
@@ -1249,17 +1248,24 @@ define('package/quiqqer/translator/bin/Panel', [
                                 Locale.get( 'quiqqer/translator', 'add.window.text' ) +
                               '</h3>' +
                               '<div class="qui-translator-add-variable-labels">' +
-                              '<label for="qui-translator-add-variable-group">' +
-                                Locale.get( 'quiqqer/translator', 'add.window.group.label' ) +
+                              '<label for="qui-translator-add-variable-maingroup">' +
+                                Locale.get( 'quiqqer/translator', 'add.window.maingroup.label' ) +
+                              '</label>' +
+                              '<label for="qui-translator-add-variable-subgroup">' +
+                                Locale.get( 'quiqqer/translator', 'add.window.subgroup.label' ) +
                               '</label>' +
                               '<label for="qui-translator-add-variable-variable">' +
                                 Locale.get( 'quiqqer/translator', 'add.window.variable.label' ) +
                               '</label>' +
                               '</div>' +
                               '<div class="qui-translator-add-variable-inputs">' +
-                              '<input type="text" name="qui-translator-add-variable-group"' +
+                              '<input type="text" name="qui-translator-add-variable-maingroup"' +
                               ' placeholder="' +
-                                Locale.get( 'quiqqer/translator', 'add.window.group.placeholder' ) +
+                                Locale.get( 'quiqqer/translator', 'add.window.maingroup.placeholder' ) +
+                              '" id="qui-translator-add-variable-group"/>' +
+                              '<input type="text" name="qui-translator-add-variable-subgroup"' +
+                              ' placeholder="' +
+                                Locale.get( 'quiqqer/translator', 'add.window.subgroup.placeholder' ) +
                               '" id="qui-translator-add-variable-group"/>' +
                               '<input type="text" name="qui-translator-add-variable-variable"' +
                               ' placeholder="' +
@@ -1273,7 +1279,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 icon  : 'icon-plus-sign-alt',
                 autoclose : false,
 
-                maxHeight : 270,
+                maxHeight : 350,
                 maxWidth  : 600,
 
                 events :
@@ -1283,6 +1289,12 @@ define('package/quiqqer/translator/bin/Panel', [
                         if ( GroupInput.value.trim() === '' )
                         {
                             GroupInput.focus();
+                            return false;
+                        }
+
+                        if ( SubGroupInput.value.trim() === '' )
+                        {
+                            SubGroupInput.focus();
                             return false;
                         }
 
@@ -1303,7 +1315,7 @@ define('package/quiqqer/translator/bin/Panel', [
                             self.Loader.hide();
                         }, {
                             'package' : 'quiqqer/translator',
-                            group     : GroupInput.value.trim(),
+                            group     : GroupInput.value.trim() + '/' + SubGroupInput.value.trim(),
                             'var'     : VariableInput.value.trim()
                         });
                     },
@@ -1317,12 +1329,30 @@ define('package/quiqqer/translator/bin/Panel', [
             ConfirmWindow.create();
             ConfirmWindow.setContent( content );
 
-            var GroupInput    = ConfirmWindow.getContent().getElement( 'input[name="qui-translator-add-variable-group"]' ),
-                VariableInput = ConfirmWindow.getContent().getElement( 'input[name="qui-translator-add-variable-variable"]' );
+            var Content       = ConfirmWindow.getContent(),
+                GroupInput    = Content.getElement( 'input[name="qui-translator-add-variable-maingroup"]' ),
+                SubGroupInput = Content.getElement( 'input[name="qui-translator-add-variable-subgroup"]' ),
+                VariableInput = Content.getElement( 'input[name="qui-translator-add-variable-variable"]'),
+                group         = this.getTranslationGroup().split( '/' );
 
-            GroupInput.value = this.getTranslationGroup();
+            if ( typeof group[ 0 ] !== 'undefined' ) {
+                GroupInput.value = group[ 0 ];
+            }
+
+            if ( typeof group[ 1 ] !== 'undefined' ) {
+                SubGroupInput.value = group[ 1 ];
+            }
 
             GroupInput.addEvent('keydown', function(event)
+            {
+                if ( typeof event !== 'undefined' &&
+                    event.code === 13 )
+                {
+                    ConfirmWindow.submit();
+                }
+            });
+
+            SubGroupInput.addEvent('keydown', function(event)
             {
                 if ( typeof event !== 'undefined' &&
                     event.code === 13 )
