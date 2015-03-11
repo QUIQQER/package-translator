@@ -26,7 +26,7 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
     {
         var i, len;
 
-        var message = Locale.get( 'package/translator', 'del.window.text' ) +
+        var message = Locale.get( 'quiqqer/translator', 'del.window.text' ) +
                       '<ul style="margin-top: 10px">';
 
         for ( i = 0, len = data.length; i < len; i++ ) {
@@ -37,14 +37,14 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
 
         new QUIConfirm({
             name   : 'del_sel_items',
-            title  : Locale.get( 'package/translator', 'del.window.title' ),
+            title  : Locale.get( 'quiqqer/translator', 'del.window.title' ),
             icon   : 'icon-trash',
             width  : 500,
             height : 200,
             text   : message,
             data   : data,
             textIcon    : 'icon-trash',
-            information : Locale.get( 'package/translator', 'del.window.text.information' ),
+            information : Locale.get( 'quiqqer/translator', 'del.window.text.information' ),
 
             events :
             {
