@@ -102,6 +102,13 @@
     width: 65%;
 }
 
+.qui-translator-add-variable-group {
+    float: left;
+    line-height: 33px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
 .qui-translator-add-variable h3 {
     margin: 0 0 15px 0;
 }

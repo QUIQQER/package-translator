@@ -634,8 +634,30 @@ define('package/quiqqer/translator/bin/Panel', [
                     styles : {
                         width: 100
                     },
-                    events : {
-                        onChange : this.$loadSubGroups
+                    events :
+                    {
+                        onChange : function(value)
+                        {
+                            var ButtonBar = self.getButtonBar(),
+                                ImportBtn = ButtonBar.getChildren( 'import' ),
+                                ExportBtn = ButtonBar.getChildren( 'export' ),
+                                Grid      = self.getGrid();
+
+                            ImportBtn.disable();
+                            ExportBtn.disable();
+
+                            if ( Grid )
+                            {
+                                var i, len;
+                                var gridBtns = Grid.getButtons();
+
+                                for ( i = 0, len = gridBtns.length; i < len; i++ ) {
+                                    gridBtns[ i ].disable();
+                                }
+                            }
+
+                            self.$loadSubGroups( value );
+                        }
                     }
                 })
             );
@@ -650,6 +672,24 @@ define('package/quiqqer/translator/bin/Panel', [
                     {
                         onChange : function()
                         {
+                            var ButtonBar = self.getButtonBar(),
+                                ImportBtn = ButtonBar.getChildren( 'import' ),
+                                ExportBtn = ButtonBar.getChildren( 'export' ),
+                                Grid      = self.getGrid();
+
+                            ImportBtn.enable();
+                            ExportBtn.enable();
+
+                            if ( Grid )
+                            {
+                                var i, len;
+                                var gridBtns = Grid.getButtons();
+
+                                for ( i = 0, len = gridBtns.length; i < len; i++ ) {
+                                    gridBtns[ i ].enable();
+                                }
+                            }
+
                             // grid sheet to 1
                             self.setAttribute( 'page', 1 );
                             self.$loadGrid();
@@ -1247,6 +1287,9 @@ define('package/quiqqer/translator/bin/Panel', [
                               '<h3>' +
                                 Locale.get( 'quiqqer/translator', 'add.window.text' ) +
                               '</h3>' +
+                              '<span class="qui-translator-add-variable-group">' +
+                                Locale.get( 'quiqqer/translator', 'add.window.group', { group : this.getTranslationGroup() } ) +
+                              '</span>' +
                               '<div class="qui-translator-add-variable-labels">' +
                               '<label for="qui-translator-add-variable-maingroup">' +
                                 Locale.get( 'quiqqer/translator', 'add.window.maingroup.label' ) +
@@ -1279,7 +1322,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 icon  : 'icon-plus-sign-alt',
                 autoclose : false,
 
-                maxHeight : 350,
+                maxHeight : 375,
                 maxWidth  : 600,
 
                 events :
@@ -1331,9 +1374,12 @@ define('package/quiqqer/translator/bin/Panel', [
 
             var Content       = ConfirmWindow.getContent(),
                 GroupInput    = Content.getElement( 'input[name="qui-translator-add-variable-maingroup"]' ),
+                GroupLabel    = Content.getElement( 'label[for="qui-translator-add-variable-maingroup"]'),
                 SubGroupInput = Content.getElement( 'input[name="qui-translator-add-variable-subgroup"]' ),
+                SubGroupLabel = Content.getElement( 'label[for="qui-translator-add-variable-subgroup"]'),
                 VariableInput = Content.getElement( 'input[name="qui-translator-add-variable-variable"]'),
-                group         = this.getTranslationGroup().split( '/' );
+                group         = this.getTranslationGroup().split( '/'),
+                GroupSpan     = Content.getElement( 'span' );
 
             if ( typeof group[ 0 ] !== 'undefined' ) {
                 GroupInput.value = group[ 0 ];
@@ -1343,32 +1389,48 @@ define('package/quiqqer/translator/bin/Panel', [
                 SubGroupInput.value = group[ 1 ];
             }
 
-            GroupInput.addEvent('keydown', function(event)
-            {
-                if ( typeof event !== 'undefined' &&
-                    event.code === 13 )
-                {
-                    ConfirmWindow.submit();
-                }
-            });
+            GroupInput.setStyle( 'display', 'none' );
+            GroupLabel.setStyle( 'display', 'none' );
+            SubGroupInput.setStyle( 'display', 'none' );
+            SubGroupLabel.setStyle( 'display', 'none' );
 
-            SubGroupInput.addEvent('keydown', function(event)
+            var onEnter = function(event)
             {
                 if ( typeof event !== 'undefined' &&
                     event.code === 13 )
                 {
                     ConfirmWindow.submit();
                 }
-            });
+            };
 
-            VariableInput.addEvent('keydown', function(event)
-            {
-                if ( typeof event !== 'undefined' &&
-                    event.code === 13 )
+            GroupInput.addEvent('keydown', onEnter );
+            SubGroupInput.addEvent( 'keydown', onEnter );
+            VariableInput.addEvent( 'keydown', onEnter );
+
+            new QUIButton({
+                textimage : 'icon-edit',
+                text      : Locale.get( 'quiqqer/translator', 'add.window.edit.btn.text' ),
+                alt       : Locale.get( 'quiqqer/translator', 'add.window.edit.btn.text' ),
+                title     : Locale.get( 'quiqqer/translator', 'add.window.edit.btn.text' ),
+                styles    : {
+                    float : 'right'
+                },
+                events :
                 {
-                    ConfirmWindow.submit();
+                    onClick : function(Btn)
+                    {
+                        GroupInput.setStyle( 'display', '' );
+                        GroupLabel.setStyle( 'display', '' );
+                        SubGroupInput.setStyle( 'display', '' );
+                        SubGroupLabel.setStyle( 'display', '' );
+
+                        GroupInput.select();
+                        GroupInput.focus();
+
+                        GroupSpan.setStyle( 'display', 'none' );
+                    }
                 }
-            });
+            }).inject( GroupSpan );
 
             ConfirmWindow.open();
         },

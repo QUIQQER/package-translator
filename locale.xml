@@ -15,6 +15,10 @@
                 <p>If you also want to add a new group, just edit the main or sub group.</p>
             ]]></en>
         </locale>
+        <locale name="add.window.group" html="true">
+            <de><![CDATA[Gruppe: <b>[group]</b>]]></de>
+            <en><![CDATA[Group: <b>[group]</b>]]></en>
+        </locale>
         <locale name="add.window.maingroup.placeholder">
             <de><![CDATA[Hauptgruppe]]></de>
             <en><![CDATA[Main group]]></en>
@@ -46,6 +50,10 @@
         <locale name="add.window.btn.add">
             <de><![CDATA[hinzufügen]]></de>
             <en><![CDATA[add]]></en>
+        </locale>
+        <locale name="add.window.edit.btn.text">
+            <de><![CDATA[Gruppe editieren]]></de>
+            <en><![CDATA[Edit group]]></en>
         </locale>
 
         <locale name="del.window.text">
