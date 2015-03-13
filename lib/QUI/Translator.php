@@ -582,9 +582,8 @@ class Translator
         $page  = ($page - 1) ? $page - 1 : 0;
         $limit = ($page * $max) .','. $max;
 
-
         // PDO search emptyTranslations
-        if ( $search && isset( $search['emptyTranslations'] ) )
+        if ( $search && isset( $search['emptyTranslations'] ) && $search['emptyTranslations'] )
         {
             $PDO = QUI::getPDO();
 
@@ -607,6 +606,7 @@ class Translator
             $queryCount = "
                 SELECT COUNT(*) as count
                 FROM {$table}
+                WHERE {$where}
             ";
 
             $Statement = $PDO->prepare( $querySelect );
@@ -633,7 +633,7 @@ class Translator
             $where  = array();
             $search = array(
                 'type'  => '%LIKE%',
-                'value' => $search['search']
+                'value' => trim($search['search'])
             );
 
 
@@ -647,8 +647,10 @@ class Translator
 
             foreach ( $db_fields as $lang )
             {
-                if ( strlen( $lang ) == 2 ) {
+                if ( strlen( $lang ) == 2 )
+                {
                     $default[ $lang ] = $search;
+                    $default[ $lang .'_edit' ] = $search;
                 }
             }
 
