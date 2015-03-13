@@ -39,3 +39,88 @@
     margin: 0;
     width: 100%;
 }
+
+.qui-translator-export-group {
+    float: left;
+    margin-right: 5%;
+    min-width: 150px;
+    width: 35%
+}
+
+.qui-translator-export-group input {
+    clear: left;
+    float: left;
+}
+
+.qui-translator-export-group label {
+    clear: right;
+    float: left;
+    line-height: 25px;
+}
+
+.qui-translator-export-language {
+    float: left;
+    margin-right: 5%;
+    min-width: 150px;
+    width: 25%
+}
+
+.qui-translator-export-type {
+    float: left;
+    min-width: 150px;
+    width: 30%
+}
+
+.qui-translator-export-type input {
+    clear: left;
+    float: left;
+}
+
+.qui-translator-export-type label {
+    clear: right;
+    float: left;
+    line-height: 25px;
+}
+
+.qui-translator-export-type label[for="qui-translator-export-type-edit-overwrite"] {
+    width: 80%;
+}
+
+.qui-translator-import-descripton {
+    margin-bottom: 10px;
+}
+
+.qui-translator-add-variable-labels {
+    float: left;
+    padding: 10px;
+    width: 35%;
+}
+
+.qui-translator-add-variable-inputs {
+    float: left;
+    padding: 10px;
+    width: 65%;
+}
+
+.qui-translator-add-variable-group {
+    float: left;
+    line-height: 33px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.qui-translator-add-variable h3 {
+    margin: 0 0 15px 0;
+}
+
+.qui-translator-add-variable input {
+    float: left;
+    margin-top: 5px;
+}
+
+.qui-translator-add-variable label {
+    clear: both;
+    float: right;
+    line-height: 33px;
+    margin-top: 5px;
+}

@@ -33,24 +33,20 @@ define('package/quiqqer/translator/bin/AddVariable', [
             width  : 560,
             height : 200,
             group  : group,
-            title  : Locale.get('package/translator', 'add.window.title', {
-                group : group
-            }),
-            information : Locale.get('package/translator', 'add.window.text', {
-                group : group
-            }),
+            title  : Locale.get( 'quiqqer/translator', 'add.window.title' ),
+            information : Locale.get( 'quiqqer/translator', 'add.window.text' ),
             // no autoclose
             check  : function() {
                 return false;
             },
 
             cancel_button : {
-                text      : Locale.get('package/translator', 'add.window.btn.close'),
+                text      : Locale.get('quiqqer/translator', 'add.window.btn.close'),
                 textimage : 'icon-remove'
             },
 
             ok_button : {
-                text      : Locale.get('package/translator', 'add.window.btn.add'),
+                text      : Locale.get('quiqqer/translator', 'add.window.btn.add'),
                 textimage : 'icon-plus'
             },
 

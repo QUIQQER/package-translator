@@ -76,7 +76,8 @@ define('package/quiqqer/translator/bin/Panel', [
             '$gridBlur',
             '$onEditComplete',
             '$searchTemplate',
-            '$attentionBox'
+            '$attentionBox',
+            'addTranslationGroup'
         ],
 
         options : {
@@ -90,7 +91,7 @@ define('package/quiqqer/translator/bin/Panel', [
         initialize: function(options)
         {
             // defaults
-            this.setAttribute( 'title', Locale.get( 'package/translator', 'panel.title' ) );
+            this.setAttribute( 'title', Locale.get( 'quiqqer/translator', 'panel.title' ) );
             this.setAttribute( 'icon', URL_BIN_DIR +'16x16/flags/default.png' );
 
             this.parent( options );
@@ -101,10 +102,12 @@ define('package/quiqqer/translator/bin/Panel', [
                 onRefresh : this.$onRefresh
             });
 
-            this.$Container = null;
-            this.$Grid      = null;
-            this.$Editor    = null;
-            this.$groups    = {};
+            this.$Container  = null;
+            this.$Grid       = null;
+            this.$Editor     = null;
+            this.$groups     = {};
+            this.$groupcount = 0;
+            this.$langs      = [];
 
             this.$EditorHeader     = null;
             this.$devMessageShowed = false;
@@ -228,72 +231,175 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         exportGroup : function()
         {
-            var id = this.getId();
+            var id      = this.getId(),
+                group   = this.getTranslationGroup(),
+                devMode = ( QUIQQER_CONFIG.globals.development ).toInt(),
 
-            new QUIConfirm({
-                title : Locale.get( 'package/translator', 'export.window.title' ),
-                text  : Locale.get( 'package/translator', 'export.window.text' ),
-                icon  : URL_BIN_DIR +'16x16/export.png',
+                content = '<div class="qui-translator-export-group">' +
+                              '<h3>' + Locale.get( 'quiqqer/translator', 'export.window.group' ) + '</h3>' +
+                              '<input id="qui-translator-export-group-current" type="radio" name="export_group" value="' + group + '" checked="checked"/>' +
+                              '<label for="qui-translator-export-group-current">' +
+                                  Locale.get( 'quiqqer/translator', 'export.window.group.current.label', { group : group } ) +
+                              '</label>' +
+                              '<input id="qui-translator-export-group-all" type="radio" name="export_group" value="all"/>' +
+                              '<label for="qui-translator-export-group-all">' +
+                                  Locale.get( 'quiqqer/translator', 'export.window.group.all.label', { count : this.$groupcount } ) +
+                              '</label>' +
+                           '</div>' +
+                           '<div class="qui-translator-export-language">' +
+                              '<h3>' + Locale.get( 'quiqqer/translator', 'export.window.language' ) + '</h3>' +
+                           '</div>' +
+                           '<div class="qui-translator-export-type">' +
+                                '<h3>' + Locale.get( 'quiqqer/translator', 'export.window.type' ) + '</h3>' +
+                                '<input id="qui-translator-export-type-original" type="radio" name="export_type" value="original" checked="checked"/>' +
+                                '<label for="qui-translator-export-type-original">' +
+                                    Locale.get( 'quiqqer/translator', 'export.window.type.original.label' ) +
+                                '</label>' +
+                                '<input id="qui-translator-export-type-edit" type="radio" name="export_type" value="edit"/>' +
+                                '<label for="qui-translator-export-type-edit">' +
+                                    Locale.get( 'quiqqer/translator', 'export.window.type.edit.label' ) +
+                                '</label>' +
+                                '<input id="qui-translator-export-type-edit-overwrite" type="checkbox" name="export_type_overwrite" checked="checked"/>' +
+                                '<label for="qui-translator-export-type-edit-overwrite">' +
+                                    Locale.get( 'quiqqer/translator', 'export.window.type.edit.overwrite.label' ) +
+                                '</label>' +
+                           '</div>';
 
-                information : '<p>' +
-                             '<input id="edit_false'+ id +'" type="radio" name="edit" value="0" />' +
-                             '<label for="edit_false'+ id +'">'+
-                                 Locale.get( 'package/translator', 'export.window.option.orig' ) +
-                             '</label>' +
-                         '</p>' +
-                         '<p>' +
-                             '<input id="edit_true'+ id +'" type="radio" name="edit" value="1" checked="checked" />' +
-                             '<label for="edit_true'+ id +'">' +
-                                 Locale.get( 'package/translator', 'export.window.option.edit' ) +
-                             '</label>' +
-                         '</p>',
+            var ConfirmWindow = new QUIConfirm({
+                title : Locale.get( 'quiqqer/translator', 'export.window.title' ),
+                icon  : 'icon-download',
 
                 events :
                 {
                     onSubmit : function(Win)
                     {
-                        var Body = Win.getBody(),
-                            edit = Body.getElement( 'input[value="1"]' ).checked,
+                        var i, len;
+                        var Body      = Win.getContent(),
+                            grp       = Body.getElement( '#qui-translator-export-group-current' ),
+                            langs     = Body.getElements( '.qui-translator-export-language input' ),
+                            type      = Body.getElement( '#qui-translator-export-type-original'),
+                            overwrite = Body.getElement( '#qui-translator-export-type-edit-overwrite'),
+                            _group    = 'all',
+                            _langs    = [],
+                            _type     = 'original';
 
-                            url  = Ajax.$url +'?'+
-                                   Ajax.parseParams('package_quiqqer_translator_ajax_export', {
-                                       'package'  : 'quiqqer/translator',
-                                       group      : this.getTranslationGroup(),
-                                       edit       : edit ? 1 : 0
-                                   });
-
-                        // create a iframe
-                        if ( !document.id('download-frame') )
-                        {
-                            new Element('iframe#download-frame', {
-                                styles : {
-                                    position : 'absolute',
-                                    width    : 100,
-                                    height   : 100,
-                                    left     : -400,
-                                    top      : -400
-                                }
-                            }).inject( document.body );
+                        // Gruppe
+                        if ( grp.checked ) {
+                            _group = group;
                         }
 
-                        document.id('download-frame').set( 'src', url );
+                        // Sprachen
+                        for ( i = 0, len = langs.length; i < len; i++ )
+                        {
+                            if ( !langs[ i ].checked ) {
+                                continue;
+                            }
 
-                    }.bind( this )
+                            _langs.push ( langs[ i ].value );
+                        }
+
+                        // Typ
+                        if ( !type.checked )
+                        {
+                            if( !overwrite.checked )
+                            {
+                                _type = 'edit';
+                            } else
+                            {
+                                _type = 'edit_overwrite';
+                            }
+                        }
+
+                        require(['DownloadManager'], function(DownloadManager)
+                        {
+                            DownloadManager.download( 'package_quiqqer_translator_ajax_export', {
+                                'package' : 'quiqqer/translator',
+                                group     : _group,
+                                langs     : JSON.encode( _langs ),
+                                type      : _type
+                            });
+                        });
+                    }
                 }
-            }).create();
-        },
-
-        /**
-         * Opens the add variable dialog
-         */
-        addVariable : function()
-        {
-            var self = this;
-
-            require(['package/quiqqer/translator/bin/AddVariable'], function(add) {
-                add( self );
             });
+
+            ConfirmWindow.create();
+            ConfirmWindow.setContent( content );
+
+            // Sprachen reinladen
+            var l,
+                Langs  = ConfirmWindow.getContent().getElement( '.qui-translator-export-language' ),
+                langs  = this.$langs;
+
+            for ( var i = 0, len = langs.length; i < len; i++ )
+            {
+                l = langs[ i ];
+
+                new Element( 'input', {
+                    type    : 'checkbox',
+                    name    : 'export_language',
+                    value   : l,
+                    id      : 'qui-translator-export-lang-' + l,
+                    checked : 'checked'
+                }).inject( Langs );
+
+                new Element( 'label', {
+                    'for' : 'qui-translator-export-lang-' + l,
+                    html  : l
+                }).inject( Langs );
+            }
+
+            // Edit-Option
+            var Content        = ConfirmWindow.getContent(),
+                OrigOption     = Content.getElement( '#qui-translator-export-type-original'),
+                OrigLabel      = Content.getElement( 'label[for="qui-translator-export-type-original"]' ),
+                EditOption     = Content.getElement( '#qui-translator-export-type-edit' ),
+                EditLabel      = Content.getElement( 'label[for="qui-translator-export-type-edit"]' ),
+                Overwrite      = Content.getElement( '#qui-translator-export-type-edit-overwrite' ),
+                OverwriteLabel = Content.getElement( 'label[for="qui-translator-export-type-edit-overwrite"]' );
+
+            if ( !devMode )
+            {
+                OrigOption.setStyle( 'display', 'none' );
+                OrigLabel.setStyle( 'display', 'none' );
+
+                EditOption.checked = true;
+                EditOption.setStyle( 'display', 'none' );
+                EditLabel.setStyle( 'display', 'none' );
+
+                ConfirmWindow.open();
+                return;
+            }
+
+            Overwrite.setStyle( 'display', 'none' );
+            OverwriteLabel.setStyle( 'display', 'none' );
+
+            EditOption.addEvent( 'click', function(event)
+            {
+                Overwrite.setStyle( 'display', '' );
+                OverwriteLabel.setStyle( 'display', '' );
+            });
+
+            OrigOption.addEvent( 'click', function(event)
+            {
+                Overwrite.setStyle( 'display', 'none' );
+                OverwriteLabel.setStyle( 'display', 'none' );
+            });
+
+            ConfirmWindow.open();
         },
+
+//        /**
+//         * Opens the add variable dialog
+//         */
+//        addVariable : function()
+//        {
+//            var self = this;
+//
+//            require(['package/quiqqer/translator/bin/AddVariable'], function(add) {
+//                add( self );
+//            });
+//        },
 
         /**
          * Opens the delete dialog
@@ -307,14 +413,6 @@ define('package/quiqqer/translator/bin/Panel', [
             require(['package/quiqqer/translator/bin/DeleteVariables'], function(del) {
                 del( self, data );
             });
-        },
-
-        /**
-         *
-         */
-        addGroup : function()
-        {
-
         },
 
         /**
@@ -355,7 +453,7 @@ define('package/quiqqer/translator/bin/Panel', [
                     width  = Body.getSize().x - 40;
 
                 cols.push({
-                    header    : Locale.get( 'package/translator', 'grid.title.variable' ),
+                    header    : Locale.get( 'quiqqer/translator', 'grid.title.variable' ),
                     dataIndex : 'var',
                     dataType  : 'string',
                     width     : 150,
@@ -365,7 +463,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 if ( self.getAttribute( 'search' ) )
                 {
                     cols.push({
-                        header    : Locale.get( 'package/translator', 'grid.title.group' ),
+                        header    : Locale.get( 'quiqqer/translator', 'grid.title.group' ),
                         dataIndex : 'groups',
                         dataType  : 'string',
                         width     : 150
@@ -400,7 +498,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 }
 
                 cols.push({
-                    header    : Locale.get( 'package/translator', 'grid.title.type' ),
+                    header    : Locale.get( 'quiqqer/translator', 'grid.title.type' ),
                     dataIndex : 'datatype',
                     dataType  : 'string',
                     width     : 50,
@@ -408,7 +506,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 });
 
                 cols.push({
-                    header    : Locale.get( 'package/translator', 'grid.title.html' ),
+                    header    : Locale.get( 'quiqqer/translator', 'grid.title.html' ),
                     dataIndex : 'html',
                     dataType  : 'bool',
                     width     : 50,
@@ -425,14 +523,14 @@ define('package/quiqqer/translator/bin/Panel', [
                     filterInput : true,
                     buttons     : [{
                         name      : 'add',
-                        text      : Locale.get( 'package/translator', 'btn.add.var.text' ),
+                        text      : Locale.get( 'quiqqer/translator', 'btn.add.var.text' ),
                         textimage : 'icon-plus',
                         events    : {
                             onClick : self.addVariable
                         }
                     }, {
                         name      : 'del',
-                        text      : Locale.get( 'package/translator', 'btn.del.var.text' ),
+                        text      : Locale.get( 'quiqqer/translator', 'btn.del.var.text' ),
                         textimage : 'icon-trash',
                         events    : {
                             onMousedown : self.deleteVariables
@@ -496,6 +594,8 @@ define('package/quiqqer/translator/bin/Panel', [
                     });
                 }
 
+                self.$langs = langs;
+
             }, {
                 'package' : 'quiqqer/translator',
                 groups : this.getTranslationGroup(),
@@ -518,8 +618,8 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton({
                 name  : 'search',
-                title : Locale.get( 'package/translator', 'btn.search.title' ),
-                alt   : Locale.get( 'package/translator', 'btn.search.alt' ),
+                title : Locale.get( 'quiqqer/translator', 'btn.search.title' ),
+                alt   : Locale.get( 'quiqqer/translator', 'btn.search.alt' ),
                 icon  : 'icon-search',
                 events : {
                     onClick : this.search
@@ -534,8 +634,30 @@ define('package/quiqqer/translator/bin/Panel', [
                     styles : {
                         width: 100
                     },
-                    events : {
-                        onChange : this.$loadSubGroups
+                    events :
+                    {
+                        onChange : function(value)
+                        {
+                            var ButtonBar = self.getButtonBar(),
+                                ImportBtn = ButtonBar.getChildren( 'import' ),
+                                ExportBtn = ButtonBar.getChildren( 'export' ),
+                                Grid      = self.getGrid();
+
+                            ImportBtn.disable();
+                            ExportBtn.disable();
+
+                            if ( Grid )
+                            {
+                                var i, len;
+                                var gridBtns = Grid.getButtons();
+
+                                for ( i = 0, len = gridBtns.length; i < len; i++ ) {
+                                    gridBtns[ i ].disable();
+                                }
+                            }
+
+                            self.$loadSubGroups( value );
+                        }
                     }
                 })
             );
@@ -550,6 +672,24 @@ define('package/quiqqer/translator/bin/Panel', [
                     {
                         onChange : function()
                         {
+                            var ButtonBar = self.getButtonBar(),
+                                ImportBtn = ButtonBar.getChildren( 'import' ),
+                                ExportBtn = ButtonBar.getChildren( 'export' ),
+                                Grid      = self.getGrid();
+
+                            ImportBtn.enable();
+                            ExportBtn.enable();
+
+                            if ( Grid )
+                            {
+                                var i, len;
+                                var gridBtns = Grid.getButtons();
+
+                                for ( i = 0, len = gridBtns.length; i < len; i++ ) {
+                                    gridBtns[ i ].enable();
+                                }
+                            }
+
                             // grid sheet to 1
                             self.setAttribute( 'page', 1 );
                             self.$loadGrid();
@@ -562,9 +702,9 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton({
                 name      : 'import',
-                text      : Locale.get( 'package/translator', 'btn.import.text' ),
+                text      : Locale.get( 'quiqqer/translator', 'btn.import.text' ),
                 textimage : 'icon-upload',
-                disabled  : true,
+                disabled  : false,
                 events : {
                     onClick : this.importTranslation
                 }
@@ -572,9 +712,9 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton({
                 name      : 'export',
-                text      : Locale.get( 'package/translator', 'btn.export.text' ),
+                text      : Locale.get( 'quiqqer/translator', 'btn.export.text' ),
                 textimage : 'icon-download',
-                disabled  : true,
+                disabled  : false,
                 events : {
                     onClick : this.exportGroup
                 }
@@ -584,7 +724,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton({
                 name      : 'publish',
-                text      : Locale.get( 'package/translator', 'btn.publish.text' ),
+                text      : Locale.get( 'quiqqer/translator', 'btn.publish.text' ),
                 textimage : 'icon-reply',
                 events : {
                     onClick : this.publish
@@ -608,7 +748,12 @@ define('package/quiqqer/translator/bin/Panel', [
 
                     Sel1   = ButtonBar.getChildren( 'translater/group/begin' ),
                     Sel2   = ButtonBar.getChildren( 'translater/group/end' ),
-                    groups = self.$groups;
+
+                    groups = {};
+
+                // clear first
+                Sel1.clear();
+                Sel2.clear();
 
                 for ( i = 0, len = result.length; i < len; i++ )
                 {
@@ -623,7 +768,8 @@ define('package/quiqqer/translator/bin/Panel', [
                     }
                 }
 
-                self.$groups = groups;
+                self.$groups     = groups;
+                self.$groupcount = result.length;
 
                 for ( g in groups )
                 {
@@ -631,7 +777,6 @@ define('package/quiqqer/translator/bin/Panel', [
                         Sel1.appendChild( g, g, URL_BIN_DIR + '16x16/flags/default.png' );
                     }
                 }
-
 
                 if ( Sel1.firstChild() ) {
                     Sel1.setValue( Sel1.firstChild().getAttribute( 'value' ) );
@@ -708,29 +853,36 @@ define('package/quiqqer/translator/bin/Panel', [
             Bar.getChildren( 'translater/group/end' ).disable();
             Bar.getChildren( 'export' ).disable();
 
+            var onClick = function()
+            {
+                self.Loader.show();
+
+                self.setAttribute( 'search', false );
+                self.setAttribute( 'page', 1 );
+
+                var Bar = self.getButtonBar();
+
+                Bar.getChildren( 'translater/group/begin' ).enable();
+                Bar.getChildren( 'translater/group/end' ).enable();
+                Bar.getChildren( 'export' ).enable();
+
+                self.$loadGrid();
+                self.resize();
+            };
+
             require(['qui/controls/messages/Attention'], function(Attention)
             {
                 new Attention({
-                    message : Locale.get( 'package/translator', 'search.params.active' ),
+                    message : Locale.get( 'quiqqer/translator', 'search.params.active' ),
                     events  :
                     {
                         onClick : function(Message)
                         {
-                            self.Loader.show();
-
-                            self.setAttribute( 'search', false );
-                            self.setAttribute( 'page', 1 );
                             Message.destroy();
+                            onClick();
+                        },
 
-                            var Bar = self.getButtonBar();
-
-                            Bar.getChildren( 'translater/group/begin' ).enable();
-                            Bar.getChildren( 'translater/group/end' ).enable();
-                            Bar.getChildren( 'export' ).enable();
-
-                            self.$loadGrid();
-                            self.resize();
-                        }
+                        onDestroy : onClick
                     },
                     styles  : {
                         margin : '0 0 20px',
@@ -847,6 +999,8 @@ define('package/quiqqer/translator/bin/Panel', [
                     }
                 }).inject( Content );
 
+                self.$EditorContainer = EditorContainer;
+
                 // minimal toolbar
                 self.$Editor.setAttribute('buttons', {
                     lines : [
@@ -898,12 +1052,12 @@ define('package/quiqqer/translator/bin/Panel', [
                         self.$Editor.hideToolbar();
                     }
 
+                    self.$Editor.setHeight( height );
                     self.Loader.hide();
                 });
 
                 self.$Editor.inject( EditorContainer );
                 self.$Editor.setContent( Cell.get('html') );
-                self.$Editor.setHeight( height );
             });
         },
 
@@ -928,7 +1082,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             new QUIButton({
                 textimage : 'icon-save',
-                text      : 'Speichern',
+                text      : Locale.get( 'quiqqer/translator', 'edit.btn.save' ),
                 styles : {
                     'float' : 'right'
                 },
@@ -948,6 +1102,25 @@ define('package/quiqqer/translator/bin/Panel', [
                         self.$saveData( Data, function() {
                             self.Loader.hide();
                         });
+                    }
+                }
+            }).inject( this.$EditorHeader );
+
+            new QUIButton({
+                textimage : 'icon-remove',
+                text      : Locale.get( 'quiqqer/translator', 'edit.btn.close' ),
+                styles : {
+                    'float'     : 'right',
+                    marginRight : 5
+                },
+                events :
+                {
+                    onClick : function()
+                    {
+                        self.$EditorHeader.destroy();
+                        self.$EditorContainer.destroy();
+                        self.$Editor = null;
+                        self.fireEvent( 'onResize' );
                     }
                 }
             }).inject( this.$EditorHeader );
@@ -997,30 +1170,269 @@ define('package/quiqqer/translator/bin/Panel', [
         {
             this.Loader.show();
 
-            var Sheet = this.createSheet();
+            var self              = this,
+                devMode           = ( QUIQQER_CONFIG.globals.development ).toInt(),
+                overwriteOriginal = false;
 
-            Sheet.addEvent('onOpen', function(Sheet)
+            require( [ 'controls/upload/Form' ], function(UploadForm)
             {
-                require(['package/quiqqer/translator/bin/Import'], function(Import)
-                {
-                    var TranslatorImport = new Import({
-                        events :
-                        {
-                            onUpload : function() {
-                                Sheet.hide();
-                            }
+                var Popup = new QUIConfirm({
+                    icon      : 'icon-file-upload',
+                    title     : Locale.get( 'quiqqer/translator', 'import.window.title' ),
+                    maxWidth  : 425,
+                    maxHeight : 325,
+                    events    :
+                    {
+                        onSubmit : function(Win) {
+                            LogoUploadForm.submit();
                         }
-                    });
-
-                    TranslatorImport.inject( Sheet.getBody() );
-                    TranslatorImport.initUpload();
+                    }
                 });
 
-                this.Loader.hide();
+                Popup.create();
 
-            }.bind( this ));
+                var content = '<p class="qui-translator-import-descripton">' +
+                                Locale.get( 'quiqqer/translator', 'import.window.description' ) +
+                              '<p>';
 
-            Sheet.show();
+                if ( devMode )
+                {
+                    content += '<input type="checkbox" id="qui-translator-import-overwrite"/>' +
+                               '<label for="qui-translator-import-overwrite">' +
+                                    Locale.get( 'quiqqer/translator', 'import.window.overwrite.label' ) +
+                               '</label>'
+                }
+
+                Popup.setContent( content );
+
+                var LogoUploadForm = new UploadForm({
+                    multible   : false,
+                    sendbutton : false,
+//                maxuploads : 5,
+                    uploads    : 1,
+                    styles     : {
+                        clear  : 'both',
+                        float  : 'left',
+                        margin : 0,
+                        width  : '100%',
+                        marginTop : 25,
+                    },
+                    events     :
+                    {
+                        onComplete : function(Control, File, result)
+                        {
+                            self.Loader.hide();
+                            self.$Grid.refresh();
+                            Popup.close();
+                        },
+
+                        onAdd : function(Control, File)
+                        {
+                            if ( typeof FileReader === 'undefined' ) {
+                                return;
+                            }
+
+                            var Reader = new FileReader();
+
+                            Reader.readAsDataURL( File );
+                        },
+
+                        onError : function(Control, Error)
+                        {
+                            QUI.getMessageHandler(function(MH)
+                            {
+                                MH.addError(
+                                    Error.getAttribute( 'message' ),
+                                    self.$ImgDrop
+                                );
+                            });
+                        },
+
+                        onSubmit : function(data, Control)
+                        {
+                            self.Loader.show();
+
+                            var Overwrite = Popup.getContent().getElement( '#qui-translator-import-overwrite');
+
+                            var checked = Overwrite ? Overwrite.checked : false;
+
+                            Control.setParam(
+                                'overwriteOriginal',
+                                checked ? 1 : 0
+                            );
+                        }
+                    }
+                });
+
+                LogoUploadForm.setParam(
+                    'onfinish',
+                    'package_quiqqer_translator_ajax_import'
+                );
+
+                LogoUploadForm.setParam( 'package', 'quiqqer/translator' );
+
+                LogoUploadForm.inject( Popup.getContent() );
+
+                Popup.open();
+
+                self.Loader.hide();
+            });
+        },
+
+        addVariable : function()
+        {
+            var self = this;
+
+            var content = '<div class="qui-translator-add-variable">' +
+                              '<h3>' +
+                                Locale.get( 'quiqqer/translator', 'add.window.text' ) +
+                              '</h3>' +
+                              '<span class="qui-translator-add-variable-group">' +
+                                Locale.get( 'quiqqer/translator', 'add.window.group', { group : this.getTranslationGroup() } ) +
+                              '</span>' +
+                              '<div class="qui-translator-add-variable-labels">' +
+                              '<label for="qui-translator-add-variable-maingroup">' +
+                                Locale.get( 'quiqqer/translator', 'add.window.maingroup.label' ) +
+                              '</label>' +
+                              '<label for="qui-translator-add-variable-subgroup">' +
+                                Locale.get( 'quiqqer/translator', 'add.window.subgroup.label' ) +
+                              '</label>' +
+                              '<label for="qui-translator-add-variable-variable">' +
+                                Locale.get( 'quiqqer/translator', 'add.window.variable.label' ) +
+                              '</label>' +
+                              '</div>' +
+                              '<div class="qui-translator-add-variable-inputs">' +
+                              '<input type="text" name="qui-translator-add-variable-maingroup"' +
+                              ' placeholder="' +
+                                Locale.get( 'quiqqer/translator', 'add.window.maingroup.placeholder' ) +
+                              '" id="qui-translator-add-variable-group"/>' +
+                              '<input type="text" name="qui-translator-add-variable-subgroup"' +
+                              ' placeholder="' +
+                                Locale.get( 'quiqqer/translator', 'add.window.subgroup.placeholder' ) +
+                              '" id="qui-translator-add-variable-group"/>' +
+                              '<input type="text" name="qui-translator-add-variable-variable"' +
+                              ' placeholder="' +
+                                Locale.get( 'quiqqer/translator', 'add.window.variable.placeholder' ) +
+                              '" id="qui-translator-add-variable-variable"/>' +
+                              '</div>' +
+                          '</div>';
+
+            var ConfirmWindow = new QUIConfirm({
+                title : Locale.get( 'quiqqer/translator', 'add.window.title' ),
+                icon  : 'icon-plus-sign-alt',
+                autoclose : false,
+
+                maxHeight : 375,
+                maxWidth  : 600,
+
+                events :
+                {
+                    onSubmit : function(Win)
+                    {
+                        if ( GroupInput.value.trim() === '' )
+                        {
+                            GroupInput.focus();
+                            return false;
+                        }
+
+                        if ( SubGroupInput.value.trim() === '' )
+                        {
+                            SubGroupInput.focus();
+                            return false;
+                        }
+
+                        if ( VariableInput.value.trim() === '' )
+                        {
+                            VariableInput.focus();
+                            return false;
+                        }
+
+                        self.Loader.show();
+
+                        Ajax.post('package_quiqqer_translator_ajax_add', function()
+                        {
+                            Win.close();
+
+                            self.$loadGroups();
+                            self.$Grid.refresh();
+                            self.Loader.hide();
+                        }, {
+                            'package' : 'quiqqer/translator',
+                            group     : GroupInput.value.trim() + '/' + SubGroupInput.value.trim(),
+                            'var'     : VariableInput.value.trim()
+                        });
+                    },
+
+                    onOpen : function(Win) {
+                        VariableInput.focus();
+                    }
+                }
+            });
+
+            ConfirmWindow.create();
+            ConfirmWindow.setContent( content );
+
+            var Content       = ConfirmWindow.getContent(),
+                GroupInput    = Content.getElement( 'input[name="qui-translator-add-variable-maingroup"]' ),
+                GroupLabel    = Content.getElement( 'label[for="qui-translator-add-variable-maingroup"]'),
+                SubGroupInput = Content.getElement( 'input[name="qui-translator-add-variable-subgroup"]' ),
+                SubGroupLabel = Content.getElement( 'label[for="qui-translator-add-variable-subgroup"]'),
+                VariableInput = Content.getElement( 'input[name="qui-translator-add-variable-variable"]'),
+                group         = this.getTranslationGroup().split( '/'),
+                GroupSpan     = Content.getElement( 'span' );
+
+            if ( typeof group[ 0 ] !== 'undefined' ) {
+                GroupInput.value = group[ 0 ];
+            }
+
+            if ( typeof group[ 1 ] !== 'undefined' ) {
+                SubGroupInput.value = group[ 1 ];
+            }
+
+            GroupInput.setStyle( 'display', 'none' );
+            GroupLabel.setStyle( 'display', 'none' );
+            SubGroupInput.setStyle( 'display', 'none' );
+            SubGroupLabel.setStyle( 'display', 'none' );
+
+            var onEnter = function(event)
+            {
+                if ( typeof event !== 'undefined' &&
+                    event.code === 13 )
+                {
+                    ConfirmWindow.submit();
+                }
+            };
+
+            GroupInput.addEvent('keydown', onEnter );
+            SubGroupInput.addEvent( 'keydown', onEnter );
+            VariableInput.addEvent( 'keydown', onEnter );
+
+            new QUIButton({
+                textimage : 'icon-edit',
+                text      : Locale.get( 'quiqqer/translator', 'add.window.edit.btn.text' ),
+                alt       : Locale.get( 'quiqqer/translator', 'add.window.edit.btn.text' ),
+                title     : Locale.get( 'quiqqer/translator', 'add.window.edit.btn.text' ),
+                styles    : {
+                    float : 'right'
+                },
+                events :
+                {
+                    onClick : function(Btn)
+                    {
+                        GroupInput.setStyle( 'display', '' );
+                        GroupLabel.setStyle( 'display', '' );
+                        SubGroupInput.setStyle( 'display', '' );
+                        SubGroupLabel.setStyle( 'display', '' );
+
+                        GroupInput.select();
+                        GroupInput.focus();
+
+                        GroupSpan.setStyle( 'display', 'none' );
+                    }
+                }
+            }).inject( GroupSpan );
+
+            ConfirmWindow.open();
         },
 
         /**
@@ -1037,7 +1449,7 @@ define('package/quiqqer/translator/bin/Panel', [
             {
                 Sheet.addButton(
                     new QUIButton({
-                        text      : Locale.get( 'package/translator', 'btn.search.sheet.text' ),
+                        text      : Locale.get( 'quiqqer/translator', 'btn.search.sheet.text' ),
                         textimage : 'icon-search',
                         events    :
                         {

@@ -8,27 +8,24 @@
  * @param String $group - translation group
  */
 
-function package_quiqqer_translator_ajax_export($group, $edit)
+function package_quiqqer_translator_ajax_export($group, $langs, $type)
 {
-    $str = \QUI\Translator::export(
-        $group,
-        \QUI\Utils\Bool::JSBool( $edit )
+    $group = str_replace( '/', '!GROUPSEPERATOR!', $group );
+    $group = \QUI\Utils\Security\Orthos::clear( $group );
+    $group = str_replace( '!GROUPSEPERATOR!', '/', $group );
+
+    $langs = \QUI\Utils\Security\Orthos::clearArray(
+        json_decode( $langs, true )
     );
+    $type = \QUI\Utils\Security\Orthos::clear( $type );
 
-    $file = str_replace( '/', '_', $group );
-
-    header( 'Expires: '. gmdate( "D, d M Y H:i:s" ) . " GMT");
-    header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-    header( 'Pragma: no-cache' );
-    header( 'Content-type: text/xml' );
-    header( 'Content-Disposition: attachment; filename="'. $file .'.xml"' );
-
-    echo $str;
-    exit;
+    \QUI\Utils\System\File::downloadHeader(
+        \QUI\Translator::export( $group, $langs, $type )
+    );
 }
 
 \QUI::$Ajax->register(
     'package_quiqqer_translator_ajax_export',
-    array( 'group', 'edit' ),
+    array( 'group', 'langs', 'type' ),
     'Permission::checkAdminUser'
 );

@@ -39,7 +39,7 @@ function package_quiqqer_translator_ajax_update($groups, $data)
 
     \QUI::getMessagesHandler()->addSuccess(
         \QUI::getLocale()->get(
-            'package/translator',
+            'quiqqer/translator',
             'message.translation.update.successful'
         )
     );

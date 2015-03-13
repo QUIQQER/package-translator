@@ -30,7 +30,7 @@ function package_quiqqer_translator_ajax_delete($data)
 
         \QUI::getMessagesHandler()->addSuccess(
             \QUI::getLocale()->get(
-                'package/translator',
+                'quiqqer/translator',
                 'message.translation.delet.successful',
                 array(
                     'groups' => $entry['groups'],
