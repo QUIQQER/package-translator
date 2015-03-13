@@ -18,8 +18,8 @@
     },
 
     "require": {
-        "quiqqer/quiqqer" : "1.*",
-        "quiqqer/utils" : "1.*"
+        "quiqqer/quiqqer" : "*@dev",
+        "quiqqer/utils" : "*@dev"
     },
 
     "autoload": {
