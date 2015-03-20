@@ -1,6 +1,6 @@
 {
     "name" : "quiqqer/translator",
-    "type" : "quiqqer-library",
+    "type" : "quiqqer-module",
     "description" : "QUIQQER Translator",
 
     "version" : "dev-dev",

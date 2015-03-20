@@ -292,8 +292,6 @@ class Translator
 
             foreach ( $locales[ 'locales' ] as $locale )
             {
-                $locale = QUI\Utils\Security\Orthos::clearArray( $locale );
-
                 $var = $locale[ 'name' ];
 
                 unset( $locale[ 'name' ] );
