@@ -8,8 +8,6 @@
             <field type="varchar(20)">datatype</field>
             <field type="varchar(200)">datadefine</field>
             <field type="int(1)">html</field>
-
-            <primary>groups,var</primary>
         </table>
     </global>
 
