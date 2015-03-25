@@ -71,7 +71,7 @@ class Translator
         QUI::getDataBase()->Table()->appendFields(
             self::Table(),
             array(
-                $lang          => 'text NOT NULL',
+                $lang          => 'text NULL',
                 $lang .'_edit' => 'text NULL'
             )
         );
@@ -710,8 +710,12 @@ class Translator
             // search empty translations
             $whereParts = array();
 
-            foreach ( $db_fields as $field ) {
-                $whereParts[] = "({$field} = '' AND {$field}_edit = '' )";
+            foreach ( $db_fields as $field )
+            {
+                $whereParts[] = "(
+                    ({$field} = '' OR {$field} IS NULL) AND
+                    ({$field}_edit = '' OR {$field}_edit IS NULL)
+                )";
             }
 
             $where = implode( ' OR ', $whereParts );
