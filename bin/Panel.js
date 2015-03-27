@@ -1057,7 +1057,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 });
 
                 self.$Editor.inject( EditorContainer );
-                self.$Editor.setContent( Cell.get('html') );
+                self.$Editor.setContent( Cell.get('text') );
             });
         },
 
