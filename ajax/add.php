@@ -12,7 +12,9 @@ function package_quiqqer_translator_ajax_add($group, $var)
     $group = \QUI\Utils\Security\Orthos::clear( $group );
     $group = str_replace( '!GROUPSEPERATOR!', '/', $group );
 
-    $var    = \QUI\Utils\Security\Orthos::clear( $var );
+    $var = str_replace( '/', '!GROUPSEPERATOR!', $var );
+    $var = \QUI\Utils\Security\Orthos::clear( $var );
+    $var = str_replace( '!GROUPSEPERATOR!', '/', $var );
 
     \QUI\Translator::add( $group, $var );
 
