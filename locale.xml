@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <locales>
-    <groups name="package/translator" datatype="js">
+
+    <groups name="quiqqer/translator" datatype="php,js">
+        <locale name="package.name">
+            <de><![CDATA[Sprachvariablen]]></de>
+            <en><![CDATA[Translations]]></en>
+        </locale>
+        <locale name="package.description">
+            <de><![CDATA[Sprachvariablen]]></de>
+            <en><![CDATA[Translations]]></en>
+        </locale>
+    </groups>
+
+    <groups name="quiqqer/translator" datatype="js">
         <locale name="add.window.title">
             <de><![CDATA[Variable hinzufügen:[group]]]></de>
             <en><![CDATA[Add Variable: [group]]]></en>
@@ -49,8 +61,8 @@
             <en><![CDATA[]]></en>
         </locale>
         <locale name="panel.title">
-            <de><![CDATA[Übersetzer]]></de>
-            <en><![CDATA[Translator]]></en>
+            <de><![CDATA[Sprachvariablen]]></de>
+            <en><![CDATA[Translations]]></en>
         </locale>
         <locale name="export.window.title">
             <de><![CDATA[Übersetzungen exportieren]]></de>
@@ -153,7 +165,7 @@
             <en><![CDATA[Edit]]></en>
         </locale>
     </groups>
-    <groups name="package/translator" datatype="php">
+    <groups name="quiqqer/translator" datatype="php">
         <locale name="exception.file.could.not.read">
             <de><![CDATA[Datei konnte nicht gelesen werden.]]></de>
             <en><![CDATA[]]></en>
