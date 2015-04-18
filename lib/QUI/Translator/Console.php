@@ -14,7 +14,6 @@ use QUI\Translator;
  *
  * @author www.pcsg.de (Henning Leutz)
  */
-
 class Console extends QUI\System\Console\Tool
 {
     /**
@@ -28,23 +27,23 @@ class Console extends QUI\System\Console\Tool
 
     /**
      * (non-PHPdoc)
+     *
      * @see \QUI\System\Console\Tool::execute()
      */
     public function execute()
     {
-        if ( $this->getArgument('--newLanguage') )
-        {
+        if ($this->getArgument('--newLanguage')) {
             $language = $this->getArgument('--newLanguage');
-            Translator::addLang( $language );
+            Translator::addLang($language);
 
-            $this->writeLn( 'Add language to translator: '. $language );
+            $this->writeLn('Add language to translator: '.$language);
         }
 
-        $this->writeLn( 'Start Translation ...' );
+        $this->writeLn('Start Translation ...');
 
         Translator::create();
 
-        $this->write( ' [ok]' );
-        $this->writeLn( '' );
+        $this->write(' [ok]');
+        $this->writeLn('');
     }
 }

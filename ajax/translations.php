@@ -6,30 +6,28 @@
  * @param String $groups
  * @param String $params
  * @param String $search
+ *
  * @return Array
  */
 function package_quiqqer_translator_ajax_translations($groups, $params, $search)
 {
     $langs = \QUI\Translator::langs();
-    $data  = \QUI\Translator::getData(
+    $data = \QUI\Translator::getData(
         $groups,
-        json_decode( $params, true ),
-        json_decode( $search, true )
+        json_decode($params, true),
+        json_decode($search, true)
     );
 
-    $dev = \QUI::conf( 'globals', 'development' );
+    $dev = \QUI::conf('globals', 'development');
 
-    if ( !$dev )
-    {
-        foreach ( $data['data'] as $key => $entry )
-        {
-            foreach ( $langs as $lang )
-            {
-                if ( isset( $entry[ $lang ] ) &&
-                     isset( $entry[ $lang .'_edit' ] ) &&
-                     !empty( $entry[ $lang .'_edit' ] ) )
-                {
-                    $data[ 'data' ][ $key ][ $lang ] = $entry[ $lang .'_edit' ];
+    if (!$dev) {
+        foreach ($data['data'] as $key => $entry) {
+            foreach ($langs as $lang) {
+                if (isset($entry[$lang])
+                    && isset($entry[$lang.'_edit'])
+                    && !empty($entry[$lang.'_edit'])
+                ) {
+                    $data['data'][$key][$lang] = $entry[$lang.'_edit'];
                 }
             }
         }
@@ -45,6 +43,6 @@ function package_quiqqer_translator_ajax_translations($groups, $params, $search)
 
 \QUI::$Ajax->register(
     'package_quiqqer_translator_ajax_translations',
-    array( 'groups', 'params', 'search' ),
+    array('groups', 'params', 'search'),
     'Permission::checkAdminUser'
 );

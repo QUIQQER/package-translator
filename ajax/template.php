@@ -7,39 +7,38 @@
  */
 function ajax_translater_template()
 {
-    $Engine   = \QUI::getTemplateManager()->getEngine( true );
+    $Engine = \QUI::getTemplateManager()->getEngine(true);
     $projects = \QUI::getProjects();
 
-    $Plugins  = \QUI::getPlugins();
+    $Plugins = \QUI::getPlugins();
     $_plugins = $Plugins->getAvailablePlugins();
 
-    $list   = \QUI\Translater::getGroupList();
+    $list = \QUI\Translater::getGroupList();
     $groups = array();
 
     $groups['system'] = '';
 
-    foreach ( $list as $entry ) {
-        $groups[ $entry ] = '';
+    foreach ($list as $entry) {
+        $groups[$entry] = '';
     }
 
     // Plugins aufnehmen
-    foreach ( $_plugins as $Plugin ) {
-        $groups[ 'plugin/'. $Plugin->getAttribute('name') ] = '';
+    foreach ($_plugins as $Plugin) {
+        $groups['plugin/'.$Plugin->getAttribute('name')] = '';
     }
 
     // Projekte aufnehmen
-    foreach ( $projects as $Project ) {
-        $groups[ 'project/'. $Plugin->getAttribute('name') ] = '';
+    foreach ($projects as $Project) {
+        $groups['project/'.$Plugin->getAttribute('name')] = '';
     }
 
-    ksort( $groups );
+    ksort($groups);
 
     $result = array();
 
-    foreach ( $groups as $key => $value )
-    {
-        $str = '{"'. str_replace('/', '":{"', $key);
-        $str = $str .'" : ""'. str_repeat('}', substr_count($str, '{'));
+    foreach ($groups as $key => $value) {
+        $str = '{"'.str_replace('/', '":{"', $key);
+        $str = $str.'" : ""'.str_repeat('}', substr_count($str, '{'));
 
         $result = array_merge_recursive($result, json_decode($str, true));
     }
@@ -49,7 +48,7 @@ function ajax_translater_template()
     ));
 
     return \QUI\Utils\Security\Orthos::removeLineBreaks(
-        $Engine->fetch(SYS_DIR .'ajax/translater/template.html')
+        $Engine->fetch(SYS_DIR.'ajax/translater/template.html')
     );
 }
 
