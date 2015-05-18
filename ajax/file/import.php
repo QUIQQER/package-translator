@@ -7,10 +7,9 @@
  */
 function package_quiqqer_translator_ajax_file_import($File, $overwrite)
 {
-    $overwrite = (int) $overwrite;
+    $overwrite = (int)$overwrite;
 
-    if ( !$File->getAttribute( 'filepath' ) )
-    {
+    if (!$File->getAttribute('filepath')) {
         \QUI::getMessagesHandler()->addError(
             \QUI::getLocale()->get(
                 'quiqqer/translator',
@@ -21,22 +20,21 @@ function package_quiqqer_translator_ajax_file_import($File, $overwrite)
         return;
     }
 
-    if ( $overwrite == 1 )
-    {
+    if ($overwrite == 1) {
         return \QUI\Translator::import(
-            $File->getAttribute( 'filepath' ),
+            $File->getAttribute('filepath'),
             false
         );
     }
 
     return \QUI\Translator::import(
-        $File->getAttribute( 'filepath' ),
+        $File->getAttribute('filepath'),
         true
     );
 }
 
 \QUI::$Ajax->register(
     'package_quiqqer_translator_ajax_file_import',
-    array( 'File', 'overwrite' ),
+    array('File', 'overwrite'),
     'Permission::checkAdminUser'
 );

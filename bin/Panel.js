@@ -1039,6 +1039,8 @@ define('package/quiqqer/translator/bin/Panel', [
                     ]
                 });
 
+                self.$Editor.setAttribute( 'showLoader', false );
+
                 self.$Editor.addEvent('onLoaded', function()
                 {
                     if ( ( localeData.html ).toInt() === 1 )
@@ -1057,7 +1059,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 });
 
                 self.$Editor.inject( EditorContainer );
-                self.$Editor.setContent( Cell.get('html') );
+                self.$Editor.setContent( Cell.get('text') );
             });
         },
 
