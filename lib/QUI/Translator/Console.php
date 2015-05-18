@@ -32,6 +32,20 @@ class Console extends QUI\System\Console\Tool
      */
     public function execute()
     {
+        if ($this->getArgument('--setup')) {
+
+            $this->writeLn('Start translator setup... ');
+
+            QUI::getPackageManager()
+               ->getInstalledPackage('quiqqer/translator')
+               ->setup();
+
+            $this->write(' [ok]');
+            $this->writeLn('');
+
+            return;
+        }
+
         if ($this->getArgument('--newLanguage')) {
             $language = $this->getArgument('--newLanguage');
             Translator::addLang($language);
