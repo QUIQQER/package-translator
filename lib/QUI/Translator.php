@@ -413,6 +413,14 @@ class Translator
                     continue;
                 }
 
+                if (!file_exists($package_dir . '/' . $package)) {
+                    continue;
+                }
+
+                if (!is_dir($package_dir . '/' . $package)) {
+                    continue;
+                }
+
                 $lang_file = $package_dir . '/' . $package . '/' . $lang . '.js';
 
                 if (file_exists($lang_file)) {
