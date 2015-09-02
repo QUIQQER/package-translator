@@ -390,7 +390,7 @@ class Translator
         $require = array();
         $result  = array();
 
-        $jsdir       = self::dir() . '/bin/';
+        $jsdir       = self::dir() . 'bin/';
         $cacheFile   = $jsdir . '_cache/' . $lang . '.js';
         $development = QUI::conf('globals', 'development');
 
@@ -403,12 +403,16 @@ class Translator
         $dirs      = QUIFile::readDir($jsdir);
         $cacheData = '';
 
-
         foreach ($dirs as $dir) {
             $package_dir  = $jsdir . $dir;
             $package_list = QUIFile::readDir($package_dir);
 
             foreach ($package_list as $package) {
+
+                if ($package == '_cache') {
+                    continue;
+                }
+
                 $lang_file = $package_dir . '/' . $package . '/' . $lang . '.js';
 
                 if (file_exists($lang_file)) {
