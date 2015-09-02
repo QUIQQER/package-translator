@@ -657,7 +657,7 @@ class Translator
         // clean cache dir of js files
         QUI::getTemp()->moveToTemp($dir . '/bin/_cache/');
 
-        
+
         if (!empty($exec_error)) {
             QUI::getMessagesHandler()->addError($exec_error);
         }
