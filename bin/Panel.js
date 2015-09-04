@@ -632,7 +632,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 new QUISelect({
                     name : 'translater/group/begin',
                     styles : {
-                        width: 100
+                        width: '17%'
                     },
                     events :
                     {
@@ -666,7 +666,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 new QUISelect({
                     name   : 'translater/group/end',
                     styles : {
-                        width: 100
+                        width: '17%'
                     },
                     events :
                     {
