@@ -24,7 +24,7 @@ function package_quiqqer_translator_ajax_translations($groups, $params, $search)
         foreach ($data['data'] as $key => $entry) {
             foreach ($langs as $lang) {
                 if (isset($entry[$lang])
-                    || (isset($entry[$lang.'_edit'])
+                    && (isset($entry[$lang.'_edit'])
                     && !empty($entry[$lang.'_edit']))
                 ) {
                     $data['data'][$key][$lang] = $entry[$lang.'_edit'];
