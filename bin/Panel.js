@@ -268,6 +268,7 @@ define('package/quiqqer/translator/bin/Panel', [
             var ConfirmWindow = new QUIConfirm({
                 title : Locale.get( 'quiqqer/translator', 'export.window.title' ),
                 icon  : 'icon-download',
+                texticon : false,
 
                 events :
                 {
