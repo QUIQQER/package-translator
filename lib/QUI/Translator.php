@@ -70,8 +70,8 @@ class Translator
         QUI::getDataBase()->Table()->appendFields(
             self::Table(),
             array(
-                $lang           => 'text NULL',
-                $lang . '_edit' => 'text NULL'
+                $lang           => 'text NOT NULL',
+                $lang . '_edit' => 'text NOT NULL'
             )
         );
     }
