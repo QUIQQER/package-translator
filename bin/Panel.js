@@ -268,6 +268,7 @@ define('package/quiqqer/translator/bin/Panel', [
             var ConfirmWindow = new QUIConfirm({
                 title : Locale.get( 'quiqqer/translator', 'export.window.title' ),
                 icon  : 'icon-download',
+                texticon : false,
 
                 events :
                 {
@@ -632,7 +633,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 new QUISelect({
                     name : 'translater/group/begin',
                     styles : {
-                        width: 100
+                        width: '17%'
                     },
                     events :
                     {
@@ -666,7 +667,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 new QUISelect({
                     name   : 'translater/group/end',
                     styles : {
-                        width: 100
+                        width: '17%'
                     },
                     events :
                     {
