@@ -222,8 +222,9 @@ class Translator
      * Import a locale xml file
      *
      * @param String $file - path to the file
-     * @param Bool $update_edit_fields - if true, the _edit fields would be updated
+     * @param Bool|Integer $overwriteOriginal - if true, the _edit fields would be updated
      *                                     if false, the original fields would be updated
+     * @param Bool $devModeIgnore
      *
      * @return Array - List of imported vars
      * @throws QUI\Exception
@@ -259,7 +260,8 @@ class Translator
             throw new QUI\Exception(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
-                    'exception.import.wrong.format'
+                    'exception.import.wrong.format',
+                    array('file' => $file)
                 )
             );
         }
@@ -268,7 +270,8 @@ class Translator
             throw new QUI\Exception(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
-                    'exception.import.wrong.format'
+                    'exception.import.wrong.format',
+                    array('file' => $file)
                 )
             );
         }

@@ -10,8 +10,8 @@
             <en><![CDATA[Translations have been imported successfully.]]></en>
         </locale>
         <locale name="exception.import.wrong.format">
-            <de><![CDATA[Die Datei hat ein falsches Format. Bitte verwenden Sie nur über den Sprachvariablen-Export erstellte Dateien]]></de>
-            <en><![CDATA[The file has a wrong format. Please only use files created via the export function of the Translator.]]></en>
+            <de><![CDATA[Die Datei [file] hat ein falsches Format. Bitte verwenden Sie nur über den Sprachvariablen-Export erstellte Dateien]]></de>
+            <en><![CDATA[The file [file] has a wrong format. Please only use files created via the export function of the Translator.]]></en>
         </locale>
         <locale name="exception.file.could.not.read">
             <de><![CDATA[Datei konnte nicht gelesen werden]]></de>
