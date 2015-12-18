@@ -7,13 +7,13 @@
  */
 function ajax_translater_template()
 {
-    $Engine = \QUI::getTemplateManager()->getEngine(true);
-    $projects = \QUI::getProjects();
+    $Engine   = QUI::getTemplateManager()->getEngine(true);
+    $projects = QUI::getProjectManager()->getProjects(true);
 
-    $Plugins = \QUI::getPlugins();
+    $Plugins  = QUI::getPlugins();
     $_plugins = $Plugins->getAvailablePlugins();
 
-    $list = \QUI\Translater::getGroupList();
+    $list   = QUI\Translator::getGroupList();
     $groups = array();
 
     $groups['system'] = '';
@@ -24,12 +24,12 @@ function ajax_translater_template()
 
     // Plugins aufnehmen
     foreach ($_plugins as $Plugin) {
-        $groups['plugin/'.$Plugin->getAttribute('name')] = '';
+        $groups['plugin/' . $Plugin->getAttribute('name')] = '';
     }
 
     // Projekte aufnehmen
     foreach ($projects as $Project) {
-        $groups['project/'.$Plugin->getAttribute('name')] = '';
+        $groups['project/' . $Project->getAttribute('name')] = '';
     }
 
     ksort($groups);
@@ -37,8 +37,8 @@ function ajax_translater_template()
     $result = array();
 
     foreach ($groups as $key => $value) {
-        $str = '{"'.str_replace('/', '":{"', $key);
-        $str = $str.'" : ""'.str_repeat('}', substr_count($str, '{'));
+        $str = '{"' . str_replace('/', '":{"', $key);
+        $str = $str . '" : ""' . str_repeat('}', substr_count($str, '{'));
 
         $result = array_merge_recursive($result, json_decode($str, true));
     }
@@ -47,12 +47,12 @@ function ajax_translater_template()
         'list' => json_encode($result)
     ));
 
-    return \QUI\Utils\Security\Orthos::removeLineBreaks(
-        $Engine->fetch(SYS_DIR.'ajax/translater/template.html')
+    return QUI\Utils\StringHelper::removeLineBreaks(
+        $Engine->fetch(SYS_DIR . 'ajax/translater/template.html')
     );
 }
 
-\QUI::$Ajax->register(
+QUI::$Ajax->register(
     'ajax_translater_template',
     false,
     'Permission::checkAdminUser'

@@ -27,8 +27,7 @@ function package_quiqqer_translator_ajax_template_search()
         .'/template/search.html'
     );
 }
-
-\QUI::$Ajax->register(
+QUI::$Ajax->register(
     'package_quiqqer_translator_ajax_template_search',
     false,
     'Permission::checkAdminUser'

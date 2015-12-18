@@ -22,13 +22,13 @@ function package_quiqqer_translator_ajax_delete($data)
             continue;
         }
 
-        \QUI\Translator::delete(
+        QUI\Translator::delete(
             $entry['groups'],
             $entry['var']
         );
 
-        \QUI::getMessagesHandler()->addSuccess(
-            \QUI::getLocale()->get(
+        QUI::getMessagesHandler()->addSuccess(
+            QUI::getLocale()->get(
                 'quiqqer/translator',
                 'message.translation.delet.successful',
                 array(
@@ -40,7 +40,7 @@ function package_quiqqer_translator_ajax_delete($data)
     }
 }
 
-\QUI::$Ajax->register(
+QUI::$Ajax->register(
     'package_quiqqer_translator_ajax_delete',
     array('data'),
     'Permission::checkAdminUser'

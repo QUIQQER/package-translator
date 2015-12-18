@@ -3,7 +3,9 @@
 /**
  * Import the data from a file or a xml string
  *
- * @param $data
+ * @param \QUI\QDOM $File
+ * @param integer $overwrite
+ * @return mixed
  */
 function package_quiqqer_translator_ajax_file_import($File, $overwrite)
 {
@@ -33,7 +35,7 @@ function package_quiqqer_translator_ajax_file_import($File, $overwrite)
     );
 }
 
-\QUI::$Ajax->register(
+QUI::$Ajax->register(
     'package_quiqqer_translator_ajax_file_import',
     array('File', 'overwrite'),
     'Permission::checkAdminUser'

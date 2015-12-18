@@ -33,7 +33,6 @@ class Console extends QUI\System\Console\Tool
     public function execute()
     {
         if ($this->getArgument('--setup')) {
-
             $this->writeLn('Start translator setup... ');
 
             QUI::getPackageManager()

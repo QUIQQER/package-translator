@@ -7,18 +7,18 @@
  * @param String $params
  * @param String $search
  *
- * @return Array
+ * @return array
  */
 function package_quiqqer_translator_ajax_translations($groups, $params, $search)
 {
-    $langs = \QUI\Translator::langs();
-    $data = \QUI\Translator::getData(
+    $langs = QUI\Translator::langs();
+    $data = QUI\Translator::getData(
         $groups,
         json_decode($params, true),
         json_decode($search, true)
     );
 
-    $dev = \QUI::conf('globals', 'development');
+    $dev = QUI::conf('globals', 'development');
 
     if (!$dev) {
         foreach ($data['data'] as $key => $entry) {
@@ -41,7 +41,7 @@ function package_quiqqer_translator_ajax_translations($groups, $params, $search)
     return $result;
 }
 
-\QUI::$Ajax->register(
+QUI::$Ajax->register(
     'package_quiqqer_translator_ajax_translations',
     array('groups', 'params', 'search'),
     'Permission::checkAdminUser'
