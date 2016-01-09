@@ -1,4 +1,3 @@
-
 /**
  * Translator add variable method
  *
@@ -18,59 +17,54 @@ define('package/quiqqer/translator/bin/AddVariable', [
     "Ajax",
     "qui/controls/windows/Prompt"
 
-], function(Panel, Locale, Ajax, QUIPrompt)
-{
+], function (Panel, Locale, Ajax, QUIPrompt) {
     "use strict";
 
-    return function(Translator)
-    {
+    return function (Translator) {
         var group = Translator.getTranslationGroup();
 
         new QUIPrompt({
-            name   : 'add_new_translation',
-            icon   : 'icon-plus-sign-alt',
-            titleicon : 'icon-plus-sign-alt',
-            width  : 560,
-            height : 200,
-            group  : group,
-            title  : Locale.get( 'quiqqer/translator', 'add.window.title' ),
-            information : Locale.get( 'quiqqer/translator', 'add.window.text' ),
+            name       : 'add_new_translation',
+            icon       : 'icon-plus-sign-alt',
+            titleicon  : 'icon-plus-sign-alt',
+            width      : 560,
+            height     : 200,
+            group      : group,
+            title      : Locale.get('quiqqer/translator', 'add.window.title'),
+            information: Locale.get('quiqqer/translator', 'add.window.text'),
             // no autoclose
-            check  : function() {
+            check      : function () {
                 return false;
             },
 
-            cancel_button : {
-                text      : Locale.get('quiqqer/translator', 'add.window.btn.close'),
-                textimage : 'icon-remove'
+            cancel_button: {
+                text     : Locale.get('quiqqer/translator', 'add.window.btn.close'),
+                textimage: 'icon-remove'
             },
 
-            ok_button : {
-                text      : Locale.get('quiqqer/translator', 'add.window.btn.add'),
-                textimage : 'icon-plus'
+            ok_button: {
+                text     : Locale.get('quiqqer/translator', 'add.window.btn.add'),
+                textimage: 'icon-plus'
             },
 
-            events :
-            {
-                onEnter : function(result, Win)
-                {
-                    if ( result === '' ) {
+            events: {
+                onEnter: function (result, Win) {
+                    if (result === '') {
                         return;
                     }
 
-                    Ajax.post('package_quiqqer_translator_ajax_add', function()
-                    {
+                    Ajax.post('package_quiqqer_translator_ajax_add', function () {
                         // nothing
                     }, {
-                        'package' : 'quiqqer/translator',
-                        groups    : group,
-                        'var'     : result
+                        'package': 'quiqqer/translator',
+                        groups   : group,
+                        'var'    : result
                     });
 
-                    Win.setValue( '' );
+                    Win.setValue('');
                 },
 
-                onClose : function(Win) {
+                onClose: function () {
                     Translator.refresh();
                 }
             }

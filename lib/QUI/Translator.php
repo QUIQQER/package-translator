@@ -861,6 +861,29 @@ class Translator
     }
 
     /**
+     * Return the data from a translation variable
+     * @param $group
+     * @param $var
+     * @return array
+     */
+    public static function getVarData($group, $var)
+    {
+        $result = QUI::getDataBase()->fetch(array(
+            'from' => self::TABLE(),
+            'where' => array(
+                'groups' => $group,
+                'var' => $var
+            )
+        ));
+
+        if (!isset($result[0])) {
+            return array();
+        }
+
+        return $result[0];
+    }
+
+    /**
      * Liste aller vorhandenen Gruppen
      *
      * @return array
@@ -919,6 +942,19 @@ class Translator
                 'var' => $var
             )
         );
+    }
+
+    /**
+     * Add a translation like from an user
+     *
+     * @param string $group
+     * @param string $var
+     * @param array $data - [de='', en=>'', datatype=>'', html=>1]
+     */
+    public static function addUserVar($group, $var, $data)
+    {
+        QUI\Translator::add($group, $var);
+        QUI\Translator::edit($group, $var, $data);
     }
 
     /**
@@ -1513,7 +1549,8 @@ class Translator
 
         // write header
         $mo .= pack(
-            'Iiiiiii', 0x950412de, // magic number
+            'Iiiiiii',
+            0x950412de, // magic number
             0, // version
             sizeof($hash), // number of entries in the catalog
             7 * 4, // key index offset
