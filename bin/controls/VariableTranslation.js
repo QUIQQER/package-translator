@@ -108,14 +108,32 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
          * Opens the translator with the variable
          */
         edit: function () {
-            PanelUtils.openPanelInTasks(
-                new Translator({
-                    group : this.getAttribute('group'),
-                    search: {
-                        search: this.getAttribute('var')
-                    }
-                })
+            var panels = QUI.Controls.getByType(
+                'package/quiqqer/translator/bin/Panel'
             );
+
+            if (!panels.length) {
+
+                PanelUtils.openPanelInTasks(
+                    new Translator({
+                        group : this.getAttribute('group'),
+                        search: {
+                            search: this.getAttribute('var')
+                        }
+                    })
+                );
+
+                return;
+            }
+
+            panels[0].setAttribute('group', this.getAttribute('group'));
+            panels[0].setAttribute('search', {
+                search: this.getAttribute('var')
+            });
+
+            PanelUtils.execPanelOpen(panels[0]);
+
+            panels[0].refresh();
         }
     });
 });
