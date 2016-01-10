@@ -3,19 +3,19 @@
 /**
  * Variablen importieren
  *
- * @param String $data - JSON Array
+ * @param string $data - JSON Array
  */
-function package_quiqqer_translator_ajax_import($overwriteOriginal, $File)
-{
-    $overwriteOriginal = QUI\Utils\Security\Orthos::clear($overwriteOriginal);
-
-    QUI\Translator::import(
-        $File->getAttribute('filepath'),
-        $overwriteOriginal
-    );
-}
-QUI::$Ajax->register(
+QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_import',
+    function ($overwriteOriginal, $File) {
+        $overwriteOriginal = QUI\Utils\Security\Orthos::clear($overwriteOriginal);
+
+        /* @var $File QUI\QDOM */
+        QUI\Translator::import(
+            $File->getAttribute('filepath'),
+            $overwriteOriginal
+        );
+    },
     array('overwriteOriginal', 'File'),
     'Permission::checkAdminUser'
 );
