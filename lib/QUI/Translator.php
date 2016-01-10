@@ -449,6 +449,26 @@ class Translator
     }
 
     /**
+     * Return all available languages
+     * @return array
+     */
+    public static function getAvailableLanguages()
+    {
+        $langs    = array();
+        $projects = QUI::getProjectManager()->getProjects(true);
+
+        /* @var $Project QUI\Projects\Project */
+        foreach ($projects as $Project) {
+            $langs = array_merge($langs, $Project->getAttribute('langs'));
+        }
+
+        $langs = array_unique($langs);
+        $langs = array_values($langs);
+
+        return $langs;
+    }
+
+    /**
      * remove all dublicate entres from the translation table
      *
      * because:
@@ -677,13 +697,19 @@ class Translator
     /**
      * Übersetzung bekommen
      *
-     * @param String $group - Gruppe
-     * @param String|Bool $var - Übersetzungsvariable, optional
+     * @param string|boolean $group - Gruppe
+     * @param string|boolean $var - Übersetzungsvariable, optional
      *
      * @return array
      */
-    public static function get($group, $var = false)
+    public static function get($group = false, $var = false)
     {
+        if (!$group) {
+            return QUI::getDataBase()->fetch(array(
+                'from' => self::TABLE()
+            ));
+        }
+
         if (!$var) {
             return QUI::getDataBase()->fetch(array(
                 'from' => self::TABLE(),
