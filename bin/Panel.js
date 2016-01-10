@@ -230,7 +230,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 devMode = (QUIQQER_CONFIG.globals.development).toInt(),
 
                 content =                                                                                                                              '<div class="qui-translator-export-group">'                                                                                  +
-                          '<h3>'                                                                                                                       +                                                                                                                     Locale.get('quiqqer/translator', 'export.window.group') + '</h3>' +
+                          '<h3>'                                                                                                                       + Locale.get('quiqqer/translator', 'export.window.group') + '</h3>' +
                           '<input id="qui-translator-export-group-current" type="radio" name="export_group" value="' + group + '" checked="checked"/>' +
                           '<label for="qui-translator-export-group-current">'                                                                          +
                           Locale.get('quiqqer/translator', 'export.window.group.current.label', {group: group})                                        +
@@ -241,10 +241,10 @@ define('package/quiqqer/translator/bin/Panel', [
                           '</label>'                                                                                                                   +
                           '</div>'                                                                                                                     +
                           '<div class="qui-translator-export-language">'                                                                               +
-                          '<h3>'                                                                                                                       +                                                                                                                     Locale.get('quiqqer/translator', 'export.window.language') + '</h3>' +
+                          '<h3>'                                                                                                                       + Locale.get('quiqqer/translator', 'export.window.language') +                                                        '</h3>'                                                +
                           '</div>'                                                                                                                     +
                           '<div class="qui-translator-export-type">'                                                                                   +
-                          '<h3>'                                                                                                                       +                                                                                                                     Locale.get('quiqqer/translator', 'export.window.type') + '</h3>'                                                    +
+                          '<h3>'                                                                                                                       +                                                                                                                     Locale.get('quiqqer/translator', 'export.window.type')                                                              + '</h3>' +
                           '<input id="qui-translator-export-type-original" type="radio" name="export_type" value="original" checked="checked"/>'       +
                           '<label for="qui-translator-export-type-original">'                                                                          +
                           Locale.get('quiqqer/translator', 'export.window.type.original.label')                                                        +
@@ -538,6 +538,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 self.resize();
                 self.Loader.hide();
 
+
                 // dev info
                 if (dev && self.$devMessageShowed === false) {
                     self.$devMessageShowed = true;
@@ -752,6 +753,7 @@ define('package/quiqqer/translator/bin/Panel', [
                         );
 
                         this.close();
+
                     }.delay(100, Sel2));
                 }
 

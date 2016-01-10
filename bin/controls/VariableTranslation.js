@@ -1,4 +1,5 @@
 /**
+ * Displays one translation variable
  *
  * @package package/quiqqer/translator/bin/controls/VariableTranslation
  * @author www.pcsg.de (Henning Leutz)
@@ -6,6 +7,8 @@
  * @require qui/QUI
  * @require qui/controls/Control
  * @require Ajax
+ * @require utils/Panels
+ * @require package/quiqqer/translator/bin/Panel
  * @require css!package/quiqqer/translator/bin/controls/VariableTranslation.css
  */
 define('package/quiqqer/translator/bin/controls/VariableTranslation', [
@@ -107,8 +110,10 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
         edit: function () {
             PanelUtils.openPanelInTasks(
                 new Translator({
-                    'group': this.getAttribute('group'),
-                    'var'  : this.getAttribute('var')
+                    group : this.getAttribute('group'),
+                    search: {
+                        search: this.getAttribute('var')
+                    }
                 })
             );
         }
