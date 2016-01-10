@@ -1,0 +1,21 @@
+
+.quiqqer-translator-variabletranslation {
+    cursor: pointer;
+    float: left;
+    padding: 0 10px 10px 10px;
+}
+
+.quiqqer-translator-variabletranslation:hover {
+    background: #2f8fc6;
+    color: #fff;
+}
+
+.quiqqer-translator-variabletranslation-entry {
+    clear: both;
+    float: left;
+    padding-top: 10px;
+}
+
+.quiqqer-translator-variabletranslation-entry img {
+    margin-right: 5px;
+}
