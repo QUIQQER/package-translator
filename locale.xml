@@ -10,8 +10,10 @@
             <en><![CDATA[Translations have been imported successfully.]]></en>
         </locale>
         <locale name="exception.import.wrong.format">
-            <de><![CDATA[Die Datei [file] hat ein falsches Format. Bitte verwenden Sie nur über den Sprachvariablen-Export erstellte Dateien]]></de>
-            <en><![CDATA[The file [file] has a wrong format. Please only use files created via the export function of the Translator.]]></en>
+            <de>
+                <![CDATA[Die Datei [file] hat ein falsches Format. Bitte verwenden Sie nur über den Sprachvariablen-Export erstellte Dateien]]></de>
+            <en>
+                <![CDATA[The file [file] has a wrong format. Please only use files created via the export function of the Translator.]]></en>
         </locale>
         <locale name="exception.file.could.not.read">
             <de><![CDATA[Datei konnte nicht gelesen werden]]></de>
@@ -33,9 +35,13 @@
             <de><![CDATA[Sprachvariable konnte nicht angelegt werden. Gruppe oder Variablen-Name ist leer]]></de>
             <en><![CDATA[Translation variable could not be created. Group or variable name is empty.]]></en>
         </locale>
-        <locale name="exception.var.exists">
-            <de><![CDATA[Sprachvariable konnte nicht angelegt werden, diese Variable existiert bereits]]></de>
-            <en><![CDATA[Translation variable could not be created because it already exists.]]></en>
+        <locale name="exception.var.exists" html="true">
+            <de><![CDATA[
+            Die Sprachvariable <b>[[group]] [var]</b> konnte nicht angelegt werden, diese Variable existiert bereits
+            ]]></de>
+            <en><![CDATA[
+            The Translation variable <b>[[group]] [var]</b> could not be created because it already exists.
+            ]]></en>
         </locale>
         <locale name="exception.group.exists">
             <de><![CDATA[Diese Gruppe existiert bereits]]></de>

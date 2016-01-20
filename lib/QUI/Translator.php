@@ -8,7 +8,7 @@ namespace QUI;
 
 use QUI;
 use QUI\Utils\XML;
-use QUI\Utils\StringHelper as QUIString;
+use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
 
 /**
@@ -526,8 +526,8 @@ class Translator
         $exec_error = array();
 
         foreach ($langs as $lang) {
-            $folders[$lang] = $dir . '/' . QUIString::toLower($lang) .
-                              '_' . QUIString::toUpper($lang) .
+            $folders[$lang] = $dir . '/' . StringHelper::toLower($lang) .
+                              '_' . StringHelper::toUpper($lang) .
                               '/LC_MESSAGES/';
 
             QUIFile::unlink($folders[$lang]);
@@ -953,12 +953,14 @@ class Translator
         $result = self::get($group, $var);
 
         if (isset($result[0])) {
-            throw new QUI\Exception(
-                QUI::getLocale()->get(
-                    'quiqqer/translator',
-                    'exception.var.exists'
+            throw new QUI\Exception(array(
+                'quiqqer/translator',
+                'exception.var.exists',
+                array(
+                    'group' => $group,
+                    'var' => $var
                 )
-            );
+            ));
         }
 
         QUI::getDataBase()->insert(
@@ -1413,8 +1415,10 @@ class Translator
             list ($key, $data) = preg_split('/\s/', $line, 2);
 
             switch ($key) {
-                case '#,': // flag...
+                case '#,':
+                    // flag...
                     $fuzzy = in_array('fuzzy', preg_split('/,\s*/', $data));
+                // flag...
                 case '#': // translator-comments
                 case '#.': // extracted-comments
                 case '#:': // reference...
