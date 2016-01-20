@@ -64,6 +64,69 @@ define('package/quiqqer/translator/bin/classes/Translator', [
                         onError  : reject
                     });
             });
+        },
+
+        /**
+         * Add a translation variable
+         *
+         * @param {String} group
+         * @param {String} varName
+         * @returns {Promise}
+         */
+        add: function (group, varName) {
+            return new Promise(function (resolve, reject) {
+                QUIAjax.post(
+                    'package_quiqqer_translator_ajax_add',
+                    resolve,
+                    {
+                        'package': 'quiqqer/translator',
+                        'onError': reject,
+                        'group'  : group,
+                        'var'    : varName
+                    });
+            });
+        },
+
+        /**
+         * Set a translation vor a translation variable
+         *
+         * @param {String} group
+         * @param {String} varName
+         * @param {Object} data - {'en' : 'English text', 'de' : 'German text'}
+         * @return {Promise}
+         */
+        setTranslation: function (group, varName, data) {
+            return new Promise(function (resolve, reject) {
+                data.var = varName;
+
+                QUIAjax.post(
+                    'package_quiqqer_translator_ajax_update',
+                    resolve,
+                    {
+                        'package': 'quiqqer/translator',
+                        onError  : reject,
+                        groups   : group,
+                        data     : JSON.encode(data)
+                    });
+            });
+        },
+
+        /**
+         * Publish the translations
+         *
+         * @returns {Promise}
+         */
+        publish: function () {
+            return new Promise(function (resolve, reject) {
+                QUIAjax.post(
+                    'package_quiqqer_translator_ajax_create',
+                    resolve,
+                    {
+                        'package': 'quiqqer/translator',
+                        onError  : reject
+                    }
+                );
+            });
         }
     });
 });
