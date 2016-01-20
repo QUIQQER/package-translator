@@ -3,8 +3,8 @@
 /**
  * Add a translation var
  *
- * @param String $group
- * @param String $var
+ * @param string $group
+ * @param string $var
  */
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_add',

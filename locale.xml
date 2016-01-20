@@ -309,6 +309,16 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <de><![CDATA[Nur die editierten Übersetzungen exportieren]]></de>
             <en><![CDATA[]]></en>
         </locale>
+
+        <locale name="control.variabletranslation.button.create">
+            <de><![CDATA[Variable anlegen]]></de>
+            <en><![CDATA[Create variable]]></en>
+        </locale>
+        <locale name="control.variabletranslation.button.create.title">
+            <de><![CDATA[Die Variable [group] [var] existiert nicht. Per Klick können Sie die Variable anlegen.]]></de>
+            <en><![CDATA[The variable [group] [var] doesn't exists. By clicking, you can create the variable.]]></en>
+        </locale>
+
     </groups>
     <groups name="quiqqer/translator" datatype="php,js">
         <locale name="package.name">

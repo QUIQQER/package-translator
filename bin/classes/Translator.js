@@ -67,6 +67,27 @@ define('package/quiqqer/translator/bin/classes/Translator', [
         },
 
         /**
+         * Add a translation variable
+         *
+         * @param {String} group
+         * @param {String} varName
+         * @returns {Promise}
+         */
+        add: function (group, varName) {
+            return new Promise(function (resolve, reject) {
+                QUIAjax.post(
+                    'package_quiqqer_translator_ajax_add',
+                    resolve,
+                    {
+                        'package': 'quiqqer/translator',
+                        'onError': reject,
+                        'group'  : group,
+                        'var'    : varName
+                    });
+            });
+        },
+
+        /**
          * Set a translation vor a translation variable
          *
          * @param {String} group

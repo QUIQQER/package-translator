@@ -16,13 +16,19 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
     'qui/QUI',
     'qui/controls/Control',
     'Ajax',
+    'Locale',
     'utils/Panels',
     'package/quiqqer/translator/bin/Panel',
+    'package/quiqqer/translator/bin/classes/Translator',
 
     'css!package/quiqqer/translator/bin/controls/VariableTranslation.css'
 
-], function (QUI, QUIControl, QUIAjax, PanelUtils, Translator) {
+], function (QUI, QUIControl, QUIAjax, QUILocale, PanelUtils,
+             TranslatorPanel, Translator) {
     "use strict";
+
+    var lg        = 'quiqqer/translator',
+        Translate = new Translator();
 
     return new Class({
 
@@ -35,9 +41,10 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
             '$onInject'
         ],
 
-        option: {
+        options: {
             'group': '',
-            'var'  : ''
+            'var'  : '',
+            size   : 1
         },
 
         initialize: function (options) {
@@ -58,7 +65,16 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
             Elm.addClass('quiqqer-translator-variabletranslation');
             Elm.addClass('smooth');
 
-            Elm.addEvent('click', this.edit);
+            Elm.addEvent('click', function () {
+
+                if (Elm.get('data-create')) {
+                    this.createVar();
+                    return;
+                }
+
+                this.edit();
+
+            }.bind(this));
 
             new Element('span', {
                 'class': 'icon-spinner icon-spin fa fa-spinner fa-spin'
@@ -68,39 +84,110 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
         },
 
         /**
+         * Refresh the display
+         */
+        refresh: function () {
+            var self = this,
+                Elm  = this.getElm();
+
+            Elm.set('data-create', null);
+
+            return new Promise(function (resolve) {
+
+                Elm.set('html', '');
+
+                new Element('span', {
+                    'class': 'icon-spinner icon-spin fa fa-spinner fa-spin'
+                }).inject(Elm);
+
+
+                QUIAjax.get([
+                    'ajax_system_getAvailableLanguages',
+                    'package_quiqqer_translator_ajax_getVarData'
+                ], function (languages, data) {
+
+                    var i, len, lang, text;
+
+                    var Container = new Element('div'),
+                        path      = URL_BIN_DIR + '16x16/flags/';
+
+
+                    if (typeOf(data) === 'array' && !data.length) {
+
+                        new Element('span', {
+                            'class': 'quiqqer-translator-variabletranslation-entry',
+                            html   : QUILocale.get(lg, 'control.variabletranslation.button.create'),
+                            title  : QUILocale.get(lg, 'control.variabletranslation.button.create.title')
+                        }).inject(Container);
+
+                        Elm.set({
+                            'data-create': 1
+                        });
+
+                    } else if (self.getAttribute('size') == 1) {
+
+                        lang = QUILocale.getCurrent();
+                        text = data[lang] || '--';
+
+                        new Element('span', {
+                            'class': 'quiqqer-translator-variabletranslation-entry',
+                            html   : '<img src="' + path + lang + '.png" />' +
+                                     text
+                        }).inject(Container);
+
+                    } else {
+
+                        for (i = 0, len = languages.length; i < len; i++) {
+                            lang = languages[i];
+                            text = data[lang] || '--';
+
+                            new Element('span', {
+                                'class': 'quiqqer-translator-variabletranslation-entry',
+                                html   : '<img src="' + path + lang + '.png" />' +
+                                         text
+                            }).inject(Container);
+                        }
+                    }
+
+                    Container.inject(
+                        Elm.set('html', '')
+                    );
+
+                    resolve();
+                }, {
+                    'package': 'quiqqer/translator',
+                    'group'  : this.getAttribute('group'),
+                    'var'    : this.getAttribute('var')
+                });
+
+            }.bind(this));
+        },
+
+        /**
          * event on inject
          */
         $onInject: function () {
+            this.refresh();
+        },
 
-            var self = this;
+        /**
+         * Create the variable and open the edit
+         *
+         * @return {Promise}
+         */
+        createVar: function () {
+            var self    = this,
+                group   = this.getAttribute('group'),
+                varName = this.getAttribute('var');
 
-            QUIAjax.get([
-                'ajax_system_getAvailableLanguages',
-                'package_quiqqer_translator_ajax_getVarData'
-            ], function (languages, data) {
+            return new Promise(function (reslove, reject) {
+                Translate.add(group, varName).then(function () {
+                    return self.refresh();
 
-                var i, len, lang, text;
-                var Container = new Element('div'),
-                    path      = URL_BIN_DIR + '16x16/flags/';
+                }).then(function () {
+                    self.edit();
 
-                for (i = 0, len = languages.length; i < len; i++) {
-                    lang = languages[i];
-                    text = data[lang] || '--';
-
-                    new Element('span', {
-                        'class': 'quiqqer-translator-variabletranslation-entry',
-                        html   : '<img src="' + path + lang + '.png" />' +
-                                 text
-                    }).inject(Container);
-                }
-
-                Container.inject(
-                    self.getElm().set('html', '')
-                );
-            }, {
-                'package': 'quiqqer/translator',
-                'group'  : this.getAttribute('group'),
-                'var'    : this.getAttribute('var')
+                }).then(reslove, reject);
             });
         },
 
@@ -115,7 +202,7 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
             if (!panels.length) {
 
                 PanelUtils.openPanelInTasks(
-                    new Translator({
+                    new TranslatorPanel({
                         group : this.getAttribute('group'),
                         search: {
                             search: this.getAttribute('var')
