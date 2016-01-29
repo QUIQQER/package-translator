@@ -496,16 +496,16 @@ class Translator
         }
 
         $Statement = $PDO->prepare(
-            'CREATE TEMPORARY TABLE bad_temp_translation AS
-            SELECT DISTINCT * FROM ' . $bad_table
+            'CREATE TEMPORARY TABLE bad_temp_translation AS SELECT DISTINCT * FROM ' . $bad_table
         );
         $Statement->execute();
 
         $Statement = $PDO->prepare('DELETE FROM ' . $bad_table);
         $Statement->execute();
 
-        $Statement = $PDO->prepare('INSERT INTO ' . $bad_table
-                                   . ' SELECT * FROM bad_temp_translation');
+        $Statement = $PDO->prepare(
+            'INSERT INTO ' . $bad_table . ' SELECT * FROM bad_temp_translation'
+        );
         $Statement->execute();
     }
 
@@ -567,24 +567,14 @@ class Translator
                 }
 
 
-                // locale/permissions must available in JS AND PHP
-                /*
-                if ( $entry['groups'] == 'locale/permissions' ) {
-                    $js_langs[ $entry['groups'] ][ $lang ][] = $entry;
-                }
-                */
-
                 $value = $entry[$lang];
 
-                if (isset($entry[$lang . '_edit'])
-                    && !empty($entry[$lang . '_edit'])
-                ) {
+                if (isset($entry[$lang . '_edit']) && !empty($entry[$lang . '_edit'])) {
                     $value = $entry[$lang . '_edit']; // benutzer übersetzung
                 }
 
                 $value = str_replace('\\', '\\\\', $value);
                 $value = str_replace('"', '\"', $value);
-                //$value = nl2br( $value );
                 $value = str_replace("\n", '', $value);
 
                 if ($value !== '' && $value !== ' ') {
@@ -609,8 +599,7 @@ class Translator
                         break;
                 }
 
-                $ini     = $folders[$lang] . str_replace('/', '_', $entry['groups'])
-                           . '.ini.php';
+                $ini     = $folders[$lang] . str_replace('/', '_', $entry['groups']) . '.ini.php';
                 $ini_str = $iniVar . '= "' . $value . '"';
 
                 QUIFile::mkfile($ini);
@@ -618,7 +607,6 @@ class Translator
 
                 // po (gettext) datei
                 $po = $folders[$lang] . str_replace('/', '_', $entry['groups']) . '.po';
-//                $mo = $folders[$lang] . str_replace('/', '_', $entry['groups']) . '.mo';
 
                 QUIFile::mkfile($po);
 
@@ -639,19 +627,15 @@ class Translator
                     foreach ($entries as $entry) {
                         $value = $entry[$lang];
 
-                        if (isset($entry[$lang . '_edit'])
-                            && !empty($entry[$lang . '_edit'])
-                        ) {
-                            $value = $entry[$lang
-                                            . '_edit']; // benutzer übersetzung
+                        if (isset($entry[$lang . '_edit']) && !empty($entry[$lang . '_edit'])) {
+                            $value = $entry[$lang . '_edit']; // benutzer übersetzung
                         }
 
                         $vars[$entry['var']] = $value;
                     }
 
                     $js = '';
-                    $js .= "define('locale/" . $group . "/" . $lang
-                           . "', ['Locale'], function(Locale)";
+                    $js .= "define('locale/" . $group . "/" . $lang . "', ['Locale'], function(Locale)";
                     $js .= '{';
                     $js .= 'Locale.set("' . $lang . '", "' . $group . '", ';
                     $js .= json_encode($vars);
@@ -669,18 +653,12 @@ class Translator
                 }
             }
 
-            // QUI\System\Log::writeRecursive( $js_langs, 'error' );
-
             // alle .po dateien einlesen und in mo umwandeln
             $po_files = QUIFile::readDir($folders[$lang]);
 
             foreach ($po_files as $po_file) {
                 if (substr($po_file, -3) == '.po') {
                     self::phpmoConvert($folders[$lang] . $po_file);
-
-                    //$exec = 'msgfmt '. $folders[ $lang ]. $po_file .' -o '.
-                    // $folders[ $lang ] . substr( $po_file, 0,-3 ).'.mo' ;
-                    //exec( QUI\Utils\Security\Orthos::clearShell( $exec ) .' 2>&1', $exec_error );
                 }
             }
         }
@@ -691,6 +669,134 @@ class Translator
 
         if (!empty($exec_error)) {
             QUI::getMessagesHandler()->addError($exec_error);
+        }
+    }
+
+    /**
+     * Publish a language group
+     *
+     * @param string $group
+     */
+    public static function publish($group)
+    {
+        $langs = self::langs();
+        $dir   = self::dir();
+
+
+        foreach ($langs as $lang) {
+            if (strlen($lang) !== 2) {
+                continue;
+            }
+
+            $folder = $dir . '/' . StringHelper::toLower($lang) . '_' .
+                      StringHelper::toUpper($lang) . '/LC_MESSAGES/';
+
+            QUIFile::mkdir($folder);
+
+
+            $result = QUI::getDataBase()->fetch(array(
+                'select' => array(
+                    $lang,
+                    $lang . '_edit',
+                    'groups',
+                    'var',
+                    'datatype',
+                    'datadefine',
+                    'html'
+                ),
+                'from' => self::TABLE(),
+                'where' => array(
+                    'groups' => $group
+                )
+            ));
+
+            $javaScriptValues = array();
+
+            $iniContent = '';
+            $poContent  = '';
+
+            foreach ($result as $data) {
+                // value select
+                $value = $data[$lang];
+
+                if (isset($data[$lang . '_edit']) && !empty($data[$lang . '_edit'])) {
+                    $value = $data[$lang . '_edit'];
+                }
+
+                if ($data['datatype'] == 'js') {
+                    $javaScriptValues[$data['var']] = $value;
+                    continue;
+                }
+
+                // php und js beachten
+                if (strpos($data['datatype'], 'js') !== false) {
+                    $javaScriptValues[$data['var']] = $value;
+                }
+
+                $value = str_replace('\\', '\\\\', $value);
+                $value = str_replace('"', '\"', $value);
+                $value = str_replace("\n", '', $value);
+
+                if ($value !== '' && $value !== ' ') {
+                    $value = trim($value);
+                }
+
+
+                // ini Content
+                $iniVar = $data['var'];
+
+                // in php some keywords are not allowed, so we rewrite the key in `
+                // its better than destroy the ini file
+                switch ($iniVar) {
+                    case 'null':
+                    case 'yes':
+                    case 'no':
+                    case 'true':
+                    case 'false':
+                    case 'on':
+                    case 'off':
+                    case 'none':
+                        $iniVar = '`' . $iniVar . '`';
+                        break;
+                }
+
+                // content
+                $iniContent .= $iniVar . '= "' . $value . '"' . "\n";
+
+                $poContent .= 'msgid "' . $data['var'] . '"' . "\n";
+                $poContent .= 'msgstr "' . $value . '"' . "\n\n";
+            }
+
+            // set data
+            $iniFile = $folder . str_replace('/', '_', $group) . '.ini.php';
+            $poFile  = $folder . str_replace('/', '_', $group) . '.po';
+
+            QUIFile::unlink($iniFile);
+            QUIFile::mkfile($iniFile);
+
+            QUIFile::unlink($poFile);
+            QUIFile::mkfile($poFile);
+
+            file_put_contents($iniFile, $iniContent);
+            file_put_contents($poFile, $poContent);
+
+            self::phpmoConvert($poFile);
+
+            // javascript
+            $jsFile = $dir . '/bin/' . $group . '/' . $lang . '.js';
+
+            QUIFile::unlink($jsFile);
+            QUIFile::mkfile($jsFile);
+
+            $jsContent = '';
+            $jsContent .= "define('locale/" . $group . "/" . $lang . "', ['Locale'], function(Locale)";
+            $jsContent .= '{';
+            $jsContent .= 'Locale.set("' . $lang . '", "' . $group . '", ';
+            $jsContent .= json_encode($javaScriptValues);
+            $jsContent .= ')';
+            $jsContent .= '});';
+
+            file_put_contents($jsFile, $jsContent);
         }
     }
 

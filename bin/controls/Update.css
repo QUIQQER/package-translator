@@ -1,0 +1,17 @@
+
+.quiqqer-translator-update {
+    float: left;
+    position: relative;
+    width: 100%;
+}
+
+.quiqqer-translator-update-entry {
+    clear: both;
+    float: left;
+    overflow: hidden;
+    position: relative;
+}
+
+.quiqqer-translator-update-entry img {
+    padding-right: 10px;
+}

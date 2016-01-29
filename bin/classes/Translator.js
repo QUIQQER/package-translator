@@ -34,35 +34,32 @@ define('package/quiqqer/translator/bin/classes/Translator', [
          */
         refreshLocale: function () {
             return new Promise(function (resolve, reject) {
-                QUIAjax.get(
-                    'package_quiqqer_translator_ajax_refreshLocale',
-                    function (data) {
+                QUIAjax.get('package_quiqqer_translator_ajax_refreshLocale', function (data) {
+                    var lang, group;
 
-                        var lang, group;
+                    for (lang in data) {
+                        if (!data.hasOwnProperty(lang)) {
+                            continue;
+                        }
 
-                        for (lang in data) {
-                            if (!data.hasOwnProperty(lang)) {
+                        for (group in data[lang]) {
+                            if (!data[lang].hasOwnProperty(group)) {
                                 continue;
                             }
 
-                            for (group in data[lang]) {
-                                if (!data[lang].hasOwnProperty(group)) {
-                                    continue;
-                                }
-
-                                QUILocale.set(
-                                    lang,
-                                    group,
-                                    data[lang][group]
-                                );
-                            }
+                            QUILocale.set(
+                                lang,
+                                group,
+                                data[lang][group]
+                            );
                         }
+                    }
 
-                        resolve();
-                    }, {
-                        'package': 'quiqqer/translator',
-                        onError  : reject
-                    });
+                    resolve();
+                }, {
+                    'package': 'quiqqer/translator',
+                    onError  : reject
+                });
             });
         },
 
@@ -75,15 +72,12 @@ define('package/quiqqer/translator/bin/classes/Translator', [
          */
         add: function (group, varName) {
             return new Promise(function (resolve, reject) {
-                QUIAjax.post(
-                    'package_quiqqer_translator_ajax_add',
-                    resolve,
-                    {
-                        'package': 'quiqqer/translator',
-                        'onError': reject,
-                        'group'  : group,
-                        'var'    : varName
-                    });
+                QUIAjax.post('package_quiqqer_translator_ajax_add', resolve, {
+                    'package': 'quiqqer/translator',
+                    'onError': reject,
+                    'group'  : group,
+                    'var'    : varName
+                });
             });
         },
 
@@ -99,15 +93,12 @@ define('package/quiqqer/translator/bin/classes/Translator', [
             return new Promise(function (resolve, reject) {
                 data.var = varName;
 
-                QUIAjax.post(
-                    'package_quiqqer_translator_ajax_update',
-                    resolve,
-                    {
-                        'package': 'quiqqer/translator',
-                        onError  : reject,
-                        groups   : group,
-                        data     : JSON.encode(data)
-                    });
+                QUIAjax.post('package_quiqqer_translator_ajax_update', resolve, {
+                    'package': 'quiqqer/translator',
+                    onError  : reject,
+                    groups   : group,
+                    data     : JSON.encode(data)
+                });
             });
         },
 
@@ -116,16 +107,15 @@ define('package/quiqqer/translator/bin/classes/Translator', [
          *
          * @returns {Promise}
          */
-        publish: function () {
+        publish: function (group) {
+            group = group || false;
+
             return new Promise(function (resolve, reject) {
-                QUIAjax.post(
-                    'package_quiqqer_translator_ajax_create',
-                    resolve,
-                    {
-                        'package': 'quiqqer/translator',
-                        onError  : reject
-                    }
-                );
+                QUIAjax.post('package_quiqqer_translator_ajax_create', resolve, {
+                    'package': 'quiqqer/translator',
+                    onError  : reject,
+                    group    : group
+                });
             });
         }
     });
