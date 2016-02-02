@@ -97,13 +97,30 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     self.getAttribute('var'),
                     data
                 );
+            }).then(function () {
+                return Translate.publish(
+                    self.getAttribute('group')
+                );
+
             }).catch(function () {
                 return Translate.setTranslation(
                     self.getAttribute('group'),
                     self.getAttribute('var'),
                     data
-                );
+                ).then(function () {
+                    return Translate.publish(
+                        self.getAttribute('group')
+                    );
+                });
             });
+        },
+
+        /**
+         * Save method -> same same as by Update
+         * @returns {*|Promise}
+         */
+        save: function () {
+            return this.createTranslation();
         },
 
         /**
