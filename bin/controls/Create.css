@@ -1,0 +1,17 @@
+
+.quiqqer-translator-create {
+    float: left;
+    position: relative;
+    width: 100%;
+}
+
+.quiqqer-translator-create-entry {
+    clear: both;
+    float: left;
+    overflow: hidden;
+    position: relative;
+}
+
+.quiqqer-translator-create-entry img {
+    padding-right: 10px;
+}

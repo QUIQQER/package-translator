@@ -5,8 +5,13 @@
  */
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_create',
-    function () {
-        QUI\Translator::create();
+    function ($group) {
+
+        if (isset($group)) {
+            QUI\Translator::publish($group);
+        } else {
+            QUI\Translator::create();
+        }
 
         QUI::getMessagesHandler()->addSuccess(
             QUI::getLocale()->get(
@@ -15,6 +20,6 @@ QUI::$Ajax->registerFunction(
             )
         );
     },
-    false,
+    array('group'),
     'Permission::checkAdminUser'
 );

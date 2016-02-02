@@ -42,9 +42,10 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
         ],
 
         options: {
-            'group': '',
-            'var'  : '',
-            size   : 1
+            'group' : '',
+            'var'   : '',
+            size    : 1,
+            editable: false
         },
 
         initialize: function (options) {
