@@ -25,8 +25,8 @@ define('package/quiqqer/translator/bin/AddVariable', [
 
         new QUIPrompt({
             name       : 'add_new_translation',
-            icon       : 'icon-plus-sign-alt',
-            titleicon  : 'icon-plus-sign-alt',
+            icon       : 'fa fa-plus',
+            titleicon  : 'fa fa-plus',
             width      : 560,
             height     : 200,
             group      : group,
@@ -39,12 +39,12 @@ define('package/quiqqer/translator/bin/AddVariable', [
 
             cancel_button: {
                 text     : Locale.get('quiqqer/translator', 'add.window.btn.close'),
-                textimage: 'icon-remove'
+                textimage: 'fa fa-remove'
             },
 
             ok_button: {
                 text     : Locale.get('quiqqer/translator', 'add.window.btn.add'),
-                textimage: 'icon-plus'
+                textimage: 'fa fa-plus'
             },
 
             events: {
