@@ -9,7 +9,6 @@
  * @require Ajax
  * @require qui/controls/windows/Confirm
  */
-
 define('package/quiqqer/translator/bin/DeleteVariables', [
 
     "package/quiqqer/translator/bin/Panel",

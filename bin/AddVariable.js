@@ -9,7 +9,6 @@
  * @require Ajax
  * @require qui/controls/windows/Prompt
  */
-
 define('package/quiqqer/translator/bin/AddVariable', [
 
     "package/quiqqer/translator/bin/Panel",

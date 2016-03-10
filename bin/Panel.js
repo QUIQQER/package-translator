@@ -17,7 +17,6 @@
  * @require controls/grid/Grid
  * @require css!package/quiqqer/translator/bin/Panel.css
  */
-
 define('package/quiqqer/translator/bin/Panel', [
 
     "qui/QUI",
@@ -394,7 +393,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.getButtonBar()
                 .getChildren('publish')
-                .setAttribute('textimage', 'fa fa-refresh');
+                .setAttribute('textimage', 'fa fa-spinner fa-spin');
 
             require(['package/quiqqer/translator/bin/Publish'], function (Publisher) {
                 Publisher.publish(self, function () {
