@@ -6,8 +6,7 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_create',
     function ($group) {
-
-        if (isset($group)) {
+        if (isset($group) && !empty($group)) {
             QUI\Translator::publish($group);
         } else {
             QUI\Translator::create();

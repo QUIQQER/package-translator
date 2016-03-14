@@ -78,7 +78,7 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
             }.bind(this));
 
             new Element('span', {
-                'class': 'icon-spinner icon-spin fa fa-spinner fa-spin'
+                'class': 'fa fa-spinner fa-spin'
             }).inject(Elm);
 
             return Elm;
@@ -98,7 +98,7 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
                 Elm.set('html', '');
 
                 new Element('span', {
-                    'class': 'icon-spinner icon-spin fa fa-spinner fa-spin'
+                    'class': 'fa fa-spinner fa-spin'
                 }).inject(Elm);
 
 
