@@ -67,7 +67,7 @@ class Translator
             );
         }
 
-        QUI::getDataBase()->Table()->appendFields(
+        QUI::getDataBase()->Table()->addColumn(
             self::TABLE(),
             array(
                 $lang => 'text NOT NULL',
@@ -1224,7 +1224,7 @@ class Translator
      */
     public static function langs()
     {
-        $fields = QUI::getDataBase()->Table()->getFields(
+        $fields = QUI::getDataBase()->Table()->getColumns(
             self::TABLE()
         );
 
@@ -1268,7 +1268,7 @@ class Translator
      */
     public static function getNeedles()
     {
-        $fields = QUI::getDataBase()->Table()->getFields(
+        $fields = QUI::getDataBase()->Table()->getColumns(
             self::TABLE()
         );
 

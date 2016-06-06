@@ -28,6 +28,20 @@ define('package/quiqqer/translator/bin/classes/Translator', [
         },
 
         /**
+         * Return the available languages
+         * Language which are in use
+         *
+         * @return {Promise}
+         */
+        getAvailableLanguages: function () {
+            return new Promise(function (resolve, reject) {
+                QUIAjax.get('ajax_system_getAvailableLanguages', resolve, {
+                    onError: reject
+                });
+            });
+        },
+
+        /**
          * refresh the translation in the locale
          *
          * @return {Promise}
