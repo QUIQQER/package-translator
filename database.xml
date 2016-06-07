@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database>
 
-    <global>
+    <global execute="\QUI\Translator::setup">
         <table name="translate">
             <field type="varchar(255)">groups</field>
             <field type="varchar(255)">var</field>
