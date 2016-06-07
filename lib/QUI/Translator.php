@@ -35,7 +35,7 @@ class Translator
      *
      * @return String
      */
-    public static function TABLE()
+    public static function table()
     {
         return QUI::getDBTableName('translate');
     }
@@ -50,7 +50,7 @@ class Translator
         // de to de_DE
         // de_edit to de_DE_edit
 
-        $table   = QUI::getDBTableName('translate');
+        $table   = self::table();
         $columns = QUI::getDataBase()->table()->getColumns($table);
 
         foreach ($columns as $column) {
@@ -489,16 +489,15 @@ class Translator
      */
     public static function getAvailableLanguages()
     {
-        $langs    = array();
-        $projects = QUI::getProjectManager()->getProjects(true);
+        $langs   = array();
+        $table   = self::table();
+        $columns = QUI::getDataBase()->table()->getColumns($table);
 
-        /* @var $Project QUI\Projects\Project */
-        foreach ($projects as $Project) {
-            $langs = array_merge($langs, $Project->getLanguages());
+        foreach ($columns as $column) {
+            if (strlen($column) === 5) {
+                $langs[] = $langs;
+            }
         }
-
-        $langs = array_unique($langs);
-        $langs = array_values($langs);
 
         return $langs;
     }
