@@ -8,7 +8,6 @@ namespace QUI;
 
 use QUI;
 use QUI\Utils\XML;
-use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
 
 /**
@@ -46,7 +45,7 @@ class Translator
      */
     public static function setup()
     {
-        // change tabl langs from 2 signs to 5 signs
+        // change table langs from 2 signs to 5 signs
         // de to de_DE
         // de_edit to de_DE_edit
 
@@ -55,7 +54,7 @@ class Translator
 
         foreach ($columns as $column) {
             if (strlen($column) == 2) {
-                $newColumn = strtolower($column) . '_' . strtoupper($column);
+                $newColumn = mb_strtolower($column) . '_' . mb_strtoupper($column);
 
                 QUI::getDataBase()->getPDO()->query(
                     "ALTER TABLE `{$table}` CHANGE `{$column}` `{$newColumn}` TEXT
@@ -68,7 +67,7 @@ class Translator
 
             if (strlen($column) == 7 && strpos($column, '_edit') !== false) {
                 $lang      = str_replace('_edit', '', $column);
-                $newColumn = strtolower($lang) . '_' . strtoupper($lang) . '_edit';
+                $newColumn = mb_strtolower($lang) . '_' . mb_strtoupper($lang) . '_edit';
 
                 QUI::getDataBase()->getPDO()->query(
                     "ALTER TABLE `{$table}` CHANGE `{$column}` `{$newColumn}` TEXT
@@ -76,9 +75,6 @@ class Translator
                 );
             }
         }
-
-        QUI\System\Log::writeRecursive(111);
-        QUI\System\Log::writeRecursive($columns);
     }
 
     /**
@@ -90,6 +86,10 @@ class Translator
      */
     public static function addLang($lang)
     {
+        if (strlen($lang) === 2) {
+            $lang = mb_strtolower($lang) . '_' . mb_strtoupper($lang);
+        }
+
         if (strlen($lang) !== 5) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
@@ -100,7 +100,7 @@ class Translator
         }
 
         QUI::getDataBase()->Table()->addColumn(
-            self::TABLE(),
+            self::table(),
             array(
                 $lang           => 'text NOT NULL',
                 $lang . '_edit' => 'text NOT NULL'
@@ -211,25 +211,18 @@ class Translator
 
                     switch ($editType) {
                         case 'edit':
-                            if (isset($entry[$lang . '_edit'])
-                                && !empty($entry[$lang . '_edit'])
-                            ) {
+                            if (isset($entry[$lang . '_edit']) && !empty($entry[$lang . '_edit'])) {
                                 $result .= $entry[$lang . '_edit'];
                             }
                             break;
 
                         case 'edit_overwrite':
-                            if (isset($entry[$lang . '_edit'])
-                                && !empty($entry[$lang . '_edit'])
-                            ) {
+                            if (isset($entry[$lang . '_edit']) && !empty($entry[$lang . '_edit'])) {
                                 $result .= $entry[$lang . '_edit'];
-                            } else {
-                                if (isset($entry[$lang])
-                                    && !empty($entry[$lang])
-                                ) {
-                                    $result .= $entry[$lang];
-                                }
+                            } elseif (isset($entry[$lang]) && !empty($entry[$lang])) {
+                                $result .= $entry[$lang];
                             }
+
                             break;
 
                         default:
@@ -416,7 +409,7 @@ class Translator
     public static function getJSTranslationFiles($lang)
     {
         if (strlen($lang) === 2) {
-            $lang = strtolower($lang) . '_' . strtoupper($lang);
+            $lang = mb_strtolower($lang) . '_' . mb_strtoupper($lang);
         }
 
         if (strlen($lang) !== 5) {
@@ -513,7 +506,7 @@ class Translator
     public static function cleanup()
     {
         $PDO       = QUI::getDataBase()->getPDO();
-        $bad_table = self::TABLE();
+        $bad_table = self::table();
 
         // check if dublicate entries exist
         $Statement = $PDO->prepare(
@@ -570,7 +563,7 @@ class Translator
 
         // Sprachdateien erstellen
         foreach ($langs as $lang) {
-            if (strlen($lang) !== 2) {
+            if (strlen($lang) !== 5) {
                 continue;
             }
 
@@ -584,7 +577,7 @@ class Translator
                     'datadefine',
                     'html'
                 ),
-                'from'   => self::TABLE()
+                'from'   => self::table()
             ));
 
             foreach ($result as $entry) {
@@ -716,12 +709,11 @@ class Translator
 
 
         foreach ($langs as $lang) {
-            if (strlen($lang) !== 2) {
+            if (strlen($lang) !== 5) {
                 continue;
             }
 
-            $folder = $dir . '/' . StringHelper::toLower($lang) . '_' .
-                      StringHelper::toUpper($lang) . '/LC_MESSAGES/';
+            $folder = $dir . '/' . $lang . '/LC_MESSAGES/';
 
             QUIFile::mkdir($folder);
 
@@ -736,7 +728,7 @@ class Translator
                     'datadefine',
                     'html'
                 ),
-                'from'   => self::TABLE(),
+                'from'   => self::table(),
                 'where'  => array(
                     'groups' => $group
                 )
@@ -844,13 +836,13 @@ class Translator
     {
         if (!$group) {
             return QUI::getDataBase()->fetch(array(
-                'from' => self::TABLE()
+                'from' => self::table()
             ));
         }
 
         if (!$var) {
             return QUI::getDataBase()->fetch(array(
-                'from'  => self::TABLE(),
+                'from'  => self::table(),
                 'where' => array(
                     'groups' => $group
                 )
@@ -858,7 +850,7 @@ class Translator
         }
 
         return QUI::getDataBase()->fetch(array(
-            'from'  => self::TABLE(),
+            'from'  => self::table(),
             'where' => array(
                 'groups' => $group,
                 'var'    => $var
@@ -877,7 +869,7 @@ class Translator
      */
     public static function getData($groups, $params = array(), $search = false)
     {
-        $table     = self::TABLE();
+        $table     = self::table();
         $db_fields = self::langs();
 
         $max  = 10;
@@ -1033,7 +1025,7 @@ class Translator
     public static function getVarData($group, $var)
     {
         $result = QUI::getDataBase()->fetch(array(
-            'from'  => self::TABLE(),
+            'from'  => self::table(),
             'where' => array(
                 'groups' => $group,
                 'var'    => $var
@@ -1056,7 +1048,7 @@ class Translator
     {
         $result = QUI::getDataBase()->fetch(array(
             'select' => 'groups',
-            'from'   => self::TABLE(),
+            'from'   => self::table(),
             'group'  => 'groups'
         ));
 
@@ -1102,7 +1094,7 @@ class Translator
         }
 
         QUI::getDataBase()->insert(
-            self::Table(),
+            self::table(),
             array(
                 'groups' => $group,
                 'var'    => $var
@@ -1165,7 +1157,7 @@ class Translator
         }
 
         QUI::getDataBase()->update(
-            self::TABLE(),
+            self::table(),
             $_data,
             array(
                 'groups' => $group,
@@ -1223,7 +1215,7 @@ class Translator
         }
 
         QUI::getDataBase()->update(
-            self::TABLE(),
+            self::table(),
             $_data,
             array(
                 'groups' => $group,
@@ -1241,7 +1233,7 @@ class Translator
     public static function delete($group, $var)
     {
         QUI::getDataBase()->delete(
-            self::TABLE(),
+            self::table(),
             array(
                 'groups' => $group,
                 'var'    => $var
@@ -1257,7 +1249,7 @@ class Translator
     public static function langs()
     {
         $fields = QUI::getDataBase()->Table()->getColumns(
-            self::TABLE()
+            self::table()
         );
 
         $langs = array();
@@ -1301,7 +1293,7 @@ class Translator
     public static function getNeedles()
     {
         $fields = QUI::getDataBase()->Table()->getColumns(
-            self::TABLE()
+            self::table()
         );
 
         $langs = array();
@@ -1315,7 +1307,7 @@ class Translator
         }
 
         $result = QUI::getDataBase()->fetch(array(
-            'from'  => self::TABLE(),
+            'from'  => self::table(),
             'where' => implode(' = "" OR ', $langs) . ' = ""'
         ));
 
