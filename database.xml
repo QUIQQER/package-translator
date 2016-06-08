@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database>
 
-    <global execute="\QUI\Translator::setup">
-        <table name="translate">
-            <field type="varchar(255)">groups</field>
-            <field type="varchar(255)">var</field>
-            <field type="varchar(20)">datatype</field>
-            <field type="varchar(200)">datadefine</field>
-            <field type="int(1)">html</field>
-        </table>
-    </global>
+    <global execute="\QUI\Translator::setup"/>
 
 </database>

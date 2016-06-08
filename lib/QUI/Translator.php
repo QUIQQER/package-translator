@@ -16,7 +16,6 @@ use QUI\Utils\System\File as QUIFile;
  * Manage all translations, for the system and the plugins
  *
  * @author  www.pcsg.de (Henning Leutz)
- * @package com.pcsg.qui.locale
  *
  * mysql fix for old dev version
  *
@@ -28,6 +27,15 @@ use QUI\Utils\System\File as QUIFile;
 class Translator
 {
     const EXPORT_DIR = 'translator_exports/';
+
+    protected static $cacheName = 'translator';
+
+    protected static $localeModifyTimes = null;
+
+    /**
+     * @var null|array
+     */
+    static protected $languages = null;
 
     /**
      * Return the real table name
@@ -48,8 +56,16 @@ class Translator
         // change table langs from 2 signs to 5 signs
         // de to de_DE
         // de_edit to de_DE_edit
+        $table = self::table();
 
-        $table   = self::table();
+        QUI::getDataBase()->table()->addColumn($table, array(
+            "groups"     => "varchar(255)",
+            "var"        => "varchar(255)",
+            "datatype"   => "varchar(20)",
+            "datadefine" => "varchar(200)",
+            "html"       => "int(1)"
+        ));
+
         $columns = QUI::getDataBase()->table()->getColumns($table);
 
         foreach ($columns as $column) {
@@ -75,6 +91,8 @@ class Translator
                 );
             }
         }
+
+        QUI\Cache\Manager::clear(self::$cacheName);
     }
 
     /**
@@ -87,7 +105,7 @@ class Translator
     public static function addLang($lang)
     {
         if (strlen($lang) === 2) {
-            $lang = mb_strtolower($lang) . '_' . mb_strtoupper($lang);
+            $lang = QUI::getLocale()->parseLangToLocaleCode($lang);
         }
 
         if (strlen($lang) !== 5) {
@@ -106,6 +124,8 @@ class Translator
                 $lang . '_edit' => 'text NOT NULL'
             )
         );
+
+        QUI\Cache\Manager::clear(self::$cacheName);
     }
 
     /**
@@ -268,11 +288,25 @@ class Translator
             );
         }
 
+        $filemtimes = self::getLocaleModifyTimes();
+
+        // nothing has changed
+        if (isset($filemtimes[$file]) && filemtime($file) <= $filemtimes[$file]) {
+            return array();
+        }
+
         $result  = array();
         $devMode = QUI::conf('globals', 'development');
 
         if ($devModeIgnore) {
             $devMode = true;
+        }
+
+        // get external locale files
+        $localeFiles = XML::getLocaleFilesFromXml($file);
+
+        foreach ($localeFiles as $localeFile) {
+            self::import($localeFile, $overwriteOriginal, $devModeIgnore);
         }
 
         // Format-Prüfung
@@ -365,6 +399,8 @@ class Translator
             }
         }
 
+        self::setLocaleFileModifyTime($file);
+
         QUI::getMessagesHandler()->addSuccess(
             QUI::getLocale()->get(
                 'quiqqer/translator',
@@ -373,6 +409,49 @@ class Translator
         );
 
         return $result;
+    }
+
+    /**
+     * Add the file to the modify time list
+     *
+     * @param string $file - path to the locale file
+     */
+    protected static function setLocaleFileModifyTime($file)
+    {
+        if (!file_exists($file)) {
+            return;
+        }
+
+        self::$localeModifyTimes[$file] = filemtime($file);
+
+        file_put_contents(
+            VAR_DIR . 'locale/localefiles',
+            json_encode(self::$localeModifyTimes)
+        );
+    }
+
+    /**
+     * Return the modify times of all imported locale xml files
+     *
+     * @return array
+     */
+    protected static function getLocaleModifyTimes()
+    {
+        if (!is_null(self::$localeModifyTimes)) {
+            return self::$localeModifyTimes;
+        }
+
+        $cacheFile = VAR_DIR . 'locale/localefiles';
+
+        if (!file_exists($cacheFile)) {
+            file_put_contents($cacheFile, '');
+        }
+
+        $list = json_decode(file_get_contents($cacheFile), true);
+
+        self::$localeModifyTimes = $list;
+
+        return $list;
     }
 
     /**
@@ -482,17 +561,22 @@ class Translator
      */
     public static function getAvailableLanguages()
     {
-        $langs   = array();
-        $table   = self::table();
-        $columns = QUI::getDataBase()->table()->getColumns($table);
-
-        foreach ($columns as $column) {
-            if (strlen($column) === 5) {
-                $langs[] = $langs;
-            }
+        if (!is_null(self::$languages)) {
+            return self::$languages;
         }
 
-        return $langs;
+        try {
+            self::$languages = QUI\Cache\Manager::get(self::$cacheName . '/languages');
+            return self::$languages;
+
+        } catch (QUI\Cache\Exception $Exception) {
+        }
+
+        self::$languages = self::langs();
+
+        QUI\Cache\Manager::set(self::$cacheName . '/languages', self::$languages);
+
+        return self::$languages;
     }
 
     /**
@@ -1032,11 +1116,7 @@ class Translator
             )
         ));
 
-        if (!isset($result[0])) {
-            return array();
-        }
-
-        return $result[0];
+        return isset($result[0]) ? $result[0] : array();
     }
 
     /**
@@ -1146,10 +1226,6 @@ class Translator
             $_data['datatype'] = $data['datatype'];
         }
 
-//        if ( isset( $data[ 'datadefine' ] ) ) {
-//            $_data[ 'datadefine' ] = $data[ 'datadefine' ];
-//        }
-
         $_data['html'] = 0;
 
         if (isset($data['html']) && $data['html']) {
@@ -1203,10 +1279,6 @@ class Translator
         if (isset($data['datatype'])) {
             $_data['datatype'] = $data['datatype'];
         }
-
-//        if ( isset( $data[ 'datadefine' ] ) ) {
-//            $_data[ 'datadefine' ] = $data[ 'datadefine' ];
-//        }
 
         $_data['html'] = 0;
 
@@ -1292,23 +1364,9 @@ class Translator
      */
     public static function getNeedles()
     {
-        $fields = QUI::getDataBase()->Table()->getColumns(
-            self::table()
-        );
-
-        $langs = array();
-
-        foreach ($fields as $entry) {
-            if ($entry == 'var' || $entry == 'groups' || $entry == 'html') {
-                continue;
-            }
-
-            $langs[] = $entry;
-        }
-
         $result = QUI::getDataBase()->fetch(array(
             'from'  => self::table(),
-            'where' => implode(' = "" OR ', $langs) . ' = ""'
+            'where' => implode(' = "" OR ', self::getAvailableLanguages()) . ' = ""'
         ));
 
         return $result;

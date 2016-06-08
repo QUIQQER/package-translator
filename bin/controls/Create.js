@@ -81,7 +81,6 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * @returns {Promise}
          */
         createTranslation: function () {
-
             var self = this,
                 data = this.getData();
 
@@ -150,8 +149,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
             Elm.set('html', '');
 
             QUIAjax.get('ajax_system_getAvailableLanguages', function (languages) {
-
-                var i, len, lang, Container;
+                var i, len, flag, lang, Container;
 
                 var current = QUILocale.getCurrent(),
                     data    = self.getAttribute('data');
@@ -170,8 +168,8 @@ define('package/quiqqer/translator/bin/controls/Create', [
                 });
 
                 for (i = 0, len = languages.length; i < len; i++) {
-
                     lang = languages[i];
+                    flag = lang.split('_')[0];
 
                     Container = new Element('div', {
                         'class': 'quiqqer-translator-create-entry',

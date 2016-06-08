@@ -93,8 +93,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 'ajax_system_getAvailableLanguages',
                 'package_quiqqer_translator_ajax_getVarData'
             ], function (languages, data) {
-
-                var i, len, lang, Container;
+                var i, len, flag, lang, Container;
                 var current = QUILocale.getCurrent();
 
                 // current language to the top
@@ -111,12 +110,12 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 });
 
                 for (i = 0, len = languages.length; i < len; i++) {
-
                     lang = languages[i];
+                    flag = lang.split('_')[0];
 
                     Container = new Element('div', {
                         'class': 'quiqqer-translator-create-entry',
-                        html   : '<img src="' + path + lang + '.png" />' +
+                        html   : '<img src="' + path + flag + '.png" />' +
                                  '<input type="text" name="' + lang + '" />'
                     }).inject(Elm);
 
