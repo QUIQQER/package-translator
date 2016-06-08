@@ -1207,19 +1207,25 @@ class Translator
         $langs = self::langs();
         $_data = array();
 
-        foreach ($langs as $lang) {
-            if (!isset($data[$lang])) {
-                continue;
+        foreach ($langs as $localeCode) {
+            if (!isset($data[$localeCode])) {
+                $lang = explode('_', $localeCode)[0];
+
+                if (!isset($data[$lang])) {
+                    continue;
+                }
+
+                $data[$localeCode] = $data[$lang];
             }
 
-            $content = trim($data[$lang]);
+            $content = trim($data[$localeCode]);
 
             // Leere Werte ignorieren
             if (empty($content)) {
                 continue;
             }
 
-            $_data[$lang] = $content;
+            $_data[$localeCode] = $content;
         }
 
         if (isset($data['datatype'])) {
