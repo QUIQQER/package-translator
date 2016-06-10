@@ -7,8 +7,10 @@
  * @require qui/QUI
  * @require qui/controls/Control
  * @require Ajax
+ * @require Locale
  * @require utils/Panels
  * @require package/quiqqer/translator/bin/Panel
+ * @require package/quiqqer/translator/bin/classes/Translator
  * @require css!package/quiqqer/translator/bin/controls/VariableTranslation.css
  */
 define('package/quiqqer/translator/bin/controls/VariableTranslation', [
@@ -114,7 +116,6 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
 
 
                     if (typeOf(data) === 'array' && !data.length) {
-
                         new Element('span', {
                             'class': 'quiqqer-translator-variabletranslation-entry',
                             html   : QUILocale.get(lg, 'control.variabletranslation.button.create'),
@@ -126,25 +127,23 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
                         });
 
                     } else if (self.getAttribute('size') == 1) {
-
                         lang = QUILocale.getCurrent();
                         text = data[lang] || '--';
 
                         new Element('span', {
                             'class': 'quiqqer-translator-variabletranslation-entry',
-                            html   : '<img src="' + path + lang + '.png" />' +
+                            html   : '<img src="' + path + lang.split('_')[0] + '.png" />' +
                                      text
                         }).inject(Container);
 
                     } else {
-
                         for (i = 0, len = languages.length; i < len; i++) {
                             lang = languages[i];
                             text = data[lang] || '--';
 
                             new Element('span', {
                                 'class': 'quiqqer-translator-variabletranslation-entry',
-                                html   : '<img src="' + path + lang + '.png" />' +
+                                html   : '<img src="' + path + lang.split('_')[0] + '.png" />' +
                                          text
                             }).inject(Container);
                         }

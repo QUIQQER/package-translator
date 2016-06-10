@@ -971,7 +971,6 @@ define('package/quiqqer/translator/bin/Panel', [
                 self.$Editor.setAttribute('buttons', {
                     lines: [
                         [[
-
                             {type: 'button', button: 'Source'},
                             {type: "seperator"},
                             {type: "button", button: "Bold"},
@@ -1000,7 +999,6 @@ define('package/quiqqer/translator/bin/Panel', [
                             {type: "button", button: "Link"},
                             {type: "button", button: "Unlink"},
                             {type: "button", button: "Image"}
-
                         ]]
                     ]
                 });

@@ -6,7 +6,6 @@
  *
  * @require Ajax
  */
-
 define(['Ajax'], function (Ajax) {
     "use strict";
 
