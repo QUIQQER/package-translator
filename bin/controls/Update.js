@@ -175,9 +175,13 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 self.getAttribute('var'),
                 data
             ).then(function () {
+                return Translate.refreshLocale();
+
+            }).then(function () {
                 return Translate.publish(
                     self.getAttribute('group')
                 );
+
             }, function (err) {
 
                 if (err.getCode() == 404 &&
@@ -188,6 +192,9 @@ define('package/quiqqer/translator/bin/controls/Update', [
                         self.getAttribute('var'),
                         data
                     ).then(function () {
+                        return Translate.refreshLocale();
+
+                    }).then(function () {
                         return Translate.publish(
                             self.getAttribute('group')
                         );

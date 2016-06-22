@@ -61,11 +61,7 @@ define('package/quiqqer/translator/bin/classes/Translator', [
                                 continue;
                             }
 
-                            QUILocale.set(
-                                lang,
-                                group,
-                                data[lang][group]
-                            );
+                            QUILocale.set(lang, group, data[lang][group]);
                         }
                     }
 

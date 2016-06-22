@@ -117,7 +117,7 @@ class Translator
             );
         }
 
-        QUI::getDataBase()->Table()->addColumn(
+        QUI::getDataBase()->table()->addColumn(
             self::table(),
             array(
                 $lang           => 'text NOT NULL',
@@ -791,7 +791,6 @@ class Translator
         $langs = self::langs();
         $dir   = self::dir();
 
-
         foreach ($langs as $lang) {
             if (strlen($lang) !== 5) {
                 continue;
@@ -906,6 +905,10 @@ class Translator
 
             file_put_contents($jsFile, $jsContent);
         }
+
+        // clean cache dir of js files
+        QUI::getTemp()->moveToTemp($dir . '/bin/_cache/');
+
     }
 
     /**
@@ -1326,7 +1329,7 @@ class Translator
      */
     public static function langs()
     {
-        $fields = QUI::getDataBase()->Table()->getColumns(
+        $fields = QUI::getDataBase()->table()->getColumns(
             self::table()
         );
 
