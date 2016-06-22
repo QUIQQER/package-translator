@@ -70,7 +70,7 @@ class Translator
         QUI::getDataBase()->Table()->addColumn(
             self::TABLE(),
             array(
-                $lang => 'text NOT NULL',
+                $lang           => 'text NOT NULL',
                 $lang . '_edit' => 'text NOT NULL'
             )
         );
@@ -322,7 +322,7 @@ class Translator
                     // update only _edit fields
                     $_locale = array(
                         'datatype' => $datatype,
-                        'html' => $locale['html']
+                        'html'     => $locale['html']
                     );
 
                     unset($locale['html']);
@@ -335,8 +335,8 @@ class Translator
                 }
 
                 $result[] = array(
-                    'group' => $group,
-                    'var' => $var,
+                    'group'  => $group,
+                    'var'    => $var,
                     'locale' => $locale,
                 );
             }
@@ -552,7 +552,7 @@ class Translator
                     'datadefine',
                     'html'
                 ),
-                'from' => self::TABLE()
+                'from'   => self::TABLE()
             ));
 
             foreach ($result as $entry) {
@@ -682,7 +682,6 @@ class Translator
         $langs = self::langs();
         $dir   = self::dir();
 
-
         foreach ($langs as $lang) {
             if (strlen($lang) !== 2) {
                 continue;
@@ -704,8 +703,8 @@ class Translator
                     'datadefine',
                     'html'
                 ),
-                'from' => self::TABLE(),
-                'where' => array(
+                'from'   => self::TABLE(),
+                'where'  => array(
                     'groups' => $group
                 )
             ));
@@ -798,6 +797,10 @@ class Translator
 
             file_put_contents($jsFile, $jsContent);
         }
+
+        // clean cache dir of js files
+        QUI::getTemp()->moveToTemp($dir . '/bin/_cache/');
+
     }
 
     /**
@@ -818,7 +821,7 @@ class Translator
 
         if (!$var) {
             return QUI::getDataBase()->fetch(array(
-                'from' => self::TABLE(),
+                'from'  => self::TABLE(),
                 'where' => array(
                     'groups' => $group
                 )
@@ -826,10 +829,10 @@ class Translator
         }
 
         return QUI::getDataBase()->fetch(array(
-            'from' => self::TABLE(),
+            'from'  => self::TABLE(),
             'where' => array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         ));
     }
@@ -906,8 +909,8 @@ class Translator
 
 
             return array(
-                'data' => $result,
-                'page' => $page + 1,
+                'data'  => $result,
+                'page'  => $page + 1,
                 'count' => $count[0]['count'],
                 'total' => $count[0]['count']
             );
@@ -918,16 +921,16 @@ class Translator
             // search translations
             $where  = array();
             $search = array(
-                'type' => '%LIKE%',
+                'type'  => '%LIKE%',
                 'value' => trim($search['search'])
             );
 
 
             // default fields
             $default = array(
-                'groups' => $search,
-                'var' => $search,
-                'datatype' => $search,
+                'groups'     => $search,
+                'var'        => $search,
+                'datatype'   => $search,
                 'datadefine' => $search
             );
 
@@ -956,15 +959,15 @@ class Translator
             }
 
             $data = array(
-                'from' => $table,
+                'from'     => $table,
                 'where_or' => $where,
-                'limit' => $limit
+                'limit'    => $limit
             );
 
         } else {
             // search complete group
             $data = array(
-                'from' => $table,
+                'from'  => $table,
                 'where' => array(
                     'groups' => $groups
                 ),
@@ -985,8 +988,8 @@ class Translator
         $count = QUI::getDataBase()->fetch($data);
 
         return array(
-            'data' => $result,
-            'page' => $page + 1,
+            'data'  => $result,
+            'page'  => $page + 1,
             'count' => $count[0]['groups'],
             'total' => $count[0]['groups']
         );
@@ -1001,10 +1004,10 @@ class Translator
     public static function getVarData($group, $var)
     {
         $result = QUI::getDataBase()->fetch(array(
-            'from' => self::TABLE(),
+            'from'  => self::TABLE(),
             'where' => array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         ));
 
@@ -1024,8 +1027,8 @@ class Translator
     {
         $result = QUI::getDataBase()->fetch(array(
             'select' => 'groups',
-            'from' => self::TABLE(),
-            'group' => 'groups'
+            'from'   => self::TABLE(),
+            'group'  => 'groups'
         ));
 
         $list = array();
@@ -1064,7 +1067,7 @@ class Translator
                 'exception.var.exists',
                 array(
                     'group' => $group,
-                    'var' => $var
+                    'var'   => $var
                 )
             ));
         }
@@ -1073,7 +1076,7 @@ class Translator
             self::Table(),
             array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         );
     }
@@ -1137,7 +1140,7 @@ class Translator
             $_data,
             array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         );
     }
@@ -1195,7 +1198,7 @@ class Translator
             $_data,
             array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         );
     }
@@ -1212,7 +1215,7 @@ class Translator
             self::TABLE(),
             array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         );
     }
@@ -1283,7 +1286,7 @@ class Translator
         }
 
         $result = QUI::getDataBase()->fetch(array(
-            'from' => self::TABLE(),
+            'from'  => self::TABLE(),
             'where' => implode(' = "" OR ', $langs) . ' = ""'
         ));
 
@@ -1335,7 +1338,7 @@ class Translator
 
                     self::$tmp[] = array(
                         'groups' => $group,
-                        'var' => $var
+                        'var'    => $var
                     );
 
                     return;
@@ -1353,7 +1356,7 @@ class Translator
 
                 self::$tmp[] = array(
                     'groups' => $_param[0],
-                    'var' => $_param[1],
+                    'var'    => $_param[1],
                 );
             },
             $string
@@ -1388,7 +1391,7 @@ class Translator
                 ) {
                     self::$tmp[] = array(
                         'groups' => $params[2],
-                        'var' => $params[3],
+                        'var'    => $params[3],
                     );
                 }
             },

@@ -98,6 +98,9 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     data
                 );
             }).then(function () {
+                return Translate.refreshLocale();
+
+            }).then(function () {
                 return Translate.publish(
                     self.getAttribute('group')
                 );
@@ -108,6 +111,9 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     self.getAttribute('var'),
                     data
                 ).then(function () {
+                    return Translate.refreshLocale();
+
+                }).then(function () {
                     return Translate.publish(
                         self.getAttribute('group')
                     );
