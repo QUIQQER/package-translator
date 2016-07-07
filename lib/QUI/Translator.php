@@ -276,6 +276,8 @@ class Translator
             );
         }
 
+        set_time_limit(ini_get('max_execution_time'));
+
         foreach ($groups as $locales) {
             $group    = $locales['group'];
             $datatype = '';
@@ -301,7 +303,6 @@ class Translator
 
                 try {
                     self::add($group, $var);
-
                 } catch (QUI\Exception $Exception) {
                 }
 
@@ -538,6 +539,8 @@ class Translator
 
         // Sprachdateien erstellen
         foreach ($langs as $lang) {
+            set_time_limit(ini_get('max_execution_time'));
+
             if (strlen($lang) !== 2) {
                 continue;
             }
