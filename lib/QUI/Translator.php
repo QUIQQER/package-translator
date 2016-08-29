@@ -150,7 +150,6 @@ class Translator
         if ($group === 'all') {
             $groups = self::getGroupList();
             $fileName .= '_all';
-
         } else {
             $groups = array($group);
             $fileName .= '_' . str_replace('/', '_', $group);
@@ -312,7 +311,6 @@ class Translator
         // Format-Prüfung
         try {
             $groups = XML::getLocaleGroupsFromDom(XML::getDomFromXml($file));
-
         } catch (QUI\Exception $Exception) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
@@ -332,6 +330,8 @@ class Translator
                 )
             );
         }
+
+        set_time_limit(ini_get('max_execution_time'));
 
         foreach ($groups as $locales) {
             $group    = $locales['group'];
@@ -358,7 +358,6 @@ class Translator
 
                 try {
                     self::add($group, $var);
-
                 } catch (QUI\Exception $Exception) {
                 }
 
@@ -374,7 +373,6 @@ class Translator
                     $locale['datatype'] = $datatype;
 
                     self::update($group, $var, $locale);
-
                 } else {
                     // update only _edit fields
                     $_locale = array(
@@ -568,7 +566,6 @@ class Translator
         try {
             self::$languages = QUI\Cache\Manager::get(self::$cacheName . '/languages');
             return self::$languages;
-
         } catch (QUI\Cache\Exception $Exception) {
         }
 
@@ -650,6 +647,8 @@ class Translator
             if (strlen($lang) !== 5) {
                 continue;
             }
+
+            set_time_limit(ini_get('max_execution_time'));
 
             $result = QUI::getDataBase()->fetch(array(
                 'select' => array(
@@ -908,7 +907,6 @@ class Translator
 
         // clean cache dir of js files
         QUI::getTemp()->moveToTemp($dir . '/bin/_cache/');
-
     }
 
     /**
@@ -1071,7 +1069,6 @@ class Translator
                 'where_or' => $where,
                 'limit'    => $limit
             );
-
         } else {
             // search complete group
             $data = array(
