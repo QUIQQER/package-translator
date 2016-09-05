@@ -7,7 +7,7 @@
 namespace QUI;
 
 use QUI;
-use QUI\Utils\XML;
+use QUI\Utils\Text\XML;
 use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
 
