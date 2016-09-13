@@ -1566,6 +1566,8 @@ class Translator
         $state = null;
         $fuzzy = false;
 
+        set_time_limit(0);
+
         // iterate over lines
         while (($line = fgets($fh, 65536)) !== false) {
             $line = trim($line);
