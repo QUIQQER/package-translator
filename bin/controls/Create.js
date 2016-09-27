@@ -105,8 +105,8 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     self.getAttribute('group')
                 );
 
-            }).catch(function (err) {
-                console.error(err);
+            }).catch(function () {
+
                 return Translate.setTranslation(
                     self.getAttribute('group'),
                     self.getAttribute('var'),
