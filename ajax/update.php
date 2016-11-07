@@ -16,7 +16,7 @@ QUI::$Ajax->registerFunction(
         if (!isset($data['var'])) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
-                    'package/tranlator',
+                    'quiqqer/translator',
                     'exception.translation.not.found.update'
                 ),
                 404
@@ -28,7 +28,7 @@ QUI::$Ajax->registerFunction(
         if (!isset($result[0])) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
-                    'package/tranlator',
+                    'quiqqer/translator',
                     'exception.translation.not.found.update'
                 ),
                 404

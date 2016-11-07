@@ -1,5 +1,5 @@
 /**
- * Create new translation variable
+ * Displays the variable and the control can update the translation variable
  *
  * @module package/quiqqer/translator/bin/controls/Create
  * @author www.pcsg.de (Henning Leutz)
@@ -9,6 +9,8 @@
  * @require qui/controls/buttons/Button
  * @require Ajax
  * @require Locale
+ * @require package/quiqqer/translator/bin/classes/Translator
+ * @require package/quiqqer/translator/bin/controls/Create
  * @require css!package/quiqqer/translator/bin/controls/Update.css
  *
  * @event onChange
@@ -44,7 +46,9 @@ define('package/quiqqer/translator/bin/controls/Update', [
             'var'   : false,
             datatype: 'php,js',
             html    : false,
-            data    : {}
+            data    : {},
+
+            createIfNotExists: false
         },
 
         initialize: function (options) {
@@ -172,10 +176,46 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 self.getAttribute('var'),
                 data
             ).then(function () {
+                return Translate.refreshLocale();
+
+            }).then(function () {
                 return Translate.publish(
                     self.getAttribute('group')
                 );
+
+            }, function (err) {
+
+                if (err.getCode() == 404 &&
+                    self.getAttribute('createIfNotExists')) {
+
+                    return Translate.add(
+                        self.getAttribute('group'),
+                        self.getAttribute('var'),
+                        data
+                    ).then(function () {
+                        return Translate.refreshLocale();
+
+                    }).then(function () {
+                        return Translate.publish(
+                            self.getAttribute('group')
+                        );
+                    });
+                }
+
+                throw err;
             });
+        },
+
+        /**
+         * Return the current value for the current locale
+         *
+         * @return {String}
+         */
+        getValue: function () {
+            var current = QUILocale.getCurrent();
+            var Input   = this.getElm().getElement('[name="' + current + '"]');
+
+            return Input ? Input.value : '';
         }
     });
 });

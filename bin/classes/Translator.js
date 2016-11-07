@@ -28,6 +28,20 @@ define('package/quiqqer/translator/bin/classes/Translator', [
         },
 
         /**
+         * Return the available languages
+         * Language which are in use
+         *
+         * @return {Promise}
+         */
+        getAvailableLanguages: function () {
+            return new Promise(function (resolve, reject) {
+                QUIAjax.get('ajax_system_getAvailableLanguages', resolve, {
+                    onError: reject
+                });
+            });
+        },
+
+        /**
          * refresh the translation in the locale
          *
          * @return {Promise}
@@ -47,11 +61,7 @@ define('package/quiqqer/translator/bin/classes/Translator', [
                                 continue;
                             }
 
-                            QUILocale.set(
-                                lang,
-                                group,
-                                data[lang][group]
-                            );
+                            QUILocale.set(lang, group, data[lang][group]);
                         }
                     }
 
@@ -73,10 +83,11 @@ define('package/quiqqer/translator/bin/classes/Translator', [
         add: function (group, varName) {
             return new Promise(function (resolve, reject) {
                 QUIAjax.post('package_quiqqer_translator_ajax_add', resolve, {
-                    'package': 'quiqqer/translator',
-                    'onError': reject,
-                    'group'  : group,
-                    'var'    : varName
+                    'package'  : 'quiqqer/translator',
+                    'onError'  : reject,
+                    'showError': false,
+                    'group'    : group,
+                    'var'      : varName
                 });
             });
         },

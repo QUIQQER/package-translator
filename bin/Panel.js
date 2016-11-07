@@ -696,11 +696,12 @@ define('package/quiqqer/translator/bin/Panel', [
                 var i, g, len, group;
 
                 var ButtonBar = self.getButtonBar(),
-
                     Sel1      = ButtonBar.getChildren('translater/group/begin'),
                     Sel2      = ButtonBar.getChildren('translater/group/end'),
-
                     groups    = {};
+
+                var g1 = Sel1.getValue();
+                var g2 = Sel2.getValue();
 
                 // clear first
                 Sel1.clear();
@@ -727,6 +728,17 @@ define('package/quiqqer/translator/bin/Panel', [
                     }
                 }
 
+                if (g1 && g2) {
+                    Sel1.setValue(g1);
+
+                    (function () {
+                        this.setValue(g2);
+                        this.close();
+                    }.delay(100, Sel2));
+
+                    return;
+                }
+
                 if (self.getAttribute('group')) {
                     var groupValue = self.getAttribute('group').split('/');
 
@@ -734,6 +746,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
                     (function () {
                         this.setValue(groupValue[1]);
+                        this.close();
                     }.delay(100, Sel2));
 
                     return;
@@ -787,7 +800,12 @@ define('package/quiqqer/translator/bin/Panel', [
                 Sel2.disable();
             } else {
                 Sel2.enable();
-                Sel2.open();
+
+                (function () {
+                    if (Sel2.getValue() === '') {
+                        Sel2.open();
+                    }
+                }).delay(200);
             }
         },
 

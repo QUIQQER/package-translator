@@ -7,7 +7,7 @@
 namespace QUI;
 
 use QUI;
-use QUI\Utils\XML;
+use QUI\Utils\Text\XML;
 use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
 
@@ -30,23 +30,26 @@ class Translator
 {
     const EXPORT_DIR = 'translator_exports/';
 
+    protected static $cacheName = 'translator';
+
+    protected static $localeModifyTimes = null;
+
     /**
      * Return the real table name
      *
      * @return String
      */
-    public static function TABLE()
+    public static function table()
     {
         return QUI::getDBTableName('translate');
     }
 
     /**
      * Translator setup
-     * it looks, which languages are exist and creat it
+     * it looks, which languages are exist and create it
      */
     public static function setup()
     {
-
     }
 
     /**
@@ -67,10 +70,10 @@ class Translator
             );
         }
 
-        QUI::getDataBase()->Table()->appendFields(
-            self::TABLE(),
+        QUI::getDataBase()->table()->addColumn(
+            self::table(),
             array(
-                $lang => 'text NOT NULL',
+                $lang           => 'text NOT NULL',
                 $lang . '_edit' => 'text NOT NULL'
             )
         );
@@ -98,7 +101,6 @@ class Translator
         if ($group === 'all') {
             $groups = self::getGroupList();
             $fileName .= '_all';
-
         } else {
             $groups = array($group);
             $fileName .= '_' . str_replace('/', '_', $group);
@@ -243,6 +245,13 @@ class Translator
             );
         }
 
+        $filemtimes = self::getLocaleModifyTimes();
+
+        // nothing has changed
+        if (isset($filemtimes[$file]) && filemtime($file) <= $filemtimes[$file]) {
+            return array();
+        }
+
         $result  = array();
         $devMode = QUI::conf('globals', 'development');
 
@@ -255,7 +264,6 @@ class Translator
             $groups = XML::getLocaleGroupsFromDom(
                 XML::getDomFromXml($file)
             );
-
         } catch (QUI\Exception $Exception) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
@@ -275,6 +283,8 @@ class Translator
                 )
             );
         }
+
+        set_time_limit(ini_get('max_execution_time'));
 
         foreach ($groups as $locales) {
             $group    = $locales['group'];
@@ -301,7 +311,6 @@ class Translator
 
                 try {
                     self::add($group, $var);
-
                 } catch (QUI\Exception $Exception) {
                 }
 
@@ -317,12 +326,11 @@ class Translator
                     $locale['datatype'] = $datatype;
 
                     self::update($group, $var, $locale);
-
                 } else {
                     // update only _edit fields
                     $_locale = array(
                         'datatype' => $datatype,
-                        'html' => $locale['html']
+                        'html'     => $locale['html']
                     );
 
                     unset($locale['html']);
@@ -335,12 +343,14 @@ class Translator
                 }
 
                 $result[] = array(
-                    'group' => $group,
-                    'var' => $var,
+                    'group'  => $group,
+                    'var'    => $var,
                     'locale' => $locale,
                 );
             }
         }
+
+        self::setLocaleFileModifyTime($file);
 
         QUI::getMessagesHandler()->addSuccess(
             QUI::getLocale()->get(
@@ -350,6 +360,49 @@ class Translator
         );
 
         return $result;
+    }
+
+    /**
+     * Add the file to the modify time list
+     *
+     * @param string $file - path to the locale file
+     */
+    protected static function setLocaleFileModifyTime($file)
+    {
+        if (!file_exists($file)) {
+            return;
+        }
+
+        self::$localeModifyTimes[$file] = filemtime($file);
+
+        file_put_contents(
+            VAR_DIR . 'locale/localefiles',
+            json_encode(self::$localeModifyTimes)
+        );
+    }
+
+    /**
+     * Return the modify times of all imported locale xml files
+     *
+     * @return array
+     */
+    protected static function getLocaleModifyTimes()
+    {
+        if (!is_null(self::$localeModifyTimes)) {
+            return self::$localeModifyTimes;
+        }
+
+        $cacheFile = VAR_DIR . 'locale/localefiles';
+
+        if (!file_exists($cacheFile)) {
+            file_put_contents($cacheFile, '');
+        }
+
+        $list = json_decode(file_get_contents($cacheFile), true);
+
+        self::$localeModifyTimes = $list;
+
+        return $list;
     }
 
     /**
@@ -479,7 +532,7 @@ class Translator
     public static function cleanup()
     {
         $PDO       = QUI::getDataBase()->getPDO();
-        $bad_table = self::TABLE();
+        $bad_table = self::table();
 
         // check if dublicate entries exist
         $Statement = $PDO->prepare(
@@ -538,6 +591,8 @@ class Translator
 
         // Sprachdateien erstellen
         foreach ($langs as $lang) {
+            set_time_limit(ini_get('max_execution_time'));
+
             if (strlen($lang) !== 2) {
                 continue;
             }
@@ -552,7 +607,7 @@ class Translator
                     'datadefine',
                     'html'
                 ),
-                'from' => self::TABLE()
+                'from'   => self::table()
             ));
 
             foreach ($result as $entry) {
@@ -682,7 +737,6 @@ class Translator
         $langs = self::langs();
         $dir   = self::dir();
 
-
         foreach ($langs as $lang) {
             if (strlen($lang) !== 2) {
                 continue;
@@ -704,8 +758,8 @@ class Translator
                     'datadefine',
                     'html'
                 ),
-                'from' => self::TABLE(),
-                'where' => array(
+                'from'   => self::table(),
+                'where'  => array(
                     'groups' => $group
                 )
             ));
@@ -798,6 +852,9 @@ class Translator
 
             file_put_contents($jsFile, $jsContent);
         }
+
+        // clean cache dir of js files
+        QUI::getTemp()->moveToTemp($dir . '/bin/_cache/');
     }
 
     /**
@@ -812,13 +869,13 @@ class Translator
     {
         if (!$group) {
             return QUI::getDataBase()->fetch(array(
-                'from' => self::TABLE()
+                'from' => self::table()
             ));
         }
 
         if (!$var) {
             return QUI::getDataBase()->fetch(array(
-                'from' => self::TABLE(),
+                'from'  => self::table(),
                 'where' => array(
                     'groups' => $group
                 )
@@ -826,10 +883,10 @@ class Translator
         }
 
         return QUI::getDataBase()->fetch(array(
-            'from' => self::TABLE(),
+            'from'  => self::table(),
             'where' => array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         ));
     }
@@ -845,7 +902,7 @@ class Translator
      */
     public static function getData($groups, $params = array(), $search = false)
     {
-        $table     = self::TABLE();
+        $table     = self::table();
         $db_fields = self::langs();
 
         $max  = 10;
@@ -906,8 +963,8 @@ class Translator
 
 
             return array(
-                'data' => $result,
-                'page' => $page + 1,
+                'data'  => $result,
+                'page'  => $page + 1,
                 'count' => $count[0]['count'],
                 'total' => $count[0]['count']
             );
@@ -918,16 +975,16 @@ class Translator
             // search translations
             $where  = array();
             $search = array(
-                'type' => '%LIKE%',
+                'type'  => '%LIKE%',
                 'value' => trim($search['search'])
             );
 
 
             // default fields
             $default = array(
-                'groups' => $search,
-                'var' => $search,
-                'datatype' => $search,
+                'groups'     => $search,
+                'var'        => $search,
+                'datatype'   => $search,
                 'datadefine' => $search
             );
 
@@ -956,15 +1013,14 @@ class Translator
             }
 
             $data = array(
-                'from' => $table,
+                'from'     => $table,
                 'where_or' => $where,
-                'limit' => $limit
+                'limit'    => $limit
             );
-
         } else {
             // search complete group
             $data = array(
-                'from' => $table,
+                'from'  => $table,
                 'where' => array(
                     'groups' => $groups
                 ),
@@ -985,8 +1041,8 @@ class Translator
         $count = QUI::getDataBase()->fetch($data);
 
         return array(
-            'data' => $result,
-            'page' => $page + 1,
+            'data'  => $result,
+            'page'  => $page + 1,
             'count' => $count[0]['groups'],
             'total' => $count[0]['groups']
         );
@@ -1001,10 +1057,10 @@ class Translator
     public static function getVarData($group, $var)
     {
         $result = QUI::getDataBase()->fetch(array(
-            'from' => self::TABLE(),
+            'from'  => self::table(),
             'where' => array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         ));
 
@@ -1024,8 +1080,8 @@ class Translator
     {
         $result = QUI::getDataBase()->fetch(array(
             'select' => 'groups',
-            'from' => self::TABLE(),
-            'group' => 'groups'
+            'from'   => self::table(),
+            'group'  => 'groups'
         ));
 
         $list = array();
@@ -1064,16 +1120,16 @@ class Translator
                 'exception.var.exists',
                 array(
                     'group' => $group,
-                    'var' => $var
+                    'var'   => $var
                 )
             ));
         }
 
         QUI::getDataBase()->insert(
-            self::Table(),
+            self::table(),
             array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         );
     }
@@ -1133,11 +1189,11 @@ class Translator
         }
 
         QUI::getDataBase()->update(
-            self::TABLE(),
+            self::table(),
             $_data,
             array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         );
     }
@@ -1191,11 +1247,11 @@ class Translator
         }
 
         QUI::getDataBase()->update(
-            self::TABLE(),
+            self::table(),
             $_data,
             array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         );
     }
@@ -1209,10 +1265,10 @@ class Translator
     public static function delete($group, $var)
     {
         QUI::getDataBase()->delete(
-            self::TABLE(),
+            self::table(),
             array(
                 'groups' => $group,
-                'var' => $var
+                'var'    => $var
             )
         );
     }
@@ -1224,8 +1280,8 @@ class Translator
      */
     public static function langs()
     {
-        $fields = QUI::getDataBase()->Table()->getFields(
-            self::TABLE()
+        $fields = QUI::getDataBase()->table()->getColumns(
+            self::table()
         );
 
         $langs = array();
@@ -1268,8 +1324,8 @@ class Translator
      */
     public static function getNeedles()
     {
-        $fields = QUI::getDataBase()->Table()->getFields(
-            self::TABLE()
+        $fields = QUI::getDataBase()->table()->getColumns(
+            self::table()
         );
 
         $langs = array();
@@ -1283,7 +1339,7 @@ class Translator
         }
 
         $result = QUI::getDataBase()->fetch(array(
-            'from' => self::TABLE(),
+            'from'  => self::table(),
             'where' => implode(' = "" OR ', $langs) . ' = ""'
         ));
 
@@ -1335,7 +1391,7 @@ class Translator
 
                     self::$tmp[] = array(
                         'groups' => $group,
-                        'var' => $var
+                        'var'    => $var
                     );
 
                     return;
@@ -1353,7 +1409,7 @@ class Translator
 
                 self::$tmp[] = array(
                     'groups' => $_param[0],
-                    'var' => $_param[1],
+                    'var'    => $_param[1],
                 );
             },
             $string
@@ -1388,7 +1444,7 @@ class Translator
                 ) {
                     self::$tmp[] = array(
                         'groups' => $params[2],
-                        'var' => $params[3],
+                        'var'    => $params[3],
                     );
                 }
             },
@@ -1509,6 +1565,8 @@ class Translator
         // state
         $state = null;
         $fuzzy = false;
+
+        set_time_limit(0);
 
         // iterate over lines
         while (($line = fgets($fh, 65536)) !== false) {
