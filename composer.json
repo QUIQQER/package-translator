@@ -21,6 +21,7 @@
   },
   "autoload": {
     "psr-4": {
+      "QUI\\": "src/QUI",
       "QUI\\Translator\\": "src/QUI/Translator"
     }
   }
