@@ -17,7 +17,6 @@ use QUI\Utils\System\File as QUIFile;
  * Manage all translations, for the system and the plugins
  *
  * @author  www.pcsg.de (Henning Leutz)
- * @package com.pcsg.qui.locale
  *
  * mysql fix for old dev version
  *
@@ -28,10 +27,19 @@ use QUI\Utils\System\File as QUIFile;
  */
 class Translator
 {
+    /**
+     *
+     */
     const EXPORT_DIR = 'translator_exports/';
 
+    /**
+     * @var string
+     */
     protected static $cacheName = 'translator';
 
+    /**
+     * @var null
+     */
     protected static $localeModifyTimes = null;
 
     /**

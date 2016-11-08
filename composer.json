@@ -20,8 +20,8 @@
     "quiqqer/utils": ">=1.4|dev-master|dev-dev"
   },
   "autoload": {
-    "psr-0": {
-      "QUI": "lib/"
+    "psr-4": {
+      "QUI\\Translator\\": "src/QUI/Translator"
     }
   }
 }
