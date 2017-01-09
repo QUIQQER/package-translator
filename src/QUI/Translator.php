@@ -81,8 +81,8 @@ class Translator
         QUI::getDataBase()->table()->addColumn(
             self::table(),
             array(
-                $lang           => 'text NOT NULL',
-                $lang . '_edit' => 'text NOT NULL'
+                $lang           => 'text NULL',
+                $lang . '_edit' => 'text NULL'
             )
         );
     }
