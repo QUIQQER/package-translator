@@ -51,9 +51,13 @@
             <de><![CDATA[Variable [groups] [var] wurde erfolgreich hinzugefügt]]></de>
             <en><![CDATA[Variable [groups] [var] has been added successfully.]]></en>
         </locale>
-        <locale name="message.translation.delet.successful">
+        <locale name="message.translation.delete.successfully">
             <de><![CDATA[Variable [groups] [var] wurde erfolgreich gelöscht]]></de>
             <en><![CDATA[Variable [groups] [var] has been deleted successfully.]]></en>
+        </locale>
+        <locale name="message.translation.delete.id.successfully">
+            <de><![CDATA[Variable #[id] wurde erfolgreich gelöscht]]></de>
+            <en><![CDATA[Variable #[id] has been deleted successfully.]]></en>
         </locale>
         <locale name="message.translation.update.successful">
             <de><![CDATA[Übersetzung wurde erfolgreich gespeichert]]></de>
@@ -163,8 +167,8 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <de><![CDATA[Import von Übersetzungsdateien]]></de>
             <en><![CDATA[Import of translations]]></en>
         </locale>
-        <locale name="import.window.description">
-            <de><![CDATA[<p>Importieren Sie Übersetzungsdateien.</p>
+        <locale name="import.window.description" html="true">
+            <de><![CDATA[
                 <p>Laden Sie eine Datei per Drag and Drop oder Uploadformular hoch.</p>
                 <p>Diese Datei wird nach Übersetzungsvariablen durchsucht und in das System importiert.</p>]]></de>
             <en><![CDATA[<p>Import translation files fast and easily.</p>
@@ -318,8 +322,8 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <de><![CDATA[Die Variable [group] [var] existiert nicht. Per Klick können Sie die Variable anlegen.]]></de>
             <en><![CDATA[The variable [group] [var] doesn't exists. By clicking, you can create the variable.]]></en>
         </locale>
-
     </groups>
+
     <groups name="quiqqer/translator" datatype="php,js">
         <locale name="package.name">
             <de><![CDATA[Sprachvariablen]]></de>
@@ -330,4 +334,5 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <en><![CDATA[Translations]]></en>
         </locale>
     </groups>
+
 </locales>

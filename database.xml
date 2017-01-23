@@ -8,6 +8,8 @@
             <field type="varchar(20) DEFAULT ''">datatype</field>
             <field type="varchar(200) DEFAULT ''">datadefine</field>
             <field type="int(1) DEFAULT 0">html</field>
+            <field type="int(4) DEFAULT 0">priority</field>
+            <field type="varchar(255) DEFAULT NULL">package</field>
         </table>
     </global>
 

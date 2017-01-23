@@ -15,6 +15,24 @@ QUI::$Ajax->registerFunction(
         }
 
         foreach ($data as $entry) {
+            if (isset($entry['id'])) {
+                QUI\Translator::deleteById($entry['id']);
+
+                QUI::getMessagesHandler()->addSuccess(
+                    QUI::getLocale()->get(
+                        'quiqqer/translator',
+                        'message.translation.delete.id.successfully',
+                        array(
+                            'groups' => $entry['groups'],
+                            'var'    => $entry['var'],
+                            'id'     => $entry['id']
+                        )
+                    )
+                );
+
+                continue;
+            }
+
             if (!isset($entry['groups'])) {
                 continue;
             }
@@ -31,10 +49,10 @@ QUI::$Ajax->registerFunction(
             QUI::getMessagesHandler()->addSuccess(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
-                    'message.translation.delet.successful',
+                    'message.translation.delete.successfully',
                     array(
                         'groups' => $entry['groups'],
-                        'var' => $entry['var']
+                        'var'    => $entry['var']
                     )
                 )
             );

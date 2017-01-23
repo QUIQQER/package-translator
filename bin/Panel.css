@@ -15,7 +15,7 @@
 }
 
 .qui-translater-search-form input:disabled {
-    background: rgba( 255, 255, 255, 0.7 );
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .qui-translater-editable-header {
@@ -87,6 +87,12 @@
 }
 
 .qui-translator-import-descripton {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.qui-translator-import-overwrite {
+    display: block;
     margin-bottom: 10px;
 }
 
