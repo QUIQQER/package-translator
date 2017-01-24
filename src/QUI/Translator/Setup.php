@@ -52,7 +52,7 @@ class Setup
     /**
      * packages empty package fields
      */
-    protected function patchForEmptyLocales()
+    protected static function patchForEmptyLocales()
     {
         $table = QUI\Translator::table();
 
