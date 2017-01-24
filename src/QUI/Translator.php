@@ -181,6 +181,10 @@ class Translator
                     $result .= ' html="true"';
                 }
 
+                if (!empty($entry['priority'])) {
+                    $result .= ' priority="' . (int)$entry['priority'] . '"';
+                }
+
                 $result .= '>' . "\n";
 
                 foreach ($langs as $lang) {
@@ -231,10 +235,11 @@ class Translator
     /**
      * Import a locale xml file
      *
-     * @param String $file - path to the file
-     * @param Bool|Integer $overwriteOriginal - if true, the _edit fields would be updated
+     * @param string $file - path to the file
+     * @param bool|integer $overwriteOriginal - if true, the _edit fields would be updated
      *                                     if false, the original fields would be updated
-     * @param Bool $devModeIgnore
+     * @param bool $devModeIgnore
+     * @param string $packageName - name of the package
      *
      * @return array - List of imported vars
      * @throws QUI\Exception
@@ -242,7 +247,8 @@ class Translator
     public static function import(
         $file,
         $overwriteOriginal = 0,
-        $devModeIgnore = false
+        $devModeIgnore = false,
+        $packageName = ''
     ) {
         if (!file_exists($file)) {
             throw new QUI\Exception(
@@ -317,13 +323,19 @@ class Translator
                     $locale['html'] = 0;
                 }
 
+                if (empty($locale['priority'])) {
+                    $locale['priority'] = 0;
+                } else {
+                    $locale['priority'] = (int)$locale['priority'];
+                }
+
                 try {
-                    self::add($group, $var);
+                    self::add($group, $var, $packageName);
                 } catch (QUI\Exception $Exception) {
                 }
 
                 // test if group exists
-                $groupContent = self::get($group, $var);
+                $groupContent = self::get($group, $var, $packageName);
 
                 if (empty($groupContent)) {
                     continue;
@@ -333,21 +345,25 @@ class Translator
                     // set the original fields
                     $locale['datatype'] = $datatype;
 
-                    self::update($group, $var, $locale);
+                    self::update($group, $var, $packageName, $locale);
                 } else {
                     // update only _edit fields
                     $_locale = array(
                         'datatype' => $datatype,
-                        'html'     => $locale['html']
+                        'html'     => $locale['html'],
+                        'priority' => $locale['priority'],
+                        'package'  => $packageName
                     );
 
                     unset($locale['html']);
+                    unset($locale['priority']);
+                    unset($locale['id']);
 
                     foreach ($locale as $key => $entry) {
                         $_locale[$key . '_edit'] = $entry;
                     }
 
-                    self::edit($group, $var, $_locale);
+                    self::edit($group, $var, $packageName, $_locale);
                 }
 
                 $result[] = array(
@@ -368,6 +384,30 @@ class Translator
         );
 
         return $result;
+    }
+
+    /**
+     * @param Package\Package $Package
+     * @param int $overwriteOriginal
+     * @param bool $devModeIgnore
+     */
+    public static function importFromPackage(
+        QUI\Package\Package $Package,
+        $overwriteOriginal = 0,
+        $devModeIgnore = false
+    ) {
+        $file = $Package->getDir() . 'locale.xml';
+
+        if (!file_exists($file)) {
+            return;
+        }
+
+        self::import(
+            $file,
+            $overwriteOriginal,
+            $devModeIgnore,
+            $Package->getName()
+        );
     }
 
     /**
@@ -587,9 +627,11 @@ class Translator
         $exec_error = array();
 
         foreach ($langs as $lang) {
-            $folders[$lang] = $dir . '/' . StringHelper::toLower($lang) .
-                              '_' . StringHelper::toUpper($lang) .
-                              '/LC_MESSAGES/';
+            $lcMessagePath = $dir . '/' . StringHelper::toLower($lang);
+            $lcMessagePath .= '_' . StringHelper::toUpper($lang);
+            $lcMessagePath .= '/LC_MESSAGES/';
+
+            $folders[$lang] = $lcMessagePath;
 
             QUIFile::unlink($folders[$lang]);
             QUIFile::mkdir($folders[$lang]);
@@ -613,10 +655,17 @@ class Translator
                     'var',
                     'datatype',
                     'datadefine',
-                    'html'
+                    'html',
+                    'priority'
                 ),
-                'from'   => self::table()
+                'from'   => self::table(),
+                'order'  => 'priority ASC'
             ));
+
+            // priority ASC Erklärung:
+            // Wir müssen den kleinsten zuerst nehmen,
+            // damit die höchste Priorität zu letzt kommt und die davor überschreibt
+            // Ist verwirrend, aber somit sparen wir ein Query
 
             foreach ($result as $entry) {
                 if ($entry['datatype'] == 'js') {
@@ -750,8 +799,9 @@ class Translator
                 continue;
             }
 
-            $folder = $dir . '/' . StringHelper::toLower($lang) . '_' .
-                      StringHelper::toUpper($lang) . '/LC_MESSAGES/';
+            $folder = $dir . '/';
+            $folder .= StringHelper::toLower($lang) . '_' . StringHelper::toUpper($lang);
+            $folder .= '/LC_MESSAGES/';
 
             QUIFile::mkdir($folder);
 
@@ -769,8 +819,14 @@ class Translator
                 'from'   => self::table(),
                 'where'  => array(
                     'groups' => $group
-                )
+                ),
+                'order'  => 'priority ASC'
             ));
+
+            // priority ASC Erklärung:
+            // Wir müssen den kleinsten zuerst nehmen,
+            // damit die höchste Priorität zu letzt kommt und die davor überschreibt
+            // Ist verwirrend, aber somit sparen wir ein Query
 
             $javaScriptValues = array();
 
@@ -870,32 +926,29 @@ class Translator
      *
      * @param string|boolean $group - Gruppe
      * @param string|boolean $var - Übersetzungsvariable, optional
+     * @param string|boolean $package - optional, package name
      *
      * @return array
      */
-    public static function get($group = false, $var = false)
+    public static function get($group = false, $var = false, $package = false)
     {
-        if (!$group) {
-            return QUI::getDataBase()->fetch(array(
-                'from' => self::table()
-            ));
+        $where = array();
+
+        if ($group) {
+            $where['groups'] = $group;
         }
 
-        if (!$var) {
-            return QUI::getDataBase()->fetch(array(
-                'from'  => self::table(),
-                'where' => array(
-                    'groups' => $group
-                )
-            ));
+        if ($var) {
+            $where['var'] = $var;
+        }
+
+        if ($package) {
+            $where['package'] = $package;
         }
 
         return QUI::getDataBase()->fetch(array(
             'from'  => self::table(),
-            'where' => array(
-                'groups' => $group,
-                'var'    => $var
-            )
+            'where' => $where
         ));
     }
 
@@ -946,16 +999,14 @@ class Translator
 
             $where = implode(' OR ', $whereParts);
 
-            $querySelect
-                = "
+            $querySelect = "
                 SELECT *
                 FROM {$table}
                 WHERE {$where}
                 LIMIT {$limit}
             ";
 
-            $queryCount
-                = "
+            $queryCount = "
                 SELECT COUNT(*) as count
                 FROM {$table}
                 WHERE {$where}
@@ -1058,18 +1109,26 @@ class Translator
 
     /**
      * Return the data from a translation variable
-     * @param $group
-     * @param $var
+     *
+     * @param string $group
+     * @param string $var
+     * @param string|bool $package
      * @return array
      */
-    public static function getVarData($group, $var)
+    public static function getVarData($group, $var, $package = false)
     {
+        $where = array(
+            'groups' => $group,
+            'var'    => $var
+        );
+
+        if (!$package) {
+            $where['package'] = $package;
+        }
+
         $result = QUI::getDataBase()->fetch(array(
             'from'  => self::table(),
-            'where' => array(
-                'groups' => $group,
-                'var'    => $var
-            )
+            'where' => $where
         ));
 
         if (!isset($result[0])) {
@@ -1104,12 +1163,13 @@ class Translator
     /**
      * Fügt eine Übersetzungsvariable hinzu
      *
-     * @param String $group
-     * @param String $var
+     * @param string $group
+     * @param string $var
+     * @param string|bool $package
      *
      * @throws QUI\Exception
      */
-    public static function add($group, $var)
+    public static function add($group, $var, $package = false)
     {
         if (empty($var) || empty($group)) {
             throw new QUI\Exception(
@@ -1120,15 +1180,16 @@ class Translator
             );
         }
 
-        $result = self::get($group, $var);
+        $result = self::get($group, $var, $package);
 
         if (isset($result[0])) {
             throw new QUI\Exception(array(
                 'quiqqer/translator',
                 'exception.var.exists',
                 array(
-                    'group' => $group,
-                    'var'   => $var
+                    'group'   => $group,
+                    'var'     => $var,
+                    'package' => $package
                 )
             ));
         }
@@ -1136,8 +1197,9 @@ class Translator
         QUI::getDataBase()->insert(
             self::table(),
             array(
-                'groups' => $group,
-                'var'    => $var
+                'groups'  => $group,
+                'var'     => $var,
+                'package' => !empty($package) ? $package : ''
             )
         );
     }
@@ -1152,17 +1214,18 @@ class Translator
     public static function addUserVar($group, $var, $data)
     {
         QUI\Translator::add($group, $var);
-        QUI\Translator::edit($group, $var, $data);
+        QUI\Translator::edit($group, $var, '', $data);
     }
 
     /**
      * Eintrag aktualisieren
      *
-     * @param String $group
-     * @param String $var
+     * @param string $group
+     * @param string $var
+     * @param string $packageName
      * @param array $data
      */
-    public static function update($group, $var, $data)
+    public static function update($group, $var, $packageName, $data)
     {
         $langs = self::langs();
         $_data = array();
@@ -1182,38 +1245,67 @@ class Translator
             $_data[$lang] = $content;
         }
 
+        $_data['html']     = 0;
+        $_data['priority'] = 0;
+        $_data['datatype'] = 'php,js';
+
         if (isset($data['datatype'])) {
             $_data['datatype'] = $data['datatype'];
         }
 
-//        if ( isset( $data[ 'datadefine' ] ) ) {
-//            $_data[ 'datadefine' ] = $data[ 'datadefine' ];
-//        }
-
-        $_data['html'] = 0;
-
-        if (isset($data['html']) && $data['html']) {
+        if (!empty($data['html'])) {
             $_data['html'] = 1;
         }
 
-        QUI::getDataBase()->update(
-            self::table(),
-            $_data,
-            array(
-                'groups' => $group,
-                'var'    => $var
-            )
-        );
+        if (!empty($data['priority'])) {
+            $_data['priority'] = (int)$data['priority'];
+        }
+
+
+        QUI::getDataBase()->update(self::table(), $_data, array(
+            'groups'  => $group,
+            'var'     => $var,
+            'package' => $packageName
+        ));
     }
 
     /**
      * User Edit
      *
-     * @param String $group
-     * @param String $var
-     * @param String $data
+     * @param string $group
+     * @param string $var
+     * @param string $packageName
+     * @param array $data
      */
-    public static function edit($group, $var, $data)
+    public static function edit($group, $var, $packageName, $data)
+    {
+        QUI::getDataBase()->update(self::table(), self::getEditData($data), array(
+            'groups'  => $group,
+            'var'     => $var,
+            'package' => $packageName
+        ));
+    }
+
+    /**
+     * User Edit with an entry id
+     *
+     * @param integer $id
+     * @param array $data
+     */
+    public static function editById($id, $data)
+    {
+        QUI::getDataBase()->update(self::table(), self::getEditData($data), array(
+            'id' => $id
+        ));
+    }
+
+    /**
+     * Prepares the data for a translation entry
+     *
+     * @param array $data
+     * @return array
+     */
+    protected static function getEditData($data)
     {
         $langs = self::langs();
         $_data = array();
@@ -1240,28 +1332,23 @@ class Translator
             $_data[$lang . '_edit'] = trim($data[$lang]);
         }
 
+        $_data['html']     = 0;
+        $_data['priority'] = 0;
+        $_data['datatype'] = 'php,js';
+
         if (isset($data['datatype'])) {
             $_data['datatype'] = $data['datatype'];
         }
 
-//        if ( isset( $data[ 'datadefine' ] ) ) {
-//            $_data[ 'datadefine' ] = $data[ 'datadefine' ];
-//        }
-
-        $_data['html'] = 0;
-
-        if (isset($data['html']) && $data['html']) {
+        if (!empty($data['html'])) {
             $_data['html'] = 1;
         }
 
-        QUI::getDataBase()->update(
-            self::table(),
-            $_data,
-            array(
-                'groups' => $group,
-                'var'    => $var
-            )
-        );
+        if (!empty($data['priority'])) {
+            $_data['priority'] = (int)$data['priority'];
+        }
+
+        return $_data;
     }
 
     /**
@@ -1282,6 +1369,19 @@ class Translator
     }
 
     /**
+     * Einen Übersetzungseintrag löschen
+     *
+     * @param integer $id
+     */
+    public static function deleteById($id)
+    {
+        QUI::getDataBase()->delete(
+            self::table(),
+            array('id' => $id)
+        );
+    }
+
+    /**
      * Welche Sprachen existieren
      *
      * @return array
@@ -1295,23 +1395,15 @@ class Translator
         $langs = array();
 
         foreach ($fields as $entry) {
-            if ($entry == 'groups') {
-                continue;
-            }
-
-            if ($entry == 'var') {
-                continue;
-            }
-
-            if ($entry == 'html') {
-                continue;
-            }
-
-            if ($entry == 'datatype') {
-                continue;
-            }
-
-            if ($entry == 'datadefine') {
+            if ($entry == 'groups'
+                || $entry == 'id'
+                || $entry == 'var'
+                || $entry == 'html'
+                || $entry == 'datatype'
+                || $entry == 'datadefine'
+                || $entry == 'package'
+                || $entry == 'priority'
+            ) {
                 continue;
             }
 
@@ -1332,23 +1424,9 @@ class Translator
      */
     public static function getNeedles()
     {
-        $fields = QUI::getDataBase()->table()->getColumns(
-            self::table()
-        );
-
-        $langs = array();
-
-        foreach ($fields as $entry) {
-            if ($entry == 'var' || $entry == 'groups' || $entry == 'html') {
-                continue;
-            }
-
-            $langs[] = $entry;
-        }
-
         $result = QUI::getDataBase()->fetch(array(
             'from'  => self::table(),
-            'where' => implode(' = "" OR ', $langs) . ' = ""'
+            'where' => implode(' = "" OR ', self::langs()) . ' = ""'
         ));
 
         return $result;
@@ -1550,9 +1628,8 @@ class Translator
      *
      * @link  http://www.gnu.org/software/gettext/manual/gettext.html#PO-Files
      *
-     * @param {String} $in
-     *
-     * @return Bool|String
+     * @param string $in
+     * @return bool|array
      */
     public static function phpmoParsePoFile($in)
     {
@@ -1685,7 +1762,7 @@ class Translator
      * @link http://www.gnu.org/software/gettext/manual/gettext.html#MO-Files
      *
      * @param array $hash
-     * @param String $out - file path
+     * @param string $out - file path
      */
     public static function phpmoWriteMoFile($hash, $out)
     {

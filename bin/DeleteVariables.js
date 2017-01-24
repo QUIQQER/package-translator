@@ -52,7 +52,8 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
                     for (var i = 0, len = data.length; i < len; i++) {
                         list.push({
                             'var'   : data[i]['var'],
-                            'groups': data[i].groups
+                            'groups': data[i].groups,
+                            'id'    : data[i].id
                         });
                     }
 

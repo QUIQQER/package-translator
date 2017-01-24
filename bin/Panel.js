@@ -30,6 +30,7 @@ define('package/quiqqer/translator/bin/Panel', [
     "Locale",
     "Editors",
     "controls/grid/Grid",
+    "controls/upload/Form",
 
     "css!package/quiqqer/translator/bin/Panel.css"
 
@@ -47,7 +48,8 @@ define('package/quiqqer/translator/bin/Panel', [
         Ajax               = arguments[7],
         Locale             = arguments[8],
         Editors            = arguments[9],
-        Grid               = arguments[10];
+        Grid               = arguments[10],
+        UploadForm         = arguments[11];
 
 
     return new Class({
@@ -416,6 +418,13 @@ define('package/quiqqer/translator/bin/Panel', [
                     langs  = translations.langs,
                     height = Body.getSize().y - 40,
                     width  = Body.getSize().x - 40;
+
+                cols.push({
+                    header   : Locale.get('quiqqer/system', 'id'),
+                    dataIndex: 'id',
+                    dataType : 'number',
+                    width    : 50
+                });
 
                 cols.push({
                     header   : Locale.get('quiqqer/translator', 'grid.title.variable'),
@@ -1124,104 +1133,94 @@ define('package/quiqqer/translator/bin/Panel', [
          * opens the importation sheet
          */
         importTranslation: function () {
-            this.Loader.show();
-
             var self    = this,
                 devMode = (QUIQQER_CONFIG.globals.development).toInt();
 
-            require(['controls/upload/Form'], function (UploadForm) {
-                var Popup = new QUIConfirm({
-                    icon     : 'fa fa-upload',
-                    title    : Locale.get('quiqqer/translator', 'import.window.title'),
-                    maxWidth : 425,
-                    maxHeight: 325,
-                    events   : {
-                        onSubmit: function () {
-                            LogoUploadForm.submit();
-                        }
-                    }
-                });
-
-                Popup.create();
-
-                var content = '<p class="qui-translator-import-descripton">' +
-                              Locale.get('quiqqer/translator', 'import.window.description') +
-                              '<p>';
-
-                if (devMode) {
-                    content += '<input type="checkbox" id="qui-translator-import-overwrite"/>' +
-                               '<label for="qui-translator-import-overwrite">' +
-                               Locale.get('quiqqer/translator', 'import.window.overwrite.label') +
-                               '</label>';
-                }
-
-                Popup.setContent(content);
-
-                var LogoUploadForm = new UploadForm({
-                    multible  : false,
-                    sendbutton: false,
-                    uploads   : 1,
-                    styles    : {
-                        clear    : 'both',
-                        float    : 'left',
-                        margin   : 0,
-                        width    : '100%',
-                        marginTop: 25
+            var LogoUploadForm = new UploadForm({
+                multible  : false,
+                sendbutton: false,
+                uploads   : 1,
+                styles    : {
+                    clear    : 'both',
+                    float    : 'left',
+                    margin   : 0,
+                    width    : '100%',
+                    marginTop: 25
+                },
+                events    : {
+                    onComplete: function () {
+                        self.Loader.hide();
+                        self.$Grid.refresh();
+                        Popup.close();
                     },
-                    events    : {
-                        onComplete: function () {
-                            self.Loader.hide();
-                            self.$Grid.refresh();
-                            Popup.close();
-                        },
 
-                        onAdd: function (Control, File) {
-                            if (typeof FileReader === 'undefined') {
-                                return;
-                            }
-
-                            var Reader = new FileReader();
-
-                            Reader.readAsDataURL(File);
-                        },
-
-                        onError: function (Control, Error) {
-                            QUI.getMessageHandler(function (MH) {
-                                MH.addError(
-                                    Error.getAttribute('message'),
-                                    self.$ImgDrop
-                                );
-                            });
-                        },
-
-                        onSubmit: function (data, Control) {
-                            self.Loader.show();
-
-                            var Overwrite = Popup.getContent().getElement('#qui-translator-import-overwrite');
-
-                            var checked = Overwrite ? Overwrite.checked : false;
-
-                            Control.setParam(
-                                'overwriteOriginal',
-                                checked ? 1 : 0
-                            );
+                    onAdd: function (Control, File) {
+                        if (typeof FileReader === 'undefined') {
+                            return;
                         }
+
+                        new FileReader().readAsDataURL(File);
+                    },
+
+                    onError: function (Control, Error) {
+                        QUI.getMessageHandler(function (MH) {
+                            MH.addError(
+                                Error.getAttribute('message'),
+                                self.$ImgDrop
+                            );
+                        });
+                    },
+
+                    onSubmit: function (data, Control) {
+                        self.Loader.show();
+
+                        var Overwrite = Popup.getContent().getElement(
+                            '#qui-translator-import-overwrite'
+                        );
+
+                        var checked = Overwrite ? Overwrite.checked : false;
+
+                        Control.setParam('overwriteOriginal', checked ? 1 : 0);
                     }
-                });
-
-                LogoUploadForm.setParam(
-                    'onfinish',
-                    'package_quiqqer_translator_ajax_import'
-                );
-
-                LogoUploadForm.setParam('package', 'quiqqer/translator');
-
-                LogoUploadForm.inject(Popup.getContent());
-
-                Popup.open();
-
-                self.Loader.hide();
+                }
             });
+
+            LogoUploadForm.setParam(
+                'onfinish',
+                'package_quiqqer_translator_ajax_import'
+            );
+
+            LogoUploadForm.setParam('package', 'quiqqer/translator');
+
+
+            new QUIConfirm({
+                icon     : 'fa fa-upload',
+                title    : Locale.get('quiqqer/translator', 'import.window.title'),
+                maxWidth : 600,
+                maxHeight: 400,
+                events   : {
+                    onOpen: function (Win) {
+                        var Content = Win.getContent();
+                        var content = '<div class="qui-translator-import-descripton">' +
+                                      Locale.get('quiqqer/translator', 'import.window.description') +
+                                      '</div>';
+
+                        if (devMode) {
+                            content += '<label for="qui-translator-import-overwrite">' +
+                                       '<input type="checkbox" id="qui-translator-import-overwrite"/>' +
+                                       Locale.get('quiqqer/translator', 'import.window.overwrite.label') +
+                                       '</label>';
+                        }
+
+                        Content.set('html', content);
+                        LogoUploadForm.inject(Content);
+                    },
+
+                    onSubmit: function () {
+                        LogoUploadForm.submit();
+                    }
+                }
+            }).open();
         },
 
         addVariable: function () {
@@ -1272,7 +1271,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 icon     : 'fa fa-plus',
                 autoclose: false,
 
-                maxHeight: 375,
+                maxHeight: 400,
                 maxWidth : 600,
                 texticon : false,
 

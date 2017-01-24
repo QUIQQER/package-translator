@@ -36,7 +36,12 @@ QUI::$Ajax->registerFunction(
         }
 
         // benutzer edit
-        QUI\Translator::edit($groups, $data['var'], $data);
+        if (isset($data['id'])) {
+            QUI\Translator::editById($data['id'], $data);
+        } else {
+            QUI\Translator::edit($groups, $data['var'], $data['package'], $data);
+        }
+
 
         QUI::getMessagesHandler()->addSuccess(
             QUI::getLocale()->get(

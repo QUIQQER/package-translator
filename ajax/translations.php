@@ -19,9 +19,7 @@ QUI::$Ajax->registerFunction(
             json_decode($search, true)
         );
 
-        $dev = QUI::conf('globals', 'development');
-
-        if (!$dev) {
+        if (!QUI::conf('globals', 'development')) {
             foreach ($data['data'] as $key => $entry) {
                 foreach ($langs as $lang) {
                     if (isset($entry[$lang])
@@ -35,7 +33,7 @@ QUI::$Ajax->registerFunction(
         }
 
         $result = array(
-            'data' => $data,
+            'data'  => $data,
             'langs' => $langs
         );
 
