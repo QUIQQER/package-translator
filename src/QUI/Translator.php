@@ -1122,7 +1122,7 @@ class Translator
             'var'    => $var
         );
 
-        if (!$package) {
+        if (!empty($package)) {
             $where['package'] = $package;
         }
 
