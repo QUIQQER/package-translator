@@ -42,11 +42,12 @@ define('package/quiqqer/translator/bin/controls/Create', [
         ],
 
         options: {
-            'group' : false,
-            'var'   : false,
-            datatype: 'php,js',
-            html    : false,
-            data    : {}
+            'group'  : false,
+            'var'    : false,
+            'package': false,
+            datatype : 'php,js',
+            html     : false,
+            data     : {}
         },
 
         initialize: function (options) {
@@ -85,12 +86,14 @@ define('package/quiqqer/translator/bin/controls/Create', [
             var self = this,
                 data = this.getData();
 
+            data.package  = this.getAttribute('package');
             data.datatype = this.getAttribute('datatype');
             data.html     = this.getAttribute('html') ? 1 : 0;
 
             return Translate.add(
                 this.getAttribute('group'),
-                this.getAttribute('var')
+                this.getAttribute('var'),
+                this.getAttribute('package')
             ).then(function () {
                 return Translate.setTranslation(
                     self.getAttribute('group'),
@@ -183,7 +186,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     Container = new Element('div', {
                         'class': 'quiqqer-translator-create-entry',
                         html   : '<img src="' + path + lang + '.png" />' +
-                                 '<input type="text" name="' + lang + '" />'
+                        '<input type="text" name="' + lang + '" />'
                     }).inject(Elm);
 
                     if (i > 0) {
