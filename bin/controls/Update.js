@@ -117,7 +117,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
                     Container = new Element('div', {
                         'class': 'quiqqer-translator-create-entry',
                         html   : '<img src="' + path + lang + '.png" />' +
-                                 '<input type="text" name="' + lang + '" />'
+                        '<input type="text" name="' + lang + '" />'
                     }).inject(Elm);
 
                     if (i > 0) {
@@ -155,7 +155,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
             }, {
                 'package': 'quiqqer/translator',
                 'group'  : this.getAttribute('group'),
-                'var'    : this.getAttribute('var')
+                'var'    : this.getAttribute('var'),
+                'pkg'    : this.getAttribute('package')
             });
         },
 
@@ -168,6 +169,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
             var self = this,
                 data = this.getData();
 
+            data.package  = this.getAttribute('package');
             data.datatype = this.getAttribute('datatype');
             data.html     = this.getAttribute('html') ? 1 : 0;
 
@@ -191,7 +193,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
                     return Translate.add(
                         self.getAttribute('group'),
                         self.getAttribute('var'),
-                        data
+                        self.getAttribute('package')
                     ).then(function () {
                         return Translate.refreshLocale();
 

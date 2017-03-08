@@ -78,16 +78,22 @@ define('package/quiqqer/translator/bin/classes/Translator', [
          *
          * @param {String} group
          * @param {String} varName
+         * @param {String} [pkg]
          * @returns {Promise}
          */
-        add: function (group, varName) {
+        add: function (group, varName, pkg) {
+            if (typeof pkg === 'undefined') {
+                pkg = group;
+            }
+
             return new Promise(function (resolve, reject) {
                 QUIAjax.post('package_quiqqer_translator_ajax_add', resolve, {
                     'package'  : 'quiqqer/translator',
                     'onError'  : reject,
                     'showError': false,
                     'group'    : group,
-                    'var'      : varName
+                    'var'      : varName,
+                    'pkg'      : pkg
                 });
             });
         },
@@ -97,7 +103,7 @@ define('package/quiqqer/translator/bin/classes/Translator', [
          *
          * @param {String} group
          * @param {String} varName
-         * @param {Object} data - {'en' : 'English text', 'de' : 'German text'}
+         * @param {Object} data - {'en' : 'English text', 'de' : 'German text', package : ''}
          * @return {Promise}
          */
         setTranslation: function (group, varName, data) {

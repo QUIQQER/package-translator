@@ -10,9 +10,9 @@
  */
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_getVarData',
-    function ($group, $var) {
-        return QUI\Translator::getVarData($group, $var);
+    function ($group, $var, $pkg) {
+        return QUI\Translator::getVarData($group, $var, $pkg);
     },
-    array('group', 'var'),
+    array('group', 'var', 'pkg'),
     'Permission::checkAdminUser'
 );
