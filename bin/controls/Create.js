@@ -140,10 +140,15 @@ define('package/quiqqer/translator/bin/controls/Create', [
          */
         getData: function () {
             var result = {},
-                list   = this.getElm().getElements('input');
+                list   = this.getElm().getElements('input'),
+                dev    = parseInt(QUIQQER_CONFIG.globals.development);
 
             for (var i = 0, len = list.length; i < len; i++) {
                 result[list[i].name] = list[i].value;
+
+                if (dev) {
+                    result[list[i].name + '_edit'] = list[i].value;
+                }
             }
 
             return result;
