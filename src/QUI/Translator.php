@@ -640,7 +640,7 @@ class Translator
         $js_langs = array();
         $Output   = false;
 
-        if (class_exists('Output')) {
+        if (class_exists('QUI\Output')) {
             $Output = new Output();
         }
 
@@ -808,7 +808,7 @@ class Translator
         $dir    = self::dir();
         $Output = false;
 
-        if (class_exists('Output')) {
+        if (class_exists('QUI\Output')) {
             $Output = new Output();
         }
         
