@@ -107,10 +107,10 @@ class Translator
 
         // Alle Gruppen
         if ($group === 'all') {
-            $groups = self::getGroupList();
+            $groups   = self::getGroupList();
             $fileName .= '_all';
         } else {
-            $groups = array($group);
+            $groups   = array($group);
             $fileName .= '_' . str_replace('/', '_', $group);
         }
 
@@ -638,6 +638,11 @@ class Translator
         }
 
         $js_langs = array();
+        $Output   = false;
+
+        if (class_exists('Output')) {
+            $Output = new Output();
+        }
 
         // Sprachdateien erstellen
         foreach ($langs as $lang) {
@@ -683,6 +688,14 @@ class Translator
 
                 if (isset($entry[$lang . '_edit']) && !empty($entry[$lang . '_edit'])) {
                     $value = $entry[$lang . '_edit']; // benutzer übersetzung
+                }
+
+                if ($Output) {
+                    $value = $Output->parse($value);
+                }
+
+                if ($entry['var'] == 'footer.box.1') {
+                    QUI\System\Log::writeRecursive($value);
                 }
 
                 $value = str_replace('\\', '\\\\', $value);
@@ -791,9 +804,14 @@ class Translator
      */
     public static function publish($group)
     {
-        $langs = self::langs();
-        $dir   = self::dir();
+        $langs  = self::langs();
+        $dir    = self::dir();
+        $Output = false;
 
+        if (class_exists('Output')) {
+            $Output = new Output();
+        }
+        
         foreach ($langs as $lang) {
             if (strlen($lang) !== 2) {
                 continue;
@@ -839,6 +857,10 @@ class Translator
 
                 if (isset($data[$lang . '_edit']) && !empty($data[$lang . '_edit'])) {
                     $value = $data[$lang . '_edit'];
+                }
+
+                if ($Output) {
+                    $value = $Output->parse($value);
                 }
 
                 if ($data['datatype'] == 'js') {
@@ -1800,7 +1822,7 @@ class Translator
                 strlen($str)
             );
             // plural msgids are not stored (?)
-            $ids .= $id . "\x00";
+            $ids     .= $id . "\x00";
             $strings .= $str . "\x00";
         }
 
