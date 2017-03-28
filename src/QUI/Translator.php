@@ -694,10 +694,6 @@ class Translator
                     $value = $Output->parse($value);
                 }
 
-                if ($entry['var'] == 'footer.box.1') {
-                    QUI\System\Log::writeRecursive($value);
-                }
-
                 $value = str_replace('\\', '\\\\', $value);
                 $value = str_replace('"', '\"', $value);
                 $value = str_replace("\n", '', $value);
@@ -811,7 +807,7 @@ class Translator
         if (class_exists('QUI\Output')) {
             $Output = new Output();
         }
-        
+
         foreach ($langs as $lang) {
             if (strlen($lang) !== 2) {
                 continue;
