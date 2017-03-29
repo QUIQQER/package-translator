@@ -1231,8 +1231,14 @@ class Translator
      */
     public static function addUserVar($group, $var, $data)
     {
-        QUI\Translator::add($group, $var);
-        QUI\Translator::edit($group, $var, '', $data);
+        $package = false;
+
+        if (isset($data['package'])) {
+            $package = $data['package'];
+        }
+
+        QUI\Translator::add($group, $var, $package);
+        QUI\Translator::edit($group, $var, $package, $data);
     }
 
     /**
