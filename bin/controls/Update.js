@@ -127,12 +127,12 @@ define('package/quiqqer/translator/bin/controls/Update', [
                         });
                     }
 
-                    if (lang + '_edit' in data && data[lang + '_edit'] !== '') {
-                        Container.getElement('input').value = data[lang + '_edit'];
-                    }
-
                     if (lang in data && data[lang] !== '') {
                         Container.getElement('input').value = data[lang];
+                    }
+
+                    if (lang + '_edit' in data && data[lang + '_edit'] !== '') {
+                        Container.getElement('input').value = data[lang + '_edit'];
                     }
                 }
 
