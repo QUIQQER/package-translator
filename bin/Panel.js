@@ -7,7 +7,7 @@
  * @require qui/QUI
  * @require qui/controls/desktop/Panel
  * @require qui/controls/buttons/Button
- * @require qui/controls/buttons/Seperator
+ * @require qui/controls/buttons/Separator
  * @require qui/controls/buttons/Select
  * @require qui/controls/windows/Confirm
  * @require qui/utils/Elements
@@ -22,7 +22,7 @@ define('package/quiqqer/translator/bin/Panel', [
     "qui/QUI",
     "qui/controls/desktop/Panel",
     "qui/controls/buttons/Button",
-    "qui/controls/buttons/Seperator",
+    "qui/controls/buttons/Separator",
     "qui/controls/buttons/Select",
     "qui/controls/windows/Confirm",
     "qui/utils/Elements",
@@ -40,7 +40,7 @@ define('package/quiqqer/translator/bin/Panel', [
     var QUI                = arguments[0],
         QUIPanel           = arguments[1],
         QUIButton          = arguments[2],
-        QUIButtonSeperator = arguments[3],
+        QUIButtonSeparator = arguments[3],
         QUISelect          = arguments[4],
         QUIConfirm         = arguments[5],
         QUIElementUtils    = arguments[6],
@@ -231,34 +231,34 @@ define('package/quiqqer/translator/bin/Panel', [
                 devMode = (QUIQQER_CONFIG.globals.development).toInt(),
 
                 content = '<div class="qui-translator-export-group">' +
-                          '<h3>' + Locale.get('quiqqer/translator', 'export.window.group') + '</h3>' +
-                          '<input id="qui-translator-export-group-current" type="radio" name="export_group" value="' + group + '" checked="checked"/>' +
-                          '<label for="qui-translator-export-group-current">' +
-                          Locale.get('quiqqer/translator', 'export.window.group.current.label', {group: group}) +
-                          '</label>' +
-                          '<input id="qui-translator-export-group-all" type="radio" name="export_group" value="all"/>' +
-                          '<label for="qui-translator-export-group-all">' +
-                          Locale.get('quiqqer/translator', 'export.window.group.all.label', {count: this.$groupcount}) +
-                          '</label>' +
-                          '</div>' +
-                          '<div class="qui-translator-export-language">' +
-                          '<h3>' + Locale.get('quiqqer/translator', 'export.window.language') + '</h3>' +
-                          '</div>' +
-                          '<div class="qui-translator-export-type">' +
-                          '<h3>' + Locale.get('quiqqer/translator', 'export.window.type') + '</h3>' +
-                          '<input id="qui-translator-export-type-original" type="radio" name="export_type" value="original" checked="checked"/>' +
-                          '<label for="qui-translator-export-type-original">' +
-                          Locale.get('quiqqer/translator', 'export.window.type.original.label') +
-                          '</label>' +
-                          '<input id="qui-translator-export-type-edit" type="radio" name="export_type" value="edit"/>' +
-                          '<label for="qui-translator-export-type-edit">' +
-                          Locale.get('quiqqer/translator', 'export.window.type.edit.label') +
-                          '</label>' +
-                          '<input id="qui-translator-export-type-edit-overwrite" type="checkbox" name="export_type_overwrite" checked="checked"/>' +
-                          '<label for="qui-translator-export-type-edit-overwrite">' +
-                          Locale.get('quiqqer/translator', 'export.window.type.edit.overwrite.label') +
-                          '</label>' +
-                          '</div>';
+                    '<h3>' + Locale.get('quiqqer/translator', 'export.window.group') + '</h3>' +
+                    '<input id="qui-translator-export-group-current" type="radio" name="export_group" value="' + group + '" checked="checked"/>' +
+                    '<label for="qui-translator-export-group-current">' +
+                    Locale.get('quiqqer/translator', 'export.window.group.current.label', {group: group}) +
+                    '</label>' +
+                    '<input id="qui-translator-export-group-all" type="radio" name="export_group" value="all"/>' +
+                    '<label for="qui-translator-export-group-all">' +
+                    Locale.get('quiqqer/translator', 'export.window.group.all.label', {count: this.$groupcount}) +
+                    '</label>' +
+                    '</div>' +
+                    '<div class="qui-translator-export-language">' +
+                    '<h3>' + Locale.get('quiqqer/translator', 'export.window.language') + '</h3>' +
+                    '</div>' +
+                    '<div class="qui-translator-export-type">' +
+                    '<h3>' + Locale.get('quiqqer/translator', 'export.window.type') + '</h3>' +
+                    '<input id="qui-translator-export-type-original" type="radio" name="export_type" value="original" checked="checked"/>' +
+                    '<label for="qui-translator-export-type-original">' +
+                    Locale.get('quiqqer/translator', 'export.window.type.original.label') +
+                    '</label>' +
+                    '<input id="qui-translator-export-type-edit" type="radio" name="export_type" value="edit"/>' +
+                    '<label for="qui-translator-export-type-edit">' +
+                    Locale.get('quiqqer/translator', 'export.window.type.edit.label') +
+                    '</label>' +
+                    '<input id="qui-translator-export-type-edit-overwrite" type="checkbox" name="export_type_overwrite" checked="checked"/>' +
+                    '<label for="qui-translator-export-type-edit-overwrite">' +
+                    Locale.get('quiqqer/translator', 'export.window.type.edit.overwrite.label') +
+                    '</label>' +
+                    '</div>';
 
             var ConfirmWindow = new QUIConfirm({
                 title   : Locale.get('quiqqer/translator', 'export.window.title'),
@@ -594,7 +594,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 }
             });
 
-            this.addButton(new QUIButtonSeperator());
+            this.addButton(new QUIButtonSeparator());
 
             this.addButton(
                 new QUISelect({
@@ -660,7 +660,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 })
             );
 
-            this.addButton(new QUIButtonSeperator());
+            this.addButton(new QUIButtonSeparator());
 
             this.addButton({
                 name     : 'import',
@@ -682,7 +682,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 }
             });
 
-            this.addButton(new QUIButtonSeperator());
+            this.addButton(new QUIButtonSeparator());
 
             this.addButton({
                 name     : 'publish',
@@ -923,7 +923,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 dev    = (QUIQQER_CONFIG.globals.development).toInt();
 
             if (!dev && (Column.dataIndex === 'html' ||
-                         Column.dataIndex === 'datatype')
+                Column.dataIndex === 'datatype')
             ) {
                 return;
             }
@@ -981,34 +981,97 @@ define('package/quiqqer/translator/bin/Panel', [
                     lines: [
                         [[
 
-                            {type: 'button', button: 'Source'},
-                            {type: "seperator"},
-                            {type: "button", button: "Bold"},
-                            {type: "button", button: "Italic"},
-                            {type: "button", button: "Underline"},
-                            {type: "button", button: "Strike"},
-                            {type: "button", button: "Subscript"},
-                            {type: "button", button: "Superscript"},
-                            {type: "seperator"},
-                            {type: "button", button: "RemoveFormat"},
-                            {type: "seperator"},
-                            {type: "button", button: "NumberedList"},
-                            {type: "button", button: "BulletedList"},
-                            {type: "seperator"},
-                            {type: "button", button: "Outdent"},
-                            {type: "button", button: "Indent"},
-                            {type: "seperator"},
-                            {type: "button", button: "Blockquote"},
-                            {type: "button", button: "CreateDiv"},
-                            {type: "seperator"},
-                            {type: "button", button: "JustifyLeft"},
-                            {type: "button", button: "JustifyCenter"},
-                            {type: "button", button: "JustifyRight"},
-                            {type: "button", button: "JustifyBlock"},
-                            {type: "seperator"},
-                            {type: "button", button: "Link"},
-                            {type: "button", button: "Unlink"},
-                            {type: "button", button: "Image"}
+                            {
+                                type  : 'button',
+                                button: 'Source'
+                            },
+                            {type: "separator"},
+                            {
+                                type  : "button",
+                                button: "Bold"
+                            },
+                            {
+                                type  : "button",
+                                button: "Italic"
+                            },
+                            {
+                                type  : "button",
+                                button: "Underline"
+                            },
+                            {
+                                type  : "button",
+                                button: "Strike"
+                            },
+                            {
+                                type  : "button",
+                                button: "Subscript"
+                            },
+                            {
+                                type  : "button",
+                                button: "Superscript"
+                            },
+                            {type: "separator"},
+                            {
+                                type  : "button",
+                                button: "RemoveFormat"
+                            },
+                            {type: "separator"},
+                            {
+                                type  : "button",
+                                button: "NumberedList"
+                            },
+                            {
+                                type  : "button",
+                                button: "BulletedList"
+                            },
+                            {type: "separator"},
+                            {
+                                type  : "button",
+                                button: "Outdent"
+                            },
+                            {
+                                type  : "button",
+                                button: "Indent"
+                            },
+                            {type: "separator"},
+                            {
+                                type  : "button",
+                                button: "Blockquote"
+                            },
+                            {
+                                type  : "button",
+                                button: "CreateDiv"
+                            },
+                            {type: "separator"},
+                            {
+                                type  : "button",
+                                button: "JustifyLeft"
+                            },
+                            {
+                                type  : "button",
+                                button: "JustifyCenter"
+                            },
+                            {
+                                type  : "button",
+                                button: "JustifyRight"
+                            },
+                            {
+                                type  : "button",
+                                button: "JustifyBlock"
+                            },
+                            {type: "separator"},
+                            {
+                                type  : "button",
+                                button: "Link"
+                            },
+                            {
+                                type  : "button",
+                                button: "Unlink"
+                            },
+                            {
+                                type  : "button",
+                                button: "Image"
+                            }
 
                         ]]
                     ]
@@ -1202,14 +1265,14 @@ define('package/quiqqer/translator/bin/Panel', [
                     onOpen: function (Win) {
                         var Content = Win.getContent();
                         var content = '<div class="qui-translator-import-descripton">' +
-                                      Locale.get('quiqqer/translator', 'import.window.description') +
-                                      '</div>';
+                            Locale.get('quiqqer/translator', 'import.window.description') +
+                            '</div>';
 
                         if (devMode) {
                             content += '<label for="qui-translator-import-overwrite">' +
-                                       '<input type="checkbox" id="qui-translator-import-overwrite"/>' +
-                                       Locale.get('quiqqer/translator', 'import.window.overwrite.label') +
-                                       '</label>';
+                                '<input type="checkbox" id="qui-translator-import-overwrite"/>' +
+                                Locale.get('quiqqer/translator', 'import.window.overwrite.label') +
+                                '</label>';
                         }
 
                         Content.set('html', content);
@@ -1227,42 +1290,42 @@ define('package/quiqqer/translator/bin/Panel', [
             var self = this;
 
             var content = '<div class="qui-translator-add-variable">' +
-                          '<h3>' +
-                          Locale.get('quiqqer/translator', 'add.window.text', {
-                              group: this.getTranslationGroup()
-                          }) +
-                          '</h3>' +
-                          '<span class="qui-translator-add-variable-group">' +
-                          Locale.get('quiqqer/translator', 'add.window.group', {
-                              group: this.getTranslationGroup()
-                          }) +
-                          '</span>' +
-                          '<div class="qui-translator-add-variable-labels">' +
-                          '<label for="qui-translator-add-variable-maingroup">' +
-                          Locale.get('quiqqer/translator', 'add.window.maingroup.label') +
-                          '</label>' +
-                          '<label for="qui-translator-add-variable-subgroup">' +
-                          Locale.get('quiqqer/translator', 'add.window.subgroup.label') +
-                          '</label>' +
-                          '<label for="qui-translator-add-variable-variable">' +
-                          Locale.get('quiqqer/translator', 'add.window.variable.label') +
-                          '</label>' +
-                          '</div>' +
-                          '<div class="qui-translator-add-variable-inputs">' +
-                          '<input type="text" name="qui-translator-add-variable-maingroup"' +
-                          ' placeholder="' +
-                          Locale.get('quiqqer/translator', 'add.window.maingroup.placeholder') +
-                          '" id="qui-translator-add-variable-group"/>' +
-                          '<input type="text" name="qui-translator-add-variable-subgroup"' +
-                          ' placeholder="' +
-                          Locale.get('quiqqer/translator', 'add.window.subgroup.placeholder') +
-                          '" id="qui-translator-add-variable-group"/>' +
-                          '<input type="text" name="qui-translator-add-variable-variable"' +
-                          ' placeholder="' +
-                          Locale.get('quiqqer/translator', 'add.window.variable.placeholder') +
-                          '" id="qui-translator-add-variable-variable"/>' +
-                          '</div>' +
-                          '</div>';
+                '<h3>' +
+                Locale.get('quiqqer/translator', 'add.window.text', {
+                    group: this.getTranslationGroup()
+                }) +
+                '</h3>' +
+                '<span class="qui-translator-add-variable-group">' +
+                Locale.get('quiqqer/translator', 'add.window.group', {
+                    group: this.getTranslationGroup()
+                }) +
+                '</span>' +
+                '<div class="qui-translator-add-variable-labels">' +
+                '<label for="qui-translator-add-variable-maingroup">' +
+                Locale.get('quiqqer/translator', 'add.window.maingroup.label') +
+                '</label>' +
+                '<label for="qui-translator-add-variable-subgroup">' +
+                Locale.get('quiqqer/translator', 'add.window.subgroup.label') +
+                '</label>' +
+                '<label for="qui-translator-add-variable-variable">' +
+                Locale.get('quiqqer/translator', 'add.window.variable.label') +
+                '</label>' +
+                '</div>' +
+                '<div class="qui-translator-add-variable-inputs">' +
+                '<input type="text" name="qui-translator-add-variable-maingroup"' +
+                ' placeholder="' +
+                Locale.get('quiqqer/translator', 'add.window.maingroup.placeholder') +
+                '" id="qui-translator-add-variable-group"/>' +
+                '<input type="text" name="qui-translator-add-variable-subgroup"' +
+                ' placeholder="' +
+                Locale.get('quiqqer/translator', 'add.window.subgroup.placeholder') +
+                '" id="qui-translator-add-variable-group"/>' +
+                '<input type="text" name="qui-translator-add-variable-variable"' +
+                ' placeholder="' +
+                Locale.get('quiqqer/translator', 'add.window.variable.placeholder') +
+                '" id="qui-translator-add-variable-variable"/>' +
+                '</div>' +
+                '</div>';
 
             var ConfirmWindow = new QUIConfirm({
                 title    : Locale.get('quiqqer/translator', 'add.window.title', {
