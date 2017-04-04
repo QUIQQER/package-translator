@@ -1231,10 +1231,21 @@ class Translator
      */
     public static function addUserVar($group, $var, $data)
     {
-        $package = false;
+        $package     = false;
+        $development = QUI::conf('globals', 'development');
 
         if (isset($data['package'])) {
             $package = $data['package'];
+        }
+
+        if ($development) {
+            $langs = self::langs();
+
+            foreach ($langs as $lang) {
+                if (!isset($data[$lang . '_edit'])) {
+                    $data[$lang . '_edit'] = $data[$lang];
+                }
+            }
         }
 
         QUI\Translator::add($group, $var, $package);
