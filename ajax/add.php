@@ -9,13 +9,13 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_add',
     function ($group, $var, $pkg) {
-        $group = str_replace('/', '!GROUPSEPERATOR!', $group);
+        $group = str_replace('/', '!GROUPSEPARATOR!', $group);
         $group = QUI\Utils\Security\Orthos::clear($group);
-        $group = str_replace('!GROUPSEPERATOR!', '/', $group);
+        $group = str_replace('!GROUPSEPARATOR!', '/', $group);
 
-        $var = str_replace('/', '!GROUPSEPERATOR!', $var);
+        $var = str_replace('/', '!GROUPSEPARATOR!', $var);
         $var = QUI\Utils\Security\Orthos::clear($var);
-        $var = str_replace('!GROUPSEPERATOR!', '/', $var);
+        $var = str_replace('!GROUPSEPARATOR!', '/', $var);
 
         QUI\Translator::add($group, $var, $pkg);
 

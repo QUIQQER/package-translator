@@ -10,9 +10,9 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_export',
     function ($group, $langs, $type) {
-        $group = str_replace('/', '!GROUPSEPERATOR!', $group);
+        $group = str_replace('/', '!GROUPSEPARATOR!', $group);
         $group = QUI\Utils\Security\Orthos::clear($group);
-        $group = str_replace('!GROUPSEPERATOR!', '/', $group);
+        $group = str_replace('!GROUPSEPARATOR!', '/', $group);
 
         $langs = QUI\Utils\Security\Orthos::clearArray(
             json_decode($langs, true)
