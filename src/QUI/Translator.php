@@ -1242,7 +1242,7 @@ class Translator
             $langs = self::langs();
 
             foreach ($langs as $lang) {
-                if (!isset($data[$lang . '_edit'])) {
+                if (!isset($data[$lang . '_edit']) && isset($data[$lang])) {
                     $data[$lang . '_edit'] = $data[$lang];
                 }
             }
