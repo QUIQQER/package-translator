@@ -326,12 +326,18 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
 
     <groups name="quiqqer/translator" datatype="php,js">
         <locale name="package.title">
-            <de><![CDATA[Sprachvariablen]]></de>
-            <en><![CDATA[Translations]]></en>
+            <de><![CDATA[QUIQQER - Sprachvariablen]]></de>
+            <en><![CDATA[QUIQQER - Translations]]></en>
         </locale>
         <locale name="package.description">
-            <de><![CDATA[Sprachvariablen]]></de>
-            <en><![CDATA[Translations]]></en>
+            <de><![CDATA[
+            Das quiqqer/translation Paket erweitert QUIQQER um ein Übersetzungs-Panel und Übersetzungsfunktionen.<br />
+            Mit dem quiqqer/translator ist es möglich, Übersetzungsvariablen zu editieren / hinzuzufügen oder zu löschen.
+            ]]></de>
+            <en><![CDATA[
+            The quiqqer/translation package expands QUIQQER with a translation panel and translation features. <br />
+            With the quiqqer / translator it is possible to edit / add or delete translation variables.
+            ]]></en>
         </locale>
     </groups>
 
