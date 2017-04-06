@@ -325,7 +325,7 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
     </groups>
 
     <groups name="quiqqer/translator" datatype="php,js">
-        <locale name="package.name">
+        <locale name="package.title">
             <de><![CDATA[Sprachvariablen]]></de>
             <en><![CDATA[Translations]]></en>
         </locale>
