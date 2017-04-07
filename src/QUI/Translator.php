@@ -396,7 +396,7 @@ class Translator
         $overwriteOriginal = 0,
         $devModeIgnore = false
     ) {
-        $file = $Package->getDir() . 'locale.xml';
+        $file = $Package->getXMLFile('locale.xml');
 
         if (!file_exists($file)) {
             return;
@@ -787,6 +787,10 @@ class Translator
         // clean cache dir of js files
         QUI::getTemp()->moveToTemp($dir . '/bin/_cache/');
 
+        if (method_exists(QUI::getLocale(), 'refresh')) {
+            QUI::getLocale()->refresh();
+        }
+
 
         if (!empty($exec_error)) {
             QUI::getMessagesHandler()->addError($exec_error);
@@ -937,6 +941,10 @@ class Translator
 
         // clean cache dir of js files
         QUI::getTemp()->moveToTemp($dir . '/bin/_cache/');
+
+        if (method_exists(QUI::getLocale(), 'refresh')) {
+            QUI::getLocale()->refresh($group);
+        }
     }
 
     /**
