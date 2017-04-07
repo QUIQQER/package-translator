@@ -943,7 +943,7 @@ class Translator
         QUI::getTemp()->moveToTemp($dir . '/bin/_cache/');
 
         if (method_exists(QUI::getLocale(), 'refresh')) {
-            QUI::getLocale()->refresh($group);
+            QUI::getLocale()->refresh();
         }
     }
 
