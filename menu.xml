@@ -5,6 +5,6 @@
           require="package/quiqqer/translator/bin/Panel"
           icon="URL_BIN_DIR/16x16/flags/default.png"
     >
-        <locale group="quiqqer/translator" var="package.name" />
+        <locale group="quiqqer/translator" var="package.title"/>
     </item>
 </menu>
