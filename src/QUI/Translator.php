@@ -679,7 +679,9 @@ class Translator
                 }
 
                 // if php,js
-                if (strpos($entry['datatype'], 'js') !== false) {
+                if (strpos($entry['datatype'], 'js') !== false
+                    || empty($entry['datatype'])
+                ) {
                     $js_langs[$entry['groups']][$lang][] = $entry;
                 }
 
@@ -869,7 +871,9 @@ class Translator
                 }
 
                 // php und js beachten
-                if (strpos($data['datatype'], 'js') !== false) {
+                if (strpos($data['datatype'], 'js') !== false
+                    || empty($entry['datatype'])
+                ) {
                     $javaScriptValues[$data['var']] = $value;
                 }
 
