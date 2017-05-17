@@ -39,6 +39,10 @@ QUI::$Ajax->registerFunction(
         if (isset($data['id'])) {
             QUI\Translator::editById($data['id'], $data);
         } else {
+            if (!isset($data['package'])) {
+                $data['package'] = '';
+            }
+
             QUI\Translator::edit($groups, $data['var'], $data['package'], $data);
         }
 
