@@ -339,6 +339,10 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             With the quiqqer / translator it is possible to edit / add or delete translation variables.
             ]]></en>
         </locale>
+        <locale name="package.menu.title">
+            <de><![CDATA[Sprachvariablen]]></de>
+            <en><![CDATA[Translations]]></en>
+        </locale>
     </groups>
 
 </locales>
