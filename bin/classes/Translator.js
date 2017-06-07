@@ -99,6 +99,26 @@ define('package/quiqqer/translator/bin/classes/Translator', [
         },
 
         /**
+         * Return the data of a variable
+         *
+         * @param group
+         * @param varName
+         * @param pkg
+         * @return {Promise}
+         */
+        get: function (group, varName, pkg) {
+            return new Promise(function (resolve, reject) {
+                QUIAjax.get('package_quiqqer_translator_ajax_getVarData', resolve, {
+                    'package': 'quiqqer/translator',
+                    'onError': reject,
+                    'group'  : group,
+                    'var'    : varName,
+                    'pkg'    : pkg
+                });
+            });
+        },
+
+        /**
          * Set a translation vor a translation variable
          *
          * @param {String} group
