@@ -793,6 +793,7 @@ class Translator
             QUI::getLocale()->refresh();
         }
 
+        Cache\Manager::clearAll();
 
         if (!empty($exec_error)) {
             QUI::getMessagesHandler()->addError($exec_error);
@@ -945,7 +946,8 @@ class Translator
 
         // clean cache dir of js files
         QUI::getTemp()->moveToTemp($dir.'/bin/_cache/');
-
+        Cache\Manager::clearAll();
+        
         if (method_exists(QUI::getLocale(), 'refresh')) {
             QUI::getLocale()->refresh();
         }
@@ -1429,7 +1431,7 @@ class Translator
         if (file_exists(VAR_DIR.'locale/localefiles')) {
             unlink(VAR_DIR.'locale/localefiles');
         }
-        
+
         QUI::getDataBase()->delete(
             self::table(),
             array('id' => $id)
