@@ -331,12 +331,10 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
         </locale>
         <locale name="package.description">
             <de><![CDATA[
-            Das quiqqer/translation Paket erweitert QUIQQER um ein Übersetzungs-Panel und Übersetzungsfunktionen.<br />
-            Mit dem quiqqer/translator ist es möglich, Übersetzungsvariablen zu editieren / hinzuzufügen oder zu löschen.
+            QUIQQER’s Übersetzer hilft Ihnen Ihre Seite multilingual anzubieten.
             ]]></de>
             <en><![CDATA[
-            The quiqqer/translation package expands QUIQQER with a translation panel and translation features. <br />
-            With the quiqqer / translator it is possible to edit / add or delete translation variables.
+            QUIQQER's translator helps you to offer your site multilingual.
             ]]></en>
         </locale>
         <locale name="package.menu.title">
