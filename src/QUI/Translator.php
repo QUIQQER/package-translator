@@ -624,7 +624,7 @@ class Translator
 
         // Sprach Ordner erstellen
         $folders = array();
-        
+
         foreach ($langs as $lang) {
             $lcMessagePath = $dir.'/'.StringHelper::toLower($lang);
             $lcMessagePath .= '_'.StringHelper::toUpper($lang);
@@ -1194,15 +1194,17 @@ class Translator
     }
 
     /**
-     * Fügt eine Übersetzungsvariable hinzu
+     * Add a translation variable
      *
      * @param string $group
      * @param string $var
-     * @param string|bool $package
+     * @param string|bool $package = default = false
+     * @param string $dataType - default = php,js
+     * @param integer|bool $html - default = false
      *
      * @throws QUI\Exception
      */
-    public static function add($group, $var, $package = false)
+    public static function add($group, $var, $package = false, $dataType = 'php,js', $html = false)
     {
         if (empty($var) || empty($group)) {
             throw new QUI\Exception(
@@ -1227,12 +1229,32 @@ class Translator
             ));
         }
 
+        // cleanup datatype
+        $types    = array();
+        $dataType = explode(',', $dataType);
+
+        foreach ($dataType as $type) {
+            switch ($type) {
+                case 'php':
+                case 'js':
+                    $types[] = $type;
+                    break;
+            }
+        }
+
+        if (empty($types)) {
+            $types = array('php', 'js');
+        }
+
+        // insert data
         QUI::getDataBase()->insert(
             self::table(),
             array(
-                'groups'  => $group,
-                'var'     => $var,
-                'package' => !empty($package) ? $package : ''
+                'groups'   => $group,
+                'var'      => $var,
+                'package'  => !empty($package) ? $package : '',
+                'datatype' => implode(',', $types),
+                'html'     => $html ? 1 : 0
             )
         );
     }

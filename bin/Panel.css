@@ -82,37 +82,27 @@
     margin-bottom: 10px;
 }
 
-.qui-translator-add-variable-labels {
-    float: left;
-    padding: 10px;
-    width: 35%;
+.qui-translator-add-variable-text {
+    margin-bottom: 20px;
 }
 
-.qui-translator-add-variable-inputs {
-    float: left;
-    padding: 10px;
-    width: 65%;
+.qui-translator-add-variable .data-table {
+    border: none;
 }
 
-.qui-translator-add-variable-group {
-    float: left;
-    line-height: 33px;
-    margin-bottom: 10px;
-    width: 100%;
+.qui-translator-add-variable .data-table td {
+    padding-left: 0;
+    padding-right: 0;
 }
 
-.qui-translator-add-variable h3 {
-    margin: 0 0 15px 0;
-}
-
-.qui-translator-add-variable input {
-    float: left;
-    margin-top: 5px;
-}
-
-.qui-translator-add-variable label {
-    clear: both;
+.qui-translator-add-variable .field-container-field button {
+    border-radius: 0;
+    box-shadow: none;
     float: right;
-    line-height: 33px;
-    margin-top: 5px;
+    height: 34px;
+}
+
+.group-display-text {
+    float: left;
+    padding: 8px;
 }

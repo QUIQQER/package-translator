@@ -112,8 +112,8 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
                 <p>If you also want to add a new group, just edit the main or sub group.</p>]]></en>
         </locale>
         <locale name="add.window.group" html="true">
-            <de><![CDATA[Gruppe: <b>[group]</b>]]></de>
-            <en><![CDATA[Group: <b>[group]</b>]]></en>
+            <de><![CDATA[Gruppe]]></de>
+            <en><![CDATA[Group]]></en>
         </locale>
         <locale name="add.window.maingroup.placeholder">
             <de><![CDATA[Hauptgruppe]]></de>
@@ -139,6 +139,31 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <de><![CDATA[Übersetzungsvariable]]></de>
             <en><![CDATA[Translation variable]]></en>
         </locale>
+        <locale name="add.window.js.label">
+            <de><![CDATA[JavaScript]]></de>
+            <en><![CDATA[JavaScript]]></en>
+        </locale>
+        <locale name="add.window.js.desc">
+            <de><![CDATA[Für JavaScript verfügbar machen.]]></de>
+            <en><![CDATA[Make available to JavaScript.]]></en>
+        </locale>
+        <locale name="add.window.php.label">
+            <de><![CDATA[PHP]]></de>
+            <en><![CDATA[PHP]]></en>
+        </locale>
+        <locale name="add.window.php.desc">
+            <de><![CDATA[Für PHP verfügbar machen.]]></de>
+            <en><![CDATA[Make available to PHP.]]></en>
+        </locale>
+        <locale name="add.window.html.label">
+            <de><![CDATA[HTML]]></de>
+            <en><![CDATA[HTML]]></en>
+        </locale>
+        <locale name="add.window.html.desc">
+            <de><![CDATA[HTML ist in der Variable erlaubt.]]></de>
+            <en><![CDATA[HTML is allowed in the variable.]]></en>
+        </locale>
+
         <locale name="add.window.btn.close">
             <de><![CDATA[schließen]]></de>
             <en><![CDATA[close]]></en>

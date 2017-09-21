@@ -22,8 +22,7 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
     return function (Translator, data) {
         var i, len;
 
-        var message = Locale.get('quiqqer/translator', 'del.window.text') +
-                      '<ul style="margin-top: 10px">';
+        var message = '<ul style="margin-top: 10px">';
 
         for (i = 0, len = data.length; i < len; i++) {
             message = message + '<li>' + data[i].groups + ' ' + data[i]['var'] + '</li>';
@@ -34,15 +33,18 @@ define('package/quiqqer/translator/bin/DeleteVariables', [
         new QUIConfirm({
             name       : 'del_sel_items',
             title      : Locale.get('quiqqer/translator', 'del.window.title'),
-            icon       : 'fa fa-trash',
-            width      : 500,
-            height     : 200,
-            text       : message,
+            maxWidth   : 600,
+            maxHeight  : 400,
+            text       : Locale.get('quiqqer/translator', 'del.window.text'),
             data       : data,
-            textIcon   : 'fa fa-trash',
-            information: Locale.get('quiqqer/translator', 'del.window.text.information'),
-
-            events: {
+            texticon   : 'fa fa-trash',
+            icon       : 'fa fa-trash',
+            information: message + Locale.get('quiqqer/translator', 'del.window.text.information'),
+            ok_button  : {
+                text     : Locale.get('quiqqer/system', 'delete'),
+                textimage: 'fa fa-trash'
+            },
+            events     : {
                 onSubmit: function (Win) {
                     Win.Loader.show();
 
