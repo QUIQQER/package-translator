@@ -85,6 +85,10 @@ class Translator
                 $lang.'_edit' => 'text NULL'
             )
         );
+
+        if (file_exists(VAR_DIR.'locale/localefiles')) {
+            unlink(VAR_DIR.'locale/localefiles');
+        }
     }
 
     /**
