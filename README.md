@@ -3,8 +3,8 @@
 QUIQQER Translator
 ========
 
-The quiqqer / translation package extends QUIQQER with a translation panel and translation functions.
-With the quiqqer / translator it is possible to edit / add or delete translation variables.
+The quiqqer/translation package extends QUIQQER with a translation panel and translation functions.
+With the quiqqer/translator it is possible to edit / add or delete translation variables.
 In addition, translations (locale.xml files) can be imported and exported.
 
 Translations are stored in different formats, so that translations can be used for high performance.
