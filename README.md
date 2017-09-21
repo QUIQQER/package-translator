@@ -1,3 +1,5 @@
+![QUIQQER Translator](bin/images/Readme.jpg)
+
 QUIQQER Übersetzer (Translator)
 ========
 

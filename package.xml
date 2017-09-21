@@ -10,6 +10,11 @@
 
         <image src="URL_OPT_DIR/quiqqer/package-translator/bin/images/Logo.jpg"/>
 
+        <preview>
+            <image src="URL_OPT_DIR/quiqqer/quiqqer/bin/images/screenshot1.png"/>
+            <image src="URL_OPT_DIR/quiqqer/quiqqer/bin/images/screenshot2.png"/>
+        </preview>
+
         <support>
             <email>support@pcsg.de</email>
             <forum>https://community.quiqqer.com</forum>
