@@ -623,9 +623,8 @@ class Translator
         $dir   = self::dir();
 
         // Sprach Ordner erstellen
-        $folders    = array();
-        $exec_error = array();
-
+        $folders = array();
+        
         foreach ($langs as $lang) {
             $lcMessagePath = $dir.'/'.StringHelper::toLower($lang);
             $lcMessagePath .= '_'.StringHelper::toUpper($lang);
@@ -794,10 +793,6 @@ class Translator
         }
 
         Cache\Manager::clearAll();
-
-        if (!empty($exec_error)) {
-            QUI::getMessagesHandler()->addError($exec_error);
-        }
     }
 
     /**
@@ -947,7 +942,7 @@ class Translator
         // clean cache dir of js files
         QUI::getTemp()->moveToTemp($dir.'/bin/_cache/');
         Cache\Manager::clearAll();
-        
+
         if (method_exists(QUI::getLocale(), 'refresh')) {
             QUI::getLocale()->refresh();
         }
@@ -1013,17 +1008,23 @@ class Translator
         $limit = ($page * $max).','.$max;
 
         // PDO search emptyTranslations
-        if ($search && isset($search['emptyTranslations'])
-            && $search['emptyTranslations']
-        ) {
-            $PDO = QUI::getPDO();
+        if ($search && isset($search['emptyTranslations']) && $search['emptyTranslations']) {
+            $PDO    = QUI::getPDO();
+            $fields = array();
 
             // search empty translations
+            if (isset($search['fields']) && !empty($search['fields'])) {
+                $fields = array_flip($search['fields']);
+            }
+
             $whereParts = array();
 
             foreach ($db_fields as $field) {
-                $whereParts[]
-                    = "(
+                if (!empty($fields) && !isset($fields[$field])) {
+                    continue;
+                }
+
+                $whereParts[] = "(
                     ({$field} = '' OR {$field} IS NULL) AND
                     ({$field}_edit = '' OR {$field}_edit IS NULL)
                 )";

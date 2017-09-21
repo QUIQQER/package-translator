@@ -1409,13 +1409,17 @@ define('package/quiqqer/translator/bin/Panel', [
 
                 if (emptyTranslations.checked) {
                     Array.each(elements, function (Elm) {
-                        if (Elm.name == 'emptyTranslations') {
+                        if (Elm.name === 'emptyTranslations') {
+                            return;
+                        }
+
+                        if (Elm.name === 'lang') {
                             return;
                         }
 
                         Elm.disabled = true;
 
-                        if (Elm.type == 'checkbox') {
+                        if (Elm.type === 'checkbox') {
                             Elm.checked = false;
                         } else {
                             Elm.value = '';
@@ -1423,18 +1427,17 @@ define('package/quiqqer/translator/bin/Panel', [
                     });
 
                     elements.search.blur();
-
                     return;
                 }
 
                 Array.each(elements, function (Elm) {
-                    if (Elm.name == 'emptyTranslations') {
+                    if (Elm.name === 'emptyTranslations') {
                         return;
                     }
 
                     Elm.disabled = false;
 
-                    if (Elm.type == 'checkbox') {
+                    if (Elm.type === 'checkbox') {
                         Elm.checked = true;
                     }
 
@@ -1467,7 +1470,7 @@ define('package/quiqqer/translator/bin/Panel', [
                     }
 
                     // language
-                    if (fields[i].length == 2 &&
+                    if (fields[i].length === 2 &&
                         Form.getElement('[value="' + fields[i] + '"]')) {
                         Form.getElement('[value="' + fields[i] + '"]').checked = true;
                     }

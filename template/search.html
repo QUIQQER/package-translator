@@ -1,98 +1,124 @@
-
 <form name="translater-search" class="qui-translater-search-form" method="post">
 
-    <table class="data-table">
-    <thead>
+    <table class="data-table data-table-flexbox site-data">
+        <thead>
         <tr>
             <th>
                 {t}quiqqer/translator template.search.to.title{/t}
             </th>
         </tr>
-    </thead>
-    <tbody>
-        <tr class="odd">
+        </thead>
+        <tbody>
+        <tr>
             <td>
-                <label>
-                    <input type="text" value="" name="search" class="qui-translater-search-field" />
-                    {t}quiqqer/translator template.search.field.text{/t}
+                <label class="field-container">
+                    <span class="field-container-item">
+                        {t}quiqqer/translator template.search.field.text{/t}
+                    </span>
+                    <input type="text" value="" name="search" class="field-container-field"/>
                 </label>
             </td>
         </tr>
-        <tr class="even">
+        <tr>
             <td>
-                <label>
-                    <input type="checkbox" value="" name="emptyTranslations" />
-                    {t}quiqqer/translator template.search.emptyTranslations.text{/t}
+                <label class="field-container">
+                    <span class="field-container-item">
+                        {t}quiqqer/translator template.search.emptyTranslations.text{/t}
+                    </span>
+                    <span class="field-container-field">
+                        <input type="checkbox"
+                               value=""
+                               name="emptyTranslations"
+                        />
+                    </span>
                 </label>
             </td>
         </tr>
-    </tbody>
+        </tbody>
     </table>
 
-    <table class="data-table">
-    <thead>
+    <table class="data-table data-table-flexbox site-data">
+        <thead>
         <tr>
             <th>
                 {t}quiqqer/translator template.search.in.title{/t}
             </th>
         </tr>
-    </thead>
-    <tbody>
-        <tr class="odd">
+        </thead>
+        <tbody>
+        <tr>
             <td>
-                <label>
-                    <input type="checkbox" value="" name="groups" />
-                    {t}quiqqer/translator template.search.groups{/t}
+                <label class="field-container">
+                    <span class="field-container-item">
+                        {t}quiqqer/translator template.search.groups{/t}
+                    </span>
+                    <span class="field-container-field">
+                        <input type="checkbox" value="" name="groups"/>
+                    </span>
                 </label>
             </td>
         </tr>
-        <tr class="even">
+        <tr>
             <td>
-                <label>
-                    <input type="checkbox" value="" name="var" />
-                    {t}quiqqer/translator template.search.vars{/t}
+                <label class="field-container">
+                    <span class="field-container-item">
+                        {t}quiqqer/translator template.search.vars{/t}
+                    </span>
+                    <span class="field-container-field">
+                        <input type="checkbox" value="" name="var"/>
+                    </span>
                 </label>
             </td>
         </tr>
-        <tr class="odd">
+        <tr>
             <td>
-                <label>
-                    <input type="checkbox" value="" name="datatype" />
-                    {t}quiqqer/translator template.search.datatype{/t}
+                <label class="field-container">
+                    <span class="field-container-item">
+                        {t}quiqqer/translator template.search.datatype{/t}
+                    </span>
+                    <span class="field-container-field">
+                        <input type="checkbox" value="" name="datatype"/>
+                    </span>
                 </label>
             </td>
         </tr>
-        <tr class="even">
+        <tr>
             <td>
-                <label>
-                    <input type="checkbox" value="" name="datadefine" />
-                    {t}quiqqer/translator template.search.datadefine{/t}
+                <label class="field-container">
+                    <span class="field-container-item">
+                        {t}quiqqer/translator template.search.datadefine{/t}
+                    </span>
+                    <span class="field-container-field">
+                        <input type="checkbox" value="" name="datadefine"/>
+                    </span>
                 </label>
             </td>
         </tr>
-    </tbody>
+        </tbody>
     </table>
 
-    <table class="data-table">
-    <thead>
-    <tr>
-        <th>
-            {t}quiqqer/translator template.search.lang.title{/t}
-        </th>
-    </tr>
-    </thead>
-    <tbody>
+    <table class="data-table data-table-flexbox site-data">
+        <thead>
+        <tr>
+            <th>
+                {t}quiqqer/translator template.search.lang.title{/t}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
         {foreach from=$languages item=lang}
-        <tr class="{cycle values="odd,even"}">
+        <tr>
             <td>
-                <label>
-                    <input type="checkbox" value="{$lang}" name="lang" />
-                    {$lang}
+                <label class="field-container">
+                    <span class="field-container-item">{$lang}</span>
+                    <span class="field-container-field">
+                        <input type="checkbox" value="{$lang}" name="lang"/>
+                    </span>
                 </label>
             </td>
         </tr>
         {/foreach}
-    </tbody>
+        </tbody>
     </table>
 
 </form>
