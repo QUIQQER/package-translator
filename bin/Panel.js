@@ -761,7 +761,14 @@ define('package/quiqqer/translator/bin/Panel', [
                     return;
                 }
 
-                if (Sel1.firstChild()) {
+                // load projects if exists
+                var hasProjects = Sel1.getChildren().filter(function (Child) {
+                    return Child.getAttribute('value') === 'project';
+                }).length;
+
+                if (hasProjects) {
+                    Sel1.setValue('project');
+                } else if (Sel1.firstChild()) {
                     Sel1.setValue(
                         Sel1.firstChild().getAttribute('value')
                     );
