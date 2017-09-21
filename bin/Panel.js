@@ -923,7 +923,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 dev    = (QUIQQER_CONFIG.globals.development).toInt();
 
             if (!dev && (Column.dataIndex === 'html' ||
-                Column.dataIndex === 'datatype')
+                    Column.dataIndex === 'datatype')
             ) {
                 return;
             }
@@ -975,108 +975,6 @@ define('package/quiqqer/translator/bin/Panel', [
                 }).inject(Content);
 
                 self.$EditorContainer = EditorContainer;
-
-                // minimal toolbar
-                self.$Editor.setAttribute('buttons', {
-                    lines: [
-                        [[
-
-                            {
-                                type  : 'button',
-                                button: 'Source'
-                            },
-                            {type: "separator"},
-                            {
-                                type  : "button",
-                                button: "Bold"
-                            },
-                            {
-                                type  : "button",
-                                button: "Italic"
-                            },
-                            {
-                                type  : "button",
-                                button: "Underline"
-                            },
-                            {
-                                type  : "button",
-                                button: "Strike"
-                            },
-                            {
-                                type  : "button",
-                                button: "Subscript"
-                            },
-                            {
-                                type  : "button",
-                                button: "Superscript"
-                            },
-                            {type: "separator"},
-                            {
-                                type  : "button",
-                                button: "RemoveFormat"
-                            },
-                            {type: "separator"},
-                            {
-                                type  : "button",
-                                button: "NumberedList"
-                            },
-                            {
-                                type  : "button",
-                                button: "BulletedList"
-                            },
-                            {type: "separator"},
-                            {
-                                type  : "button",
-                                button: "Outdent"
-                            },
-                            {
-                                type  : "button",
-                                button: "Indent"
-                            },
-                            {type: "separator"},
-                            {
-                                type  : "button",
-                                button: "Blockquote"
-                            },
-                            {
-                                type  : "button",
-                                button: "CreateDiv"
-                            },
-                            {type: "separator"},
-                            {
-                                type  : "button",
-                                button: "JustifyLeft"
-                            },
-                            {
-                                type  : "button",
-                                button: "JustifyCenter"
-                            },
-                            {
-                                type  : "button",
-                                button: "JustifyRight"
-                            },
-                            {
-                                type  : "button",
-                                button: "JustifyBlock"
-                            },
-                            {type: "separator"},
-                            {
-                                type  : "button",
-                                button: "Link"
-                            },
-                            {
-                                type  : "button",
-                                button: "Unlink"
-                            },
-                            {
-                                type  : "button",
-                                button: "Image"
-                            }
-
-                        ]]
-                    ]
-                });
-
                 self.$Editor.setAttribute('showLoader', false);
 
                 self.$Editor.addEvent('onLoaded', function () {
