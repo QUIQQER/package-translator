@@ -1,19 +1,19 @@
 ![QUIQQER Translator](bin/images/Readme.jpg)
 
-QUIQQER Übersetzer (Translator)
+QUIQQER Translator
 ========
 
-Das quiqqer/translation Paket erweitert QUIQQER um ein Übersetzungs-Panel und Übersetzungsfunktionen.
-Mit dem quiqqer/translator ist es möglich, Übersetzungsvariablen zu editieren / hinzuzufügen oder zu löschen.
-Zusätzlich können Übersetzungen (locale.xml Dateien) importiert und exportiert werden.
+The quiqqer / translation package extends QUIQQER with a translation panel and translation functions.
+With the quiqqer / translator it is possible to edit / add or delete translation variables.
+In addition, translations (locale.xml files) can be imported and exported.
 
-Übersetzungen werden in verschiedene Formate gespeichert, damit Übersetzungen performant eingesetzt werden können.
-JavaScript- (Client) und PHP- (Server) Variablen werden getrennt aufbereitet und zur Verfügung gestellt.
+Translations are stored in different formats, so that translations can be used for high performance.
+JavaScript (client) and PHP (server) variables are processed separately and made available.
 
-Es wird versucht, auf gettext (http://php.net/manual/de/book.gettext.php) zurückzugreifen,
-wenn dies der Server nicht unterstützt werden normale ini Dateien verwendet.
+An attempt is made to access gettext (http://php.net/manual/de/book.gettext.php)
+if this is not supported the server will use normal ini files.
 
-Paketname:
+Package name:
 
     quiqqer/translator
 
@@ -21,17 +21,16 @@ Paketname:
 Features
 --------
 
-- Übersetzungs-Verwaltung
-- Übersetzer API (XML, PHP, JavaScript)
-
+- Translation Management
+- Translator API (XML, PHP, JavaScript)
 
 Installation
 ------------
 
-Der Paketname ist: quiqqer/translator
+The package name is: quiqqer/translator
 
 
-Mitwirken
+Contribute
 ----------
 
 - Issue Tracker: https://dev.quiqqer.com/quiqqer/package-translator/issues
@@ -41,10 +40,11 @@ Mitwirken
 Support
 -------
 
-Falls Sie Fehler gefunden, Wünsche oder Verbesserungsvorschläge haben, 
-können Sie uns gern per Mail an support@pcsg.de darüber informieren.  
-Wir werden versuchen auf Ihre Wünsche einzugehen bzw. diese an die 
-zuständigen Entwickler des Projektes weiterleiten.
+If you have found errors, wishes or suggestions for improvement,
+you can contact us by email at support@pcsg.de.
+
+We will try to meet your needs or send them to the responsible developers
+of the project.
 
 
 License
