@@ -184,10 +184,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 return Translate.publish(
                     self.getAttribute('group')
                 );
-
             }, function (err) {
-
-                if (err.getCode() == 404 &&
+                if (err.getCode() === 404 &&
                     self.getAttribute('createIfNotExists')) {
 
                     return Translate.add(

@@ -3,11 +3,6 @@
  *
  * @module package/quiqqer/translator/bin/AddVariable
  * @author www.pcsg.de (Henning Leutz)
- *
- * @require package/quiqqer/translator/bin/Panel
- * @require Locale
- * @require Ajax
- * @require qui/controls/windows/Prompt
  */
 define('package/quiqqer/translator/bin/AddVariable', [
 

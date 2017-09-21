@@ -10,10 +10,12 @@
             <en><![CDATA[Translations have been imported successfully.]]></en>
         </locale>
         <locale name="exception.import.wrong.format">
-            <de>
-                <![CDATA[Die Datei [file] hat ein falsches Format. Bitte verwenden Sie nur über den Sprachvariablen-Export erstellte Dateien]]></de>
-            <en>
-                <![CDATA[The file [file] has a wrong format. Please only use files created via the export function of the Translator.]]></en>
+            <de><![CDATA[
+            Die Datei [file] hat ein falsches Format. Bitte verwenden Sie nur über den Sprachvariablen-Export erstellte Dateien
+            ]]></de>
+            <en><![CDATA[
+            The file [file] has a wrong format. Please only use files created via the export function of the Translator.
+            ]]></en>
         </locale>
         <locale name="exception.file.could.not.read">
             <de><![CDATA[Datei konnte nicht gelesen werden]]></de>
@@ -112,8 +114,8 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
                 <p>If you also want to add a new group, just edit the main or sub group.</p>]]></en>
         </locale>
         <locale name="add.window.group" html="true">
-            <de><![CDATA[Gruppe: <b>[group]</b>]]></de>
-            <en><![CDATA[Group: <b>[group]</b>]]></en>
+            <de><![CDATA[Gruppe]]></de>
+            <en><![CDATA[Group]]></en>
         </locale>
         <locale name="add.window.maingroup.placeholder">
             <de><![CDATA[Hauptgruppe]]></de>
@@ -139,6 +141,31 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <de><![CDATA[Übersetzungsvariable]]></de>
             <en><![CDATA[Translation variable]]></en>
         </locale>
+        <locale name="add.window.js.label">
+            <de><![CDATA[JavaScript]]></de>
+            <en><![CDATA[JavaScript]]></en>
+        </locale>
+        <locale name="add.window.js.desc">
+            <de><![CDATA[Für JavaScript verfügbar machen.]]></de>
+            <en><![CDATA[Make available to JavaScript.]]></en>
+        </locale>
+        <locale name="add.window.php.label">
+            <de><![CDATA[PHP]]></de>
+            <en><![CDATA[PHP]]></en>
+        </locale>
+        <locale name="add.window.php.desc">
+            <de><![CDATA[Für PHP verfügbar machen.]]></de>
+            <en><![CDATA[Make available to PHP.]]></en>
+        </locale>
+        <locale name="add.window.html.label">
+            <de><![CDATA[HTML]]></de>
+            <en><![CDATA[HTML]]></en>
+        </locale>
+        <locale name="add.window.html.desc">
+            <de><![CDATA[HTML ist in der Variable erlaubt.]]></de>
+            <en><![CDATA[HTML is allowed in the variable.]]></en>
+        </locale>
+
         <locale name="add.window.btn.close">
             <de><![CDATA[schließen]]></de>
             <en><![CDATA[close]]></en>
@@ -329,14 +356,28 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <de><![CDATA[QUIQQER - Sprachvariablen]]></de>
             <en><![CDATA[QUIQQER - Translations]]></en>
         </locale>
-        <locale name="package.description">
+        <locale name="package.description" html="true">
             <de><![CDATA[
-            Das quiqqer/translation Paket erweitert QUIQQER um ein Übersetzungs-Panel und Übersetzungsfunktionen.<br />
+            <p>Das quiqqer/translation Paket erweitert QUIQQER um ein Übersetzungs-Panel und Übersetzungsfunktionen.
             Mit dem quiqqer/translator ist es möglich, Übersetzungsvariablen zu editieren / hinzuzufügen oder zu löschen.
+            Zusätzlich können Übersetzungen (locale.xml Dateien) importiert und exportiert werden.</p>
+
+            <p>Übersetzungen werden in verschiedene Formate gespeichert, damit Übersetzungen performant eingesetzt werden können.
+            JavaScript- (Client) und PHP- (Server) Variablen werden getrennt aufbereitet und zur Verfügung gestellt.</p>
+
+            <p>Es wird versucht, auf gettext (http://php.net/manual/de/book.gettext.php) zurückzugreifen,
+            wenn dies der Server nicht unterstützt werden normale ini Dateien verwendet.</p>
             ]]></de>
             <en><![CDATA[
-            The quiqqer/translation package expands QUIQQER with a translation panel and translation features. <br />
-            With the quiqqer / translator it is possible to edit / add or delete translation variables.
+            <p>The quiqqer/translation package extends QUIQQER with a translation panel and translation functions.
+            With the quiqqer/translator it is possible to edit / add or delete translation variables.
+            In addition, translations (locale.xml files) can be imported and exported.</p>
+
+            <p>Translations are stored in different formats, so that translations can be used for high performance.
+            JavaScript (client) and PHP (server) variables are processed separately and made available.</p>
+
+            <p>An attempt is made to access gettext (http://php.net/manual/de/book.gettext.php)
+            if this is not supported the server will use normal ini files.</p>
             ]]></en>
         </locale>
         <locale name="package.menu.title">

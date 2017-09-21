@@ -85,6 +85,10 @@ class Translator
                 $lang.'_edit' => 'text NULL'
             )
         );
+
+        if (file_exists(VAR_DIR.'locale/localefiles')) {
+            unlink(VAR_DIR.'locale/localefiles');
+        }
     }
 
     /**
@@ -623,8 +627,7 @@ class Translator
         $dir   = self::dir();
 
         // Sprach Ordner erstellen
-        $folders    = array();
-        $exec_error = array();
+        $folders = array();
 
         foreach ($langs as $lang) {
             $lcMessagePath = $dir.'/'.StringHelper::toLower($lang);
@@ -794,10 +797,6 @@ class Translator
         }
 
         Cache\Manager::clearAll();
-
-        if (!empty($exec_error)) {
-            QUI::getMessagesHandler()->addError($exec_error);
-        }
     }
 
     /**
@@ -947,7 +946,7 @@ class Translator
         // clean cache dir of js files
         QUI::getTemp()->moveToTemp($dir.'/bin/_cache/');
         Cache\Manager::clearAll();
-        
+
         if (method_exists(QUI::getLocale(), 'refresh')) {
             QUI::getLocale()->refresh();
         }
@@ -1013,17 +1012,23 @@ class Translator
         $limit = ($page * $max).','.$max;
 
         // PDO search emptyTranslations
-        if ($search && isset($search['emptyTranslations'])
-            && $search['emptyTranslations']
-        ) {
-            $PDO = QUI::getPDO();
+        if ($search && isset($search['emptyTranslations']) && $search['emptyTranslations']) {
+            $PDO    = QUI::getPDO();
+            $fields = array();
 
             // search empty translations
+            if (isset($search['fields']) && !empty($search['fields'])) {
+                $fields = array_flip($search['fields']);
+            }
+
             $whereParts = array();
 
             foreach ($db_fields as $field) {
-                $whereParts[]
-                    = "(
+                if (!empty($fields) && !isset($fields[$field])) {
+                    continue;
+                }
+
+                $whereParts[] = "(
                     ({$field} = '' OR {$field} IS NULL) AND
                     ({$field}_edit = '' OR {$field}_edit IS NULL)
                 )";
@@ -1193,15 +1198,17 @@ class Translator
     }
 
     /**
-     * Fügt eine Übersetzungsvariable hinzu
+     * Add a translation variable
      *
      * @param string $group
      * @param string $var
-     * @param string|bool $package
+     * @param string|bool $package = default = false
+     * @param string $dataType - default = php,js
+     * @param integer|bool $html - default = false
      *
      * @throws QUI\Exception
      */
-    public static function add($group, $var, $package = false)
+    public static function add($group, $var, $package = false, $dataType = 'php,js', $html = false)
     {
         if (empty($var) || empty($group)) {
             throw new QUI\Exception(
@@ -1226,12 +1233,32 @@ class Translator
             ));
         }
 
+        // cleanup datatype
+        $types    = array();
+        $dataType = explode(',', $dataType);
+
+        foreach ($dataType as $type) {
+            switch ($type) {
+                case 'php':
+                case 'js':
+                    $types[] = $type;
+                    break;
+            }
+        }
+
+        if (empty($types)) {
+            $types = array('php', 'js');
+        }
+
+        // insert data
         QUI::getDataBase()->insert(
             self::table(),
             array(
-                'groups'  => $group,
-                'var'     => $var,
-                'package' => !empty($package) ? $package : ''
+                'groups'   => $group,
+                'var'      => $var,
+                'package'  => !empty($package) ? $package : '',
+                'datatype' => implode(',', $types),
+                'html'     => $html ? 1 : 0
             )
         );
     }
