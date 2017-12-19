@@ -295,15 +295,10 @@ class Translator
         }
 
         if (empty($groups)) {
-            throw new QUI\Exception(
-                QUI::getLocale()->get(
-                    'quiqqer/translator',
-                    'exception.import.wrong.format',
-                    array('file' => $file)
-                )
-            );
+            return array();
         }
 
+        
         set_time_limit(ini_get('max_execution_time'));
 
         foreach ($groups as $locales) {
@@ -411,12 +406,36 @@ class Translator
             return;
         }
 
-        self::import(
-            $file,
-            $overwriteOriginal,
-            $devModeIgnore,
-            $Package->getName()
-        );
+        $files = [$file];
+
+        try {
+            $Dom      = XML::getDomFromXml($file);
+            $fileList = $Dom->getElementsByTagName('file');
+
+            /** @var \DOMElement $File */
+            foreach ($fileList as $File) {
+                $filePath = $Package->getDir().ltrim($File->getAttribute('file'), '/');
+
+                if (file_exists($filePath)) {
+                    $files[] = $filePath;
+                }
+            }
+        } catch (QUI\Exception $Exception) {
+        }
+
+        if ($Package->getName() === 'quiqqer/quiqqer') {
+            QUI\System\Log::writeRecursive($files);
+        }
+
+        // import
+        foreach ($files as $file) {
+            self::import(
+                $file,
+                $overwriteOriginal,
+                $devModeIgnore,
+                $Package->getName()
+            );
+        }
     }
 
     /**
