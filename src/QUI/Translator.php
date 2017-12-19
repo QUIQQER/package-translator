@@ -27,8 +27,10 @@ use QUI\Utils\System\File as QUIFile;
  */
 class Translator
 {
+    const ERROR_CODE_VAR_EXISTS = 601;
+
     /**
-     *
+     * @var string
      */
     const EXPORT_DIR = 'translator_exports/';
 
@@ -336,6 +338,9 @@ class Translator
                 try {
                     self::add($group, $var, $packageName);
                 } catch (QUI\Exception $Exception) {
+                    if ($Exception->getCode() !== self::ERROR_CODE_VAR_EXISTS) {
+                        QUI\System\Log::writeException($Exception);
+                    }
                 }
 
                 // test if group exists
@@ -1222,15 +1227,18 @@ class Translator
         $result = self::get($group, $var, $package);
 
         if (isset($result[0])) {
-            throw new QUI\Exception(array(
-                'quiqqer/translator',
-                'exception.var.exists',
+            throw new QUI\Exception(
                 array(
-                    'group'   => $group,
-                    'var'     => $var,
-                    'package' => $package
-                )
-            ));
+                    'quiqqer/translator',
+                    'exception.var.exists',
+                    array(
+                        'group'   => $group,
+                        'var'     => $var,
+                        'package' => $package
+                    )
+                ),
+                self::ERROR_CODE_VAR_EXISTS
+            );
         }
 
         // cleanup datatype
