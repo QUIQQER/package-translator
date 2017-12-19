@@ -298,7 +298,7 @@ class Translator
             return array();
         }
 
-        
+
         set_time_limit(ini_get('max_execution_time'));
 
         foreach ($groups as $locales) {
@@ -406,7 +406,12 @@ class Translator
             return;
         }
 
-        $files = [$file];
+        self::import(
+            $file,
+            $overwriteOriginal,
+            $devModeIgnore,
+            $Package->getName()
+        );
 
         try {
             $Dom      = XML::getDomFromXml($file);
@@ -414,23 +419,25 @@ class Translator
 
             /** @var \DOMElement $File */
             foreach ($fileList as $File) {
-                $filePath = $Package->getDir().ltrim($File->getAttribute('file'), '/');
+                $filePath    = $Package->getDir().ltrim($File->getAttribute('file'), '/');
+                $packageName = $Package->getName();
 
-                if (file_exists($filePath)) {
-                    $files[] = $filePath;
+                if ($File->hasAttribute('package')) {
+                    $packageName = $File->getAttribute('package');
                 }
+
+                if (!file_exists($filePath)) {
+                    continue;
+                }
+
+                self::import(
+                    $filePath,
+                    $overwriteOriginal,
+                    $devModeIgnore,
+                    $packageName
+                );
             }
         } catch (QUI\Exception $Exception) {
-        }
-
-        // import
-        foreach ($files as $file) {
-            self::import(
-                $file,
-                $overwriteOriginal,
-                $devModeIgnore,
-                $Package->getName()
-            );
         }
     }
 
