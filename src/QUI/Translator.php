@@ -423,10 +423,6 @@ class Translator
         } catch (QUI\Exception $Exception) {
         }
 
-        if ($Package->getName() === 'quiqqer/quiqqer') {
-            QUI\System\Log::writeRecursive($files);
-        }
-
         // import
         foreach ($files as $file) {
             self::import(
