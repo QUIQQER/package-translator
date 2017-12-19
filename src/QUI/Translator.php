@@ -27,8 +27,10 @@ use QUI\Utils\System\File as QUIFile;
  */
 class Translator
 {
+    const ERROR_CODE_VAR_EXISTS = 601;
+
     /**
-     *
+     * @var string
      */
     const EXPORT_DIR = 'translator_exports/';
 
@@ -293,15 +295,10 @@ class Translator
         }
 
         if (empty($groups)) {
-            throw new QUI\Exception(
-                QUI::getLocale()->get(
-                    'quiqqer/translator',
-                    'exception.import.wrong.format',
-                    array('file' => $file)
-                )
-            );
+            return array();
         }
 
+        
         set_time_limit(ini_get('max_execution_time'));
 
         foreach ($groups as $locales) {
@@ -336,6 +333,9 @@ class Translator
                 try {
                     self::add($group, $var, $packageName);
                 } catch (QUI\Exception $Exception) {
+                    if ($Exception->getCode() !== self::ERROR_CODE_VAR_EXISTS) {
+                        QUI\System\Log::writeException($Exception);
+                    }
                 }
 
                 // test if group exists
@@ -406,12 +406,36 @@ class Translator
             return;
         }
 
-        self::import(
-            $file,
-            $overwriteOriginal,
-            $devModeIgnore,
-            $Package->getName()
-        );
+        $files = [$file];
+
+        try {
+            $Dom      = XML::getDomFromXml($file);
+            $fileList = $Dom->getElementsByTagName('file');
+
+            /** @var \DOMElement $File */
+            foreach ($fileList as $File) {
+                $filePath = $Package->getDir().ltrim($File->getAttribute('file'), '/');
+
+                if (file_exists($filePath)) {
+                    $files[] = $filePath;
+                }
+            }
+        } catch (QUI\Exception $Exception) {
+        }
+
+        if ($Package->getName() === 'quiqqer/quiqqer') {
+            QUI\System\Log::writeRecursive($files);
+        }
+
+        // import
+        foreach ($files as $file) {
+            self::import(
+                $file,
+                $overwriteOriginal,
+                $devModeIgnore,
+                $Package->getName()
+            );
+        }
     }
 
     /**
@@ -1222,15 +1246,18 @@ class Translator
         $result = self::get($group, $var, $package);
 
         if (isset($result[0])) {
-            throw new QUI\Exception(array(
-                'quiqqer/translator',
-                'exception.var.exists',
+            throw new QUI\Exception(
                 array(
-                    'group'   => $group,
-                    'var'     => $var,
-                    'package' => $package
-                )
-            ));
+                    'quiqqer/translator',
+                    'exception.var.exists',
+                    array(
+                        'group'   => $group,
+                        'var'     => $var,
+                        'package' => $package
+                    )
+                ),
+                self::ERROR_CODE_VAR_EXISTS
+            );
         }
 
         // cleanup datatype
