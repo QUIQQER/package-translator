@@ -27,8 +27,10 @@ use QUI\Utils\System\File as QUIFile;
  */
 class Translator
 {
+    const ERROR_CODE_VAR_EXISTS = 601;
+
     /**
-     *
+     * @var string
      */
     const EXPORT_DIR = 'translator_exports/';
 
@@ -120,8 +122,8 @@ class Translator
 
         $fileName .= '_'.mb_substr(md5(microtime()), 0, 6).'.xml';
 
-        $result = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $result .= '<locales>'."\n";
+        $result = '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL;
+        $result .= '<locales>'.PHP_EOL;
 
         foreach ($groups as $grp) {
             $result .= self::createXMLContent($grp, $langs, $type);
@@ -176,7 +178,7 @@ class Translator
         $result = '';
 
         foreach ($pool as $type => $entries) {
-            $result .= '<groups name="'.$group.'" datatype="'.$type.'">'."\n";
+            $result .= '<groups name="'.$group.'" datatype="'.$type.'">'.PHP_EOL;
 
             foreach ($entries as $entry) {
                 $result .= "\t".'<locale name="'.$entry['var'].'"';
@@ -189,7 +191,7 @@ class Translator
                     $result .= ' priority="'.(int)$entry['priority'].'"';
                 }
 
-                $result .= '>'."\n";
+                $result .= '>'.PHP_EOL;
 
                 foreach ($langs as $lang) {
                     $result .= "\t\t".'<'.$lang.'>';
@@ -224,13 +226,13 @@ class Translator
                             }
                     }
 
-                    $result .= ']]></'.$lang.'>'."\n";
+                    $result .= ']]></'.$lang.'>'.PHP_EOL;
                 }
 
-                $result .= "\t".'</locale>'."\n";
+                $result .= "\t".'</locale>'.PHP_EOL;
             }
 
-            $result .= '</groups>'."\n";
+            $result .= '</groups>'.PHP_EOL;
         }
 
         return $result;
@@ -293,14 +295,9 @@ class Translator
         }
 
         if (empty($groups)) {
-            throw new QUI\Exception(
-                QUI::getLocale()->get(
-                    'quiqqer/translator',
-                    'exception.import.wrong.format',
-                    array('file' => $file)
-                )
-            );
+            return array();
         }
+
 
         set_time_limit(ini_get('max_execution_time'));
 
@@ -336,6 +333,9 @@ class Translator
                 try {
                     self::add($group, $var, $packageName);
                 } catch (QUI\Exception $Exception) {
+                    if ($Exception->getCode() !== self::ERROR_CODE_VAR_EXISTS) {
+                        QUI\System\Log::writeException($Exception);
+                    }
                 }
 
                 // test if group exists
@@ -412,6 +412,33 @@ class Translator
             $devModeIgnore,
             $Package->getName()
         );
+
+        try {
+            $Dom      = XML::getDomFromXml($file);
+            $fileList = $Dom->getElementsByTagName('file');
+
+            /** @var \DOMElement $File */
+            foreach ($fileList as $File) {
+                $filePath    = $Package->getDir().ltrim($File->getAttribute('file'), '/');
+                $packageName = $Package->getName();
+
+                if ($File->hasAttribute('package')) {
+                    $packageName = $File->getAttribute('package');
+                }
+
+                if (!file_exists($filePath)) {
+                    continue;
+                }
+
+                self::import(
+                    $filePath,
+                    $overwriteOriginal,
+                    $devModeIgnore,
+                    $packageName
+                );
+            }
+        } catch (QUI\Exception $Exception) {
+        }
     }
 
     /**
@@ -532,7 +559,7 @@ class Translator
                 if (file_exists($lang_file)) {
                     $result['locale/'.$dir.'/'.$package] = $lang_file;
 
-                    $cacheData .= "\n".file_get_contents($lang_file);
+                    $cacheData .= PHP_EOL.file_get_contents($lang_file);
                     $require[] = 'locale/'.$dir.'/'.$package.'/'.$lang;
                 }
             }
@@ -701,7 +728,7 @@ class Translator
 
                 $value = str_replace('\\', '\\\\', $value);
                 $value = str_replace('"', '\"', $value);
-                $value = str_replace("\n", '', $value);
+                $value = str_replace("\n", '{\n}', $value);
 
                 if ($value !== '' && $value !== ' ') {
                     $value = trim($value);
@@ -879,7 +906,7 @@ class Translator
 
                 $value = str_replace('\\', '\\\\', $value);
                 $value = str_replace('"', '\"', $value);
-                $value = str_replace("\n", '', $value);
+                $value = str_replace("\n", '{\n}', $value);
 
                 if ($value !== '' && $value !== ' ') {
                     $value = trim($value);
@@ -905,10 +932,10 @@ class Translator
                 }
 
                 // content
-                $iniContent .= $iniVar.'= "'.$value.'"'."\n";
+                $iniContent .= $iniVar.'= "'.$value.'"'.PHP_EOL;
 
-                $poContent .= 'msgid "'.$data['var'].'"'."\n";
-                $poContent .= 'msgstr "'.$value.'"'."\n\n";
+                $poContent .= 'msgid "'.$data['var'].'"'.PHP_EOL;
+                $poContent .= 'msgstr "'.$value.'"'.PHP_EOL.PHP_EOL;
             }
 
             // set data
@@ -1222,15 +1249,18 @@ class Translator
         $result = self::get($group, $var, $package);
 
         if (isset($result[0])) {
-            throw new QUI\Exception(array(
-                'quiqqer/translator',
-                'exception.var.exists',
+            throw new QUI\Exception(
                 array(
-                    'group'   => $group,
-                    'var'     => $var,
-                    'package' => $package
-                )
-            ));
+                    'quiqqer/translator',
+                    'exception.var.exists',
+                    array(
+                        'group'   => $group,
+                        'var'     => $var,
+                        'package' => $package
+                    )
+                ),
+                self::ERROR_CODE_VAR_EXISTS
+            );
         }
 
         // cleanup datatype
@@ -1796,11 +1826,10 @@ class Translator
                             case 'msgctxt':
                             case 'msgid':
                             case 'msgid_plural':
-                                $temp[$state] .= "\n".$line;
+                                $temp[$state] .= PHP_EOL.$line;
                                 break;
                             case 'msgstr':
-                                $temp[$state][sizeof($temp[$state]) - 1] .= "\n"
-                                                                            .$line;
+                                $temp[$state][sizeof($temp[$state]) - 1] .= PHP_EOL.$line;
                                 break;
                             default:
                                 // parse error
