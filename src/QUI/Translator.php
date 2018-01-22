@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains QUI\Translater
+ * This file contains QUI\Translator
  */
 
 namespace QUI;
@@ -12,7 +12,7 @@ use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
 
 /**
- * QUIQQER Translater
+ * QUIQQER Translator
  *
  * Manage all translations, for the system and the plugins
  *
@@ -68,6 +68,7 @@ class Translator
      * @param String $lang - lang code, length must be 2 signs
      *
      * @throws QUI\Exception
+     * @throws \Exception
      */
     public static function addLang($lang)
     {
@@ -122,8 +123,8 @@ class Translator
 
         $fileName .= '_'.mb_substr(md5(microtime()), 0, 6).'.xml';
 
-        $result = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $result .= '<locales>'."\n";
+        $result = '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL;
+        $result .= '<locales>'.PHP_EOL;
 
         foreach ($groups as $grp) {
             $result .= self::createXMLContent($grp, $langs, $type);
@@ -178,7 +179,7 @@ class Translator
         $result = '';
 
         foreach ($pool as $type => $entries) {
-            $result .= '<groups name="'.$group.'" datatype="'.$type.'">'."\n";
+            $result .= '<groups name="'.$group.'" datatype="'.$type.'">'.PHP_EOL;
 
             foreach ($entries as $entry) {
                 $result .= "\t".'<locale name="'.$entry['var'].'"';
@@ -191,7 +192,7 @@ class Translator
                     $result .= ' priority="'.(int)$entry['priority'].'"';
                 }
 
-                $result .= '>'."\n";
+                $result .= '>'.PHP_EOL;
 
                 foreach ($langs as $lang) {
                     $result .= "\t\t".'<'.$lang.'>';
@@ -226,13 +227,13 @@ class Translator
                             }
                     }
 
-                    $result .= ']]></'.$lang.'>'."\n";
+                    $result .= ']]></'.$lang.'>'.PHP_EOL;
                 }
 
-                $result .= "\t".'</locale>'."\n";
+                $result .= "\t".'</locale>'.PHP_EOL;
             }
 
-            $result .= '</groups>'."\n";
+            $result .= '</groups>'.PHP_EOL;
         }
 
         return $result;
@@ -394,6 +395,8 @@ class Translator
      * @param Package\Package $Package
      * @param int $overwriteOriginal
      * @param bool $devModeIgnore
+     *
+     * @throws QUI\Exception
      */
     public static function importFromPackage(
         QUI\Package\Package $Package,
@@ -559,7 +562,7 @@ class Translator
                 if (file_exists($lang_file)) {
                     $result['locale/'.$dir.'/'.$package] = $lang_file;
 
-                    $cacheData .= "\n".file_get_contents($lang_file);
+                    $cacheData .= PHP_EOL.file_get_contents($lang_file);
                     $require[] = 'locale/'.$dir.'/'.$package.'/'.$lang;
                 }
             }
@@ -643,6 +646,8 @@ class Translator
 
     /**
      * Create the locale files
+     *
+     * @throws QUI\Exception
      */
     public static function create()
     {
@@ -709,9 +714,7 @@ class Translator
                 }
 
                 // if php,js
-                if (strpos($entry['datatype'], 'js') !== false
-                    || empty($entry['datatype'])
-                ) {
+                if (strpos($entry['datatype'], 'js') !== false || empty($entry['datatype'])) {
                     $js_langs[$entry['groups']][$lang][] = $entry;
                 }
 
@@ -728,7 +731,7 @@ class Translator
 
                 $value = str_replace('\\', '\\\\', $value);
                 $value = str_replace('"', '\"', $value);
-                $value = str_replace("\n", '', $value);
+                $value = str_replace("\n", '{\n}', $value);
 
                 if ($value !== '' && $value !== ' ') {
                     $value = trim($value);
@@ -830,6 +833,8 @@ class Translator
      * Publish a language group
      *
      * @param string $group
+     *
+     * @throws QUI\Exception
      */
     public static function publish($group)
     {
@@ -898,15 +903,13 @@ class Translator
                 }
 
                 // php und js beachten
-                if (strpos($data['datatype'], 'js') !== false
-                    || empty($entry['datatype'])
-                ) {
+                if (strpos($data['datatype'], 'js') !== false || empty($data['datatype'])) {
                     $javaScriptValues[$data['var']] = $value;
                 }
 
                 $value = str_replace('\\', '\\\\', $value);
                 $value = str_replace('"', '\"', $value);
-                $value = str_replace("\n", '', $value);
+                $value = str_replace("\n", '{\n}', $value);
 
                 if ($value !== '' && $value !== ' ') {
                     $value = trim($value);
@@ -932,10 +935,10 @@ class Translator
                 }
 
                 // content
-                $iniContent .= $iniVar.'= "'.$value.'"'."\n";
+                $iniContent .= $iniVar.'= "'.$value.'"'.PHP_EOL;
 
-                $poContent .= 'msgid "'.$data['var'].'"'."\n";
-                $poContent .= 'msgstr "'.$value.'"'."\n\n";
+                $poContent .= 'msgid "'.$data['var'].'"'.PHP_EOL;
+                $poContent .= 'msgstr "'.$value.'"'.PHP_EOL.PHP_EOL;
             }
 
             // set data
@@ -1299,6 +1302,8 @@ class Translator
      * @param string $group
      * @param string $var
      * @param array $data - [de='', en=>'', datatype=>'', html=>1]
+     *
+     * @throws QUI\Exception
      */
     public static function addUserVar($group, $var, $data)
     {
@@ -1826,11 +1831,10 @@ class Translator
                             case 'msgctxt':
                             case 'msgid':
                             case 'msgid_plural':
-                                $temp[$state] .= "\n".$line;
+                                $temp[$state] .= PHP_EOL.$line;
                                 break;
                             case 'msgstr':
-                                $temp[$state][sizeof($temp[$state]) - 1] .= "\n"
-                                                                            .$line;
+                                $temp[$state][sizeof($temp[$state]) - 1] .= PHP_EOL.$line;
                                 break;
                             default:
                                 // parse error
