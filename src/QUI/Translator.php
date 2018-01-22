@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains QUI\Translater
+ * This file contains QUI\Translator
  */
 
 namespace QUI;
@@ -12,7 +12,7 @@ use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
 
 /**
- * QUIQQER Translater
+ * QUIQQER Translator
  *
  * Manage all translations, for the system and the plugins
  *
@@ -68,6 +68,7 @@ class Translator
      * @param String $lang - lang code, length must be 2 signs
      *
      * @throws QUI\Exception
+     * @throws \Exception
      */
     public static function addLang($lang)
     {
@@ -394,6 +395,8 @@ class Translator
      * @param Package\Package $Package
      * @param int $overwriteOriginal
      * @param bool $devModeIgnore
+     *
+     * @throws QUI\Exception
      */
     public static function importFromPackage(
         QUI\Package\Package $Package,
@@ -643,6 +646,8 @@ class Translator
 
     /**
      * Create the locale files
+     *
+     * @throws QUI\Exception
      */
     public static function create()
     {
@@ -830,6 +835,8 @@ class Translator
      * Publish a language group
      *
      * @param string $group
+     *
+     * @throws QUI\Exception
      */
     public static function publish($group)
     {
@@ -898,9 +905,7 @@ class Translator
                 }
 
                 // php und js beachten
-                if (strpos($data['datatype'], 'js') !== false
-                    || empty($entry['datatype'])
-                ) {
+                if (strpos($data['datatype'], 'js') !== false || empty($entry['datatype'])) {
                     $javaScriptValues[$data['var']] = $value;
                 }
 
@@ -1299,6 +1304,8 @@ class Translator
      * @param string $group
      * @param string $var
      * @param array $data - [de='', en=>'', datatype=>'', html=>1]
+     *
+     * @throws QUI\Exception
      */
     public static function addUserVar($group, $var, $data)
     {
