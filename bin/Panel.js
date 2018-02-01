@@ -1093,7 +1093,8 @@ define('package/quiqqer/translator/bin/Panel', [
          */
         importTranslation: function () {
             var self    = this,
-                devMode = (QUIQQER_CONFIG.globals.development).toInt();
+                devMode = (QUIQQER_CONFIG.globals.development).toInt(),
+                Popup;
 
             var LogoUploadForm = new UploadForm({
                 multiple  : false,
@@ -1110,7 +1111,7 @@ define('package/quiqqer/translator/bin/Panel', [
                     onComplete: function () {
                         self.Loader.hide();
                         self.$Grid.refresh();
-                        Popup.close();
+                        //Popup.close();
                     },
 
                     onAdd: function (Control, File) {
@@ -1151,8 +1152,7 @@ define('package/quiqqer/translator/bin/Panel', [
 
             LogoUploadForm.setParam('package', 'quiqqer/translator');
 
-
-            new QUIConfirm({
+            Popup = new QUIConfirm({
                 icon     : 'fa fa-upload',
                 title    : Locale.get('quiqqer/translator', 'import.window.title'),
                 maxWidth : 600,
@@ -1179,7 +1179,9 @@ define('package/quiqqer/translator/bin/Panel', [
                         LogoUploadForm.submit();
                     }
                 }
-            }).open();
+            });
+
+            Popup.open();
         },
 
         addVariable: function () {
