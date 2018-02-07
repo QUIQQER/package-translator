@@ -1432,8 +1432,6 @@ class Translator
 
         $development = QUI::conf('globals', 'development');
 
-        \QUI\System\Log::writeRecursive($data);
-
         foreach ($langs as $lang) {
             if ($development) {
                 if (isset($data[$lang])) {
