@@ -200,6 +200,10 @@ class Translator
                     $result .= ' priority="'.(int)$entry['priority'].'"';
                 }
 
+                if (!empty($entry['package'])) {
+                    $result .= ' package="'.$entry['package'].'"';
+                }
+
                 $result .= '>'.PHP_EOL;
 
                 foreach ($langs as $lang) {
@@ -341,8 +345,14 @@ class Translator
                     $locale['priority'] = (int)$locale['priority'];
                 }
 
+                $localePackageName = $packageName;
+
+                if (empty($localePackageName) && !empty($locale['package'])) {
+                    $localePackageName = $locale['package'];
+                }
+
                 try {
-                    self::add($group, $var, $packageName);
+                    self::add($group, $var, $localePackageName);
                 } catch (QUI\Exception $Exception) {
                     if ($Exception->getCode() !== self::ERROR_CODE_VAR_EXISTS) {
                         QUI\System\Log::writeException($Exception);
@@ -350,7 +360,7 @@ class Translator
                 }
 
                 // test if group exists
-                $groupContent = self::get($group, $var, $packageName);
+                $groupContent = self::get($group, $var, $localePackageName);
 
                 if (empty($groupContent)) {
                     continue;
@@ -359,15 +369,14 @@ class Translator
                 if ($overwriteOriginal && $devMode) {
                     // set the original fields
                     $locale['datatype'] = $datatype;
-
-                    self::update($group, $var, $packageName, $locale);
+                    self::update($group, $var, $localePackageName, $locale);
                 } else {
                     // update only _edit fields
                     $_locale = array(
                         'datatype' => $datatype,
                         'html'     => $locale['html'],
                         'priority' => $locale['priority'],
-                        'package'  => $packageName
+                        'package'  => $localePackageName
                     );
 
                     unset($locale['html']);
@@ -378,7 +387,7 @@ class Translator
                         $_locale[$key.'_edit'] = $entry;
                     }
 
-                    self::edit($group, $var, $packageName, $_locale);
+                    self::edit($group, $var, $localePackageName, $_locale);
                 }
 
                 $result[] = array(
@@ -1440,11 +1449,16 @@ class Translator
                 continue;
             }
 
-            if (!isset($data[$lang])) {
+            if (!isset($data[$lang]) && !isset($data[$lang.'_edit'])) {
                 continue;
             }
 
-            $_data[$lang.'_edit'] = trim($data[$lang]);
+            if (isset($data[$lang])) {
+                $_data[$lang.'_edit'] = trim($data[$lang]);
+                continue;
+            }
+
+            $_data[$lang.'_edit'] = trim($data[$lang.'_edit']);
         }
 
         $_data['html']     = 0;
