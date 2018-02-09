@@ -29,6 +29,7 @@ class Setup
         $exists = QUI::getDataBase()->table()->getColumn($table, 'id');
 
         if (!empty($exists)) {
+            QUI::getDataBase()->table()->setPrimaryKey($table, 'id');
             self::patchForEmptyLocales();
             return;
         }
@@ -44,6 +45,7 @@ class Setup
             UPDATE `{$table}` SET `{$table}`.`id` = @count:= @count + 1;"
         );
 
+        QUI::getDataBase()->table()->setPrimaryKey($table, 'id');
         QUI::getDataBase()->table()->setAutoIncrement($table, 'id');
 
         self::patchForEmptyLocales();

@@ -81,6 +81,14 @@ class Translator
             );
         }
 
+        // if column already exists, don't refresh locale
+        $exists = QUI::getDataBase()->table()->existColumnInTable(self::table(), $lang);
+
+        if ($exists) {
+            return;
+        }
+
+
         QUI::getDataBase()->table()->addColumn(
             self::table(),
             array(
@@ -192,6 +200,10 @@ class Translator
                     $result .= ' priority="'.(int)$entry['priority'].'"';
                 }
 
+                if (!empty($entry['package'])) {
+                    $result .= ' package="'.$entry['package'].'"';
+                }
+
                 $result .= '>'.PHP_EOL;
 
                 foreach ($langs as $lang) {
@@ -285,7 +297,7 @@ class Translator
             $groups = XML::getLocaleGroupsFromDom(
                 XML::getDomFromXml($file)
             );
-        } catch (QUI\Exception $Exception) {
+        } catch (\Exception $Exception) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
@@ -296,6 +308,8 @@ class Translator
         }
 
         if (empty($groups)) {
+            self::setLocaleFileModifyTime($file);
+
             return array();
         }
 
@@ -331,8 +345,14 @@ class Translator
                     $locale['priority'] = (int)$locale['priority'];
                 }
 
+                $localePackageName = $packageName;
+
+                if (empty($localePackageName) && !empty($locale['package'])) {
+                    $localePackageName = $locale['package'];
+                }
+
                 try {
-                    self::add($group, $var, $packageName);
+                    self::add($group, $var, $localePackageName);
                 } catch (QUI\Exception $Exception) {
                     if ($Exception->getCode() !== self::ERROR_CODE_VAR_EXISTS) {
                         QUI\System\Log::writeException($Exception);
@@ -340,7 +360,7 @@ class Translator
                 }
 
                 // test if group exists
-                $groupContent = self::get($group, $var, $packageName);
+                $groupContent = self::get($group, $var, $localePackageName);
 
                 if (empty($groupContent)) {
                     continue;
@@ -349,15 +369,14 @@ class Translator
                 if ($overwriteOriginal && $devMode) {
                     // set the original fields
                     $locale['datatype'] = $datatype;
-
-                    self::update($group, $var, $packageName, $locale);
+                    self::update($group, $var, $localePackageName, $locale);
                 } else {
                     // update only _edit fields
                     $_locale = array(
                         'datatype' => $datatype,
                         'html'     => $locale['html'],
                         'priority' => $locale['priority'],
-                        'package'  => $packageName
+                        'package'  => $localePackageName
                     );
 
                     unset($locale['html']);
@@ -368,7 +387,7 @@ class Translator
                         $_locale[$key.'_edit'] = $entry;
                     }
 
-                    self::edit($group, $var, $packageName, $_locale);
+                    self::edit($group, $var, $localePackageName, $_locale);
                 }
 
                 $result[] = array(
@@ -586,6 +605,8 @@ class Translator
     /**
      * Return all available languages
      * @return array
+     *
+     * @throws QUi\Exception
      */
     public static function getAvailableLanguages()
     {
@@ -630,18 +651,10 @@ class Translator
             return;
         }
 
-        $Statement = $PDO->prepare(
-            'CREATE TEMPORARY TABLE bad_temp_translation AS SELECT DISTINCT * FROM '.$bad_table
-        );
-        $Statement->execute();
-
-        $Statement = $PDO->prepare('DELETE FROM '.$bad_table);
-        $Statement->execute();
-
-        $Statement = $PDO->prepare(
-            'INSERT INTO '.$bad_table.' SELECT * FROM bad_temp_translation'
-        );
-        $Statement->execute();
+        $PDO->prepare('DROP TABLE IF EXISTS bad_temp_translation')->execute();
+        $PDO->prepare('CREATE TEMPORARY TABLE bad_temp_translation AS SELECT DISTINCT * FROM '.$bad_table)->execute();
+        $PDO->prepare('DELETE FROM '.$bad_table)->execute();
+        $PDO->prepare('INSERT INTO '.$bad_table.' SELECT * FROM bad_temp_translation')->execute();
     }
 
     /**
@@ -1436,11 +1449,16 @@ class Translator
                 continue;
             }
 
-            if (!isset($data[$lang])) {
+            if (!isset($data[$lang]) && !isset($data[$lang.'_edit'])) {
                 continue;
             }
 
-            $_data[$lang.'_edit'] = trim($data[$lang]);
+            if (isset($data[$lang])) {
+                $_data[$lang.'_edit'] = trim($data[$lang]);
+                continue;
+            }
+
+            $_data[$lang.'_edit'] = trim($data[$lang.'_edit']);
         }
 
         $_data['html']     = 0;
