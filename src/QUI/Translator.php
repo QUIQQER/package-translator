@@ -81,6 +81,14 @@ class Translator
             );
         }
 
+        // if column already exists, don't refresh locale
+        $exists = QUI::getDataBase()->table()->existColumnInTable(self::table(), $lang);
+
+        if ($exists) {
+            return;
+        }
+
+
         QUI::getDataBase()->table()->addColumn(
             self::table(),
             array(
@@ -285,7 +293,7 @@ class Translator
             $groups = XML::getLocaleGroupsFromDom(
                 XML::getDomFromXml($file)
             );
-        } catch (QUI\Exception $Exception) {
+        } catch (\Exception $Exception) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
@@ -296,6 +304,8 @@ class Translator
         }
 
         if (empty($groups)) {
+            self::setLocaleFileModifyTime($file);
+
             return array();
         }
 
@@ -586,6 +596,8 @@ class Translator
     /**
      * Return all available languages
      * @return array
+     *
+     * @throws QUi\Exception
      */
     public static function getAvailableLanguages()
     {
@@ -630,18 +642,10 @@ class Translator
             return;
         }
 
-        $Statement = $PDO->prepare(
-            'CREATE TEMPORARY TABLE bad_temp_translation AS SELECT DISTINCT * FROM '.$bad_table
-        );
-        $Statement->execute();
-
-        $Statement = $PDO->prepare('DELETE FROM '.$bad_table);
-        $Statement->execute();
-
-        $Statement = $PDO->prepare(
-            'INSERT INTO '.$bad_table.' SELECT * FROM bad_temp_translation'
-        );
-        $Statement->execute();
+        $PDO->prepare('DROP TABLE IF EXISTS bad_temp_translation')->execute();
+        $PDO->prepare('CREATE TEMPORARY TABLE bad_temp_translation AS SELECT DISTINCT * FROM '.$bad_table)->execute();
+        $PDO->prepare('DELETE FROM '.$bad_table)->execute();
+        $PDO->prepare('INSERT INTO '.$bad_table.' SELECT * FROM bad_temp_translation')->execute();
     }
 
     /**
