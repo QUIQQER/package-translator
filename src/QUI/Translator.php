@@ -259,6 +259,7 @@ class Translator
      *                                     if false, the original fields would be updated
      * @param bool $devModeIgnore
      * @param string $packageName - name of the package
+     * @param bool $force - The translation should really be executed, the $filemtimes is ignored
      *
      * @return array - List of imported vars
      * @throws QUI\Exception
@@ -267,7 +268,8 @@ class Translator
         $file,
         $overwriteOriginal = 0,
         $devModeIgnore = false,
-        $packageName = ''
+        $packageName = '',
+        $force = false
     ) {
         if (!file_exists($file)) {
             throw new QUI\Exception(
@@ -281,7 +283,7 @@ class Translator
         $filemtimes = self::getLocaleModifyTimes();
 
         // nothing has changed
-        if (isset($filemtimes[$file]) && filemtime($file) <= $filemtimes[$file]) {
+        if ($force === false && isset($filemtimes[$file]) && filemtime($file) <= $filemtimes[$file]) {
             return array();
         }
 
