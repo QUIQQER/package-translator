@@ -416,13 +416,15 @@ class Translator
      * @param Package\Package $Package
      * @param int $overwriteOriginal
      * @param bool $devModeIgnore
+     * @param bool $force - The translation should really be executed, the $filemtimes is ignored
      *
      * @throws QUI\Exception
      */
     public static function importFromPackage(
         QUI\Package\Package $Package,
         $overwriteOriginal = 0,
-        $devModeIgnore = false
+        $devModeIgnore = false,
+        $force = false
     ) {
         $file = $Package->getXMLFile('locale.xml');
 
@@ -434,7 +436,8 @@ class Translator
             $file,
             $overwriteOriginal,
             $devModeIgnore,
-            $Package->getName()
+            $Package->getName(),
+            $force
         );
 
         try {
@@ -458,7 +461,8 @@ class Translator
                     $filePath,
                     $overwriteOriginal,
                     $devModeIgnore,
-                    $packageName
+                    $packageName,
+                    $force
                 );
             }
         } catch (QUI\Exception $Exception) {
