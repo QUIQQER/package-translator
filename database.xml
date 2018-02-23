@@ -10,6 +10,10 @@
             <field type="int(1) DEFAULT 0">html</field>
             <field type="int(4) DEFAULT 0">priority</field>
             <field type="varchar(255) DEFAULT NULL">package</field>
+
+            <index>package</index>
+            <index>groups</index>
+            <index>var</index>
         </table>
     </global>
 
