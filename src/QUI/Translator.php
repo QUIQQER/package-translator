@@ -88,7 +88,6 @@ class Translator
             return;
         }
 
-
         QUI::getDataBase()->table()->addColumn(
             self::table(),
             array(
@@ -315,7 +314,6 @@ class Translator
             return array();
         }
 
-
         set_time_limit(ini_get('max_execution_time'));
 
         foreach ($groups as $locales) {
@@ -410,6 +408,246 @@ class Translator
         );
 
         return $result;
+    }
+
+    /**
+     * Starts a mass import of the whole locale.xml file.
+     * The locale.xml will be inserted in one query of multiple INSERT IGNORE statements.
+     *
+     * Note:
+     * This does not recurse into locale.xml files defined by <file> tags
+     *
+     * @param $file - Full system filepath to the locale.xml
+     * @param string $packageName - The package name of the locale.xml
+     *
+     * @return bool - Returns true on success
+     * @throws Exception
+     *
+     * @todo prepared statements
+     */
+    public static function batchImport(
+        $file,
+        $packageName = ''
+    ) {
+
+        if (!file_exists($file)) {
+            throw new QUI\Exception(
+                QUI::getLocale()->get(
+                    'quiqqer/translator',
+                    'exception.lang.file.not.exist'
+                )
+            );
+        }
+
+        // Check xml format
+        try {
+            $groups = XML::getLocaleGroupsFromDom(
+                XML::getDomFromXml($file)
+            );
+        } catch (\Exception $Exception) {
+            throw new QUI\Exception(
+                QUI::getLocale()->get(
+                    'quiqqer/translator',
+                    'exception.import.wrong.format',
+                    array('file' => $file)
+                )
+            );
+        }
+
+        if (empty($groups)) {
+            self::setLocaleFileModifyTime($file);
+
+            return 0;
+        }
+
+        // *********************************** //
+        //         Database Operations
+        // *********************************** //
+
+        $PDO = QUI::getDataBase()->getPDO();
+        set_time_limit(ini_get('max_execution_time'));
+
+        $localeVariables = array();
+
+        foreach ($groups as $locales) {
+            $group    = $locales['group'];
+            $datatype = '';
+
+            if (isset($locales['datatype'])) {
+                $datatype = $locales['datatype'];
+            }
+
+            foreach ($locales['locales'] as $locale) {
+                $var = $locale['name'];
+
+                unset($locale['name']);
+
+                if (!isset($locale['html'])) {
+                    $locale['html'] = 0;
+                }
+
+                if ($locale['html']) {
+                    $locale['html'] = 1;
+                } else {
+                    $locale['html'] = 0;
+                }
+
+                if (empty($locale['priority'])) {
+                    $locale['priority'] = 0;
+                } else {
+                    $locale['priority'] = (int)$locale['priority'];
+                }
+
+                $localePackageName = $packageName;
+
+                if (empty($localePackageName) && !empty($locale['package'])) {
+                    $localePackageName = $locale['package'];
+                }
+
+                // Add locale variable to the batch
+                $localeVariable = array(
+                    'group'    => $group,
+                    'var'      => $var,
+                    'datatype' => $datatype,
+                    'html'     => $locale['html'],
+                    'priority' => $locale['priority'],
+                    'package'  => $localePackageName
+                );
+
+                foreach (self::langs() as $lang) {
+                    if (isset($locale[$lang])) {
+                        $localeVariable[$lang] = $locale[$lang];
+                    }
+                }
+
+                // Add the data into the array using the key: group/variable
+                $localeVariables[trim($group)."/".trim($var)] = $localeVariable;
+            }
+        }
+
+        $sql = "";
+        // ************************** //
+        //           Update
+        // ************************** //
+        $currentRows = QUI::getDataBase()->fetch(array(
+            "select" => array(
+                "id",
+                "groups",
+                "var",
+            ),
+            "from"   => self::table(),
+            "where"  => array(
+                "package" => $packageName
+            )
+        ));
+
+        foreach ($currentRows as $currentRow) {
+            $varGroup = trim($currentRow['groups']);
+            $varName  = trim($currentRow['var']);
+
+            // Check if this xml contains the locale variable.
+            // if it does not contain it, skip it
+            if (!isset($localeVariables[$varGroup."/".$varName])) {
+                continue;
+            }
+
+            $var = $localeVariables[$varGroup."/".$varName];
+
+
+            // Build a string containing all languages
+            $updateFieldString = "";
+
+            foreach (self::langs() as $langCode) {
+                if (isset($var[$langCode])) {
+                    $updateFieldString .= $langCode."=".$PDO->quote($var[$langCode]).", ";
+                }
+            }
+
+            $updateFieldString = trim($updateFieldString, ", ");
+
+            if (empty($updateFieldString)) {
+                continue;
+            }
+
+            $sql .= "UPDATE ".self::table();
+            $sql .= " SET ";
+            $sql .= $updateFieldString;
+            $sql .= " WHERE id=".$PDO->quote($currentRow['id']).";";
+            $sql .= PHP_EOL;
+
+            unset($localeVariables[$varGroup."/".$varName]);
+        }
+
+        // ************************** //
+        //           Insert
+        // ************************** //
+
+        $langColumns = implode(",", self::langs());
+
+        foreach ($localeVariables as $var) {
+            //Check if at least one active language will be inserted
+            // @TODO check if this part can be improved
+            $containsActiveLanguage = false;
+
+            foreach (self::langs() as $langCode) {
+                if (isset($var[$langCode])) {
+                    $containsActiveLanguage = true;
+                }
+            }
+
+            if (!$containsActiveLanguage) {
+                continue;
+            }
+
+            // Insert the locale variable
+            $langValues = "";
+
+            foreach (self::langs() as $langCode) {
+                if (!isset($var[$langCode])) {
+                    $langValues .= "null".",";
+                    continue;
+                }
+
+                $langValues .= $PDO->quote($var[$langCode]).",";
+            }
+
+            $langValues = trim($langValues, ", ");
+
+            $sql .= "INSERT INTO `".self::table()."` ";
+            $sql .= " (groups, var, datatype, html, priority, package, ".$langColumns.")";
+
+            // Build the value clause VALUES('','',[...])
+            $sql .= " VALUES (";
+            $sql .= $PDO->quote($var['group']).",";
+            $sql .= $PDO->quote($var['var']).",";
+            $sql .= $PDO->quote($var['datatype']).",";
+            $sql .= $PDO->quote($var['html']).",";
+            $sql .= $PDO->quote($var['priority']).",";
+            $sql .= $PDO->quote($var['package']).",";
+            $sql .= $langValues;
+            $sql .= ");";
+            $sql .= PHP_EOL;
+        }
+
+
+        if (empty($sql)) {
+            return true;
+        }
+
+        $result = $PDO->exec($sql);
+
+        if ($result === false) {
+            throw new QUI\Exception(
+                QUI::getLocale()->get('quiqqer/translator', 'exception.batch.query.error', array(
+                    'file'  => $file,
+                    'error' => $PDO->errorInfo()[2]
+                ))
+            );
+        }
+
+        self::setLocaleFileModifyTime($file);
+
+        return true;
     }
 
     /**
@@ -610,6 +848,7 @@ class Translator
 
     /**
      * Return all available languages
+     *
      * @return array
      *
      * @throws QUi\Exception
@@ -736,7 +975,6 @@ class Translator
                 if (strpos($entry['datatype'], 'js') !== false || empty($entry['datatype'])) {
                     $js_langs[$entry['groups']][$lang][] = $entry;
                 }
-
 
                 $value = $entry[$lang];
 
@@ -876,7 +1114,6 @@ class Translator
 
             QUIFile::mkdir($folder);
 
-
             $result = QUI::getDataBase()->fetch(array(
                 'select' => array(
                     $lang,
@@ -933,7 +1170,6 @@ class Translator
                 if ($value !== '' && $value !== ' ') {
                     $value = trim($value);
                 }
-
 
                 // ini Content
                 $iniVar = $data['var'];
@@ -1106,7 +1342,6 @@ class Translator
             $Statement->execute();
             $count = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
-
             return array(
                 'data'  => $result,
                 'page'  => $page + 1,
@@ -1115,7 +1350,6 @@ class Translator
             );
         }
 
-
         if ($search && isset($search['search'])) {
             // search translations
             $where  = array();
@@ -1123,7 +1357,6 @@ class Translator
                 'type'  => '%LIKE%',
                 'value' => trim($search['search'])
             );
-
 
             // default fields
             $default = array(
@@ -1199,6 +1432,7 @@ class Translator
      * @param string $group
      * @param string $var
      * @param string|bool $package
+     *
      * @return array
      */
     public static function getVarData($group, $var, $package = false)
@@ -1391,7 +1625,6 @@ class Translator
             $_data['priority'] = (int)$data['priority'];
         }
 
-
         QUI::getDataBase()->update(self::table(), $_data, array(
             'groups'  => $group,
             'var'     => $var,
@@ -1433,6 +1666,7 @@ class Translator
      * Prepares the data for a translation entry
      *
      * @param array $data
+     *
      * @return array
      */
     protected static function getEditData($data)
@@ -1772,6 +2006,7 @@ class Translator
      * @link  http://www.gnu.org/software/gettext/manual/gettext.html#PO-Files
      *
      * @param string $in
+     *
      * @return bool|array
      */
     public static function phpmoParsePoFile($in)

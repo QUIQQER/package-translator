@@ -49,6 +49,11 @@
             <de><![CDATA[Diese Gruppe existiert bereits]]></de>
             <en><![CDATA[This group already exists.]]></en>
         </locale>
+        <locale name="exception.batch.query.error">
+            <de><![CDATA[Während des MassenImports der Sprachvariablen ist ein SQL-Fehler aufgetreten.]]></de>
+            <en><![CDATA[An SQL error occured during batch import of the localization variables.]]></en>
+        </locale>
+
         <locale name="message.var.add.successful">
             <de><![CDATA[Variable [groups] [var] wurde erfolgreich hinzugefügt]]></de>
             <en><![CDATA[Variable [groups] [var] has been added successfully.]]></en>
