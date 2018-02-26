@@ -587,18 +587,17 @@ class Translator
         foreach ($localeVariables as $var) {
             //Check if at least one active language will be inserted
             // @TODO check if this part can be improved
-//            $containsActiveLanguage = false;
+            $containsActiveLanguage = false;
 
             foreach (self::langs() as $langCode) {
                 if (isset($var[$langCode])) {
-                    //$containsActiveLanguage = true;
-                    continue 2;
+                    $containsActiveLanguage = true;
                 }
             }
-//
-//            if (!$containsActiveLanguage) {
-//                continue;
-//            }
+
+            if (!$containsActiveLanguage) {
+                continue;
+            }
 
             // Insert the locale variable
             $langValues = "";
