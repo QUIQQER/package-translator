@@ -3,6 +3,7 @@
 
     <global>
         <table name="translate">
+            <field type="INT(11) NOT NULL">id</field>
             <field type="varchar(255)">groups</field>
             <field type="varchar(255)">var</field>
             <field type="varchar(20) DEFAULT ''">datatype</field>
@@ -11,6 +12,7 @@
             <field type="int(4) DEFAULT 0">priority</field>
             <field type="varchar(255) DEFAULT NULL">package</field>
 
+            <auto_increment>id</auto_increment>
             <index>package</index>
             <index>groups</index>
             <index>var</index>
