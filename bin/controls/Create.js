@@ -158,7 +158,6 @@ define('package/quiqqer/translator/bin/controls/Create', [
             Elm.set('html', '');
 
             QUIAjax.get('ajax_system_getAvailableLanguages', function (languages) {
-
                 var i, len, lang, Container;
 
                 var current = QUILocale.getCurrent(),
@@ -178,13 +177,11 @@ define('package/quiqqer/translator/bin/controls/Create', [
                 });
 
                 for (i = 0, len = languages.length; i < len; i++) {
-
                     lang = languages[i];
 
                     Container = new Element('div', {
                         'class': 'quiqqer-translator-entry',
-                        html   : '<img src="' + path + lang + '.png" />' +
-                        '<input type="text" name="' + lang + '" />'
+                        html   : '<img src="' + path + lang + '.png" /><input type="text" name="' + lang + '" />'
                     }).inject(Elm);
 
                     if (i > 0) {

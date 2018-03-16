@@ -33,11 +33,12 @@ define('package/quiqqer/translator/bin/controls/Update', [
         ],
 
         options: {
-            'group' : false,
-            'var'   : false,
-            datatype: 'php,js',
-            html    : false,
-            data    : {},
+            'group'  : false,
+            'var'    : false,
+            'package': false,
+            datatype : 'php,js',
+            html     : false,
+            data     : {},
 
             createIfNotExists: false
         },
@@ -109,8 +110,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
 
                         Container = new Element('div', {
                             'class': 'quiqqer-translator-entry',
-                            html   : '<img src="' + path + lang + '.png" />' +
-                            '<input type="text" name="' + lang + '" />'
+                            html   : '<img src="' + path + lang + '.png" /><input type="text" name="' + lang + '" />'
                         }).inject(Elm);
 
                         if (i > 0) {
@@ -124,7 +124,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
                             Container.getElement('input').value = data[lang];
                         }
 
-                        if (lang + '_edit' in data && data[lang + '_edit'] !== '') {
+                        if (lang + '_edit' in data && data[lang + '_edit'] !== '' && data[lang + '_edit'] !== null) {
                             Container.getElement('input').value = data[lang + '_edit'];
                         }
                     }
@@ -168,6 +168,28 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 this.$Elm.addClass('field-container-field');
                 this.$Elm.addClass('quiqqer-t-entry__minimize');
             }
+
+            // options
+            if (this.$Input.get('data-qui-options-group')) {
+                this.setAttribute('group', this.$Input.get('data-qui-options-group'));
+            }
+
+            if (this.$Input.get('data-qui-options-package')) {
+                this.setAttribute('package', this.$Input.get('data-qui-options-package'));
+            }
+
+            if (this.$Input.get('data-qui-options-var')) {
+                this.setAttribute('var', this.$Input.get('data-qui-options-var'));
+            }
+
+            if (this.$Input.get('data-qui-options-datatype')) {
+                this.setAttribute('datatype', this.$Input.get('data-qui-options-datatype'));
+            }
+
+            if (!this.getAttribute('package')) {
+                this.setAttribute('package', this.getAttribute('group'));
+            }
+
 
             this.$onInject().then(function () {
                 self.$Input.inject(self.$Elm, 'after');
