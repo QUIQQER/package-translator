@@ -5,13 +5,13 @@
     width: 100%;
 }
 
-.quiqqer-translator-create-entry {
+.quiqqer-translator-entry {
     clear: both;
     float: left;
     overflow: hidden;
     position: relative;
 }
 
-.quiqqer-translator-create-entry img {
+.quiqqer-translator-entry img {
     padding-right: 10px;
 }

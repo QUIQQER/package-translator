@@ -4,15 +4,6 @@
  * @module package/quiqqer/translator/bin/controls/Create
  * @author www.pcsg.de (Henning Leutz)
  *
- * @require qui/QUI
- * @require qui/controls/Control
- * @require qui/controls/buttons/Button
- * @require Ajax
- * @require Locale
- * @require package/quiqqer/translator/bin/classes/Translator
- * @require package/quiqqer/translator/bin/controls/Create
- * @require css!package/quiqqer/translator/bin/controls/Update.css
- *
  * @event onChange
  */
 define('package/quiqqer/translator/bin/controls/Update', [
@@ -42,11 +33,12 @@ define('package/quiqqer/translator/bin/controls/Update', [
         ],
 
         options: {
-            'group' : false,
-            'var'   : false,
-            datatype: 'php,js',
-            html    : false,
-            data    : {},
+            'group'  : false,
+            'var'    : false,
+            'package': false,
+            datatype : 'php,js',
+            html     : false,
+            data     : {},
 
             createIfNotExists: false
         },
@@ -59,7 +51,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
             this.removeEvents('onInject');
 
             this.addEvents({
-                onInject: this.$onInject
+                onInject: this.$onInject,
+                onImport: this.$onImport
             });
         },
 
@@ -81,6 +74,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
 
         /**
          * event : on inject
+         *
+         * @return {Promise}
          */
         $onInject: function () {
             var self = this,
@@ -89,75 +84,140 @@ define('package/quiqqer/translator/bin/controls/Update', [
 
             Elm.set('html', '');
 
-            QUIAjax.get([
-                'ajax_system_getAvailableLanguages',
-                'package_quiqqer_translator_ajax_getVarData'
-            ], function (languages, data) {
+            return new Promise(function (resolve) {
+                QUIAjax.get([
+                    'ajax_system_getAvailableLanguages',
+                    'package_quiqqer_translator_ajax_getVarData'
+                ], function (languages, data) {
+                    var i, len, lang, Container;
+                    var current = QUILocale.getCurrent();
 
-                var i, len, lang, Container;
-                var current = QUILocale.getCurrent();
+                    // current language to the top
+                    languages.sort(function (a, b) {
+                        if (a === current) {
+                            return -1;
+                        }
 
-                // current language to the top
-                languages.sort(function (a, b) {
-                    if (a == current) {
-                        return -1;
+                        if (b === current) {
+                            return 1;
+                        }
+
+                        return 0;
+                    });
+
+                    for (i = 0, len = languages.length; i < len; i++) {
+                        lang = languages[i];
+
+                        Container = new Element('div', {
+                            'class': 'quiqqer-translator-entry',
+                            html   : '<img src="' + path + lang + '.png" /><input type="text" name="' + lang + '" />'
+                        }).inject(Elm);
+
+                        if (i > 0) {
+                            Container.setStyles({
+                                display: 'none',
+                                opacity: 0
+                            });
+                        }
+
+                        if (lang in data && data[lang] !== '') {
+                            Container.getElement('input').value = data[lang];
+                        }
+
+                        if (lang + '_edit' in data && data[lang + '_edit'] !== '' && data[lang + '_edit'] !== null) {
+                            Container.getElement('input').value = data[lang + '_edit'];
+                        }
                     }
 
-                    if (b == current) {
-                        return 1;
-                    }
-
-                    return 0;
-                });
-
-                for (i = 0, len = languages.length; i < len; i++) {
-
-                    lang = languages[i];
-
-                    Container = new Element('div', {
-                        'class': 'quiqqer-translator-create-entry',
-                        html   : '<img src="' + path + lang + '.png" />' +
-                        '<input type="text" name="' + lang + '" />'
+                    self.$Toggler = new QUIButton({
+                        icon  : 'fa fa-arrow-circle-o-right',
+                        styles: {
+                            position: 'absolute',
+                            right   : 0
+                        },
+                        events: {
+                            onClick: self.toggle
+                        }
                     }).inject(Elm);
 
-                    if (i > 0) {
-                        Container.setStyles({
-                            display: 'none',
-                            opacity: 0
-                        });
-                    }
+                    Elm.getElements('input').addEvent('change', function () {
+                        self.setAttribute('data', self.getData());
+                        self.fireEvent('change', [self]);
+                    });
 
-                    if (lang in data && data[lang] !== '') {
-                        Container.getElement('input').value = data[lang];
-                    }
+                    resolve();
+                }, {
+                    'package': 'quiqqer/translator',
+                    'group'  : self.getAttribute('group'),
+                    'var'    : self.getAttribute('var'),
+                    'pkg'    : self.getAttribute('package')
+                });
+            });
+        },
 
-                    if (lang + '_edit' in data && data[lang + '_edit'] !== '') {
-                        Container.getElement('input').value = data[lang + '_edit'];
-                    }
+        /**
+         * event: on import
+         */
+        $onImport: function () {
+            var self = this;
+
+            this.$Input = this.getElm();
+            this.$Elm   = new Element('div').wraps(this.$Input);
+
+            if (this.$Input.hasClass('field-container-field')) {
+                this.$Elm.addClass('field-container-field');
+                this.$Elm.addClass('quiqqer-t-entry__minimize');
+            }
+
+            // options
+            if (this.$Input.get('data-qui-options-group')) {
+                this.setAttribute('group', this.$Input.get('data-qui-options-group'));
+            }
+
+            if (this.$Input.get('data-qui-options-package')) {
+                this.setAttribute('package', this.$Input.get('data-qui-options-package'));
+            }
+
+            if (this.$Input.get('data-qui-options-var')) {
+                this.setAttribute('var', this.$Input.get('data-qui-options-var'));
+            }
+
+            if (this.$Input.get('data-qui-options-datatype')) {
+                this.setAttribute('datatype', this.$Input.get('data-qui-options-datatype'));
+            }
+
+            if (!this.getAttribute('package')) {
+                this.setAttribute('package', this.getAttribute('group'));
+            }
+
+
+            this.$onInject().then(function () {
+                self.$Input.inject(self.$Elm, 'after');
+
+                // flexbox tables
+                if (!self.$Input.hasClass('field-container-field')) {
+                    return;
                 }
 
-                self.$Toggler = new QUIButton({
-                    icon  : 'fa fa-arrow-circle-o-right',
+                self.$Toggler.getElm().setStyle('display', 'none');
+                self.$Toggler.destroy();
+
+                self.$Toggler = new Element('span.field-container-item', {
+                    html  : '<span class="fa fa-arrow-circle-o-right"></span>',
                     styles: {
-                        position: 'absolute',
-                        right   : 0
+                        cursor   : 'pointer',
+                        textAlign: 'center',
+                        width    : 50
                     },
                     events: {
-                        onClick: self.toggle
+                        click: function (event) {
+                            event.stop();
+                            self.toggle();
+                        }
                     }
-                }).inject(Elm);
-
-                Elm.getElements('input').addEvent('change', function () {
-                    self.setAttribute('data', self.getData());
-                    self.fireEvent('change', [self]);
-                });
-
-            }, {
-                'package': 'quiqqer/translator',
-                'group'  : this.getAttribute('group'),
-                'var'    : this.getAttribute('var'),
-                'pkg'    : this.getAttribute('package')
+                }).inject(self.getElm(), 'after');
             });
+
         },
 
         /**

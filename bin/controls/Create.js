@@ -4,13 +4,6 @@
  * @module package/quiqqer/translator/bin/controls/Create
  * @author www.pcsg.de (Henning Leutz)
  *
- * @require qui/QUI
- * @require qui/controls/Control
- * @require qui/controls/buttons/Button
- * @require Ajax
- * @require Locale
- * @require css!package/quiqqer/translator/bin/controls/Create.css
- *
  * @event onChange
  */
 define('package/quiqqer/translator/bin/controls/Create', [
@@ -165,7 +158,6 @@ define('package/quiqqer/translator/bin/controls/Create', [
             Elm.set('html', '');
 
             QUIAjax.get('ajax_system_getAvailableLanguages', function (languages) {
-
                 var i, len, lang, Container;
 
                 var current = QUILocale.getCurrent(),
@@ -173,11 +165,11 @@ define('package/quiqqer/translator/bin/controls/Create', [
 
                 // current language to the top
                 languages.sort(function (a, b) {
-                    if (a == current) {
+                    if (a === current) {
                         return -1;
                     }
 
-                    if (b == current) {
+                    if (b === current) {
                         return 1;
                     }
 
@@ -185,13 +177,11 @@ define('package/quiqqer/translator/bin/controls/Create', [
                 });
 
                 for (i = 0, len = languages.length; i < len; i++) {
-
                     lang = languages[i];
 
                     Container = new Element('div', {
-                        'class': 'quiqqer-translator-create-entry',
-                        html   : '<img src="' + path + lang + '.png" />' +
-                        '<input type="text" name="' + lang + '" />'
+                        'class': 'quiqqer-translator-entry',
+                        html   : '<img src="' + path + lang + '.png" /><input type="text" name="' + lang + '" />'
                     }).inject(Elm);
 
                     if (i > 0) {
@@ -231,11 +221,25 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * Toggle the open status
          */
         toggle: function () {
+            if (this.$Toggler.nodeName === 'SPAN') {
+                if (this.getElm().hasClass('quiqqer-t-entry__minimize')) {
+                    this.getElm().removeClass('quiqqer-t-entry__minimize');
+                    this.open();
+                    return;
+                }
+
+                this.close().then(function () {
+                    this.getElm().addClass('quiqqer-t-entry__minimize');
+                }.bind(this));
+                return;
+            }
+
             if (this.$Toggler.isActive()) {
                 this.close();
-            } else {
-                this.open();
+                return;
             }
+
+            this.open();
         },
 
         /**
@@ -243,7 +247,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
          */
         open: function () {
             var self = this,
-                list = this.getElm().getElements('.quiqqer-translator-create-entry');
+                list = this.getElm().getElements('.quiqqer-translator-entry');
 
             var First = list.shift();
 
@@ -253,11 +257,11 @@ define('package/quiqqer/translator/bin/controls/Create', [
             });
 
             moofx(First).animate({
-                height: 40
+                height: 34
             });
 
             moofx(list).animate({
-                height : 40,
+                height : 34,
                 opacity: 1
             }, {
                 duration: 200,
@@ -267,35 +271,45 @@ define('package/quiqqer/translator/bin/controls/Create', [
                         'fa fa-arrow-circle-o-down'
                     );
 
-                    self.$Toggler.setActive();
+                    if ("setActive" in self.$Toggler) {
+                        self.$Toggler.setActive();
+                    }
                 }
             });
         },
 
         /**
          * shows all translation entries
+         *
+         * @return {Promise}
          */
         close: function () {
             var self = this,
-                list = this.getElm().getElements('.quiqqer-translator-create-entry');
+                list = this.getElm().getElements('.quiqqer-translator-entry');
 
             var First = list.shift();
 
             First.setStyle('height', null);
 
-            moofx(list).animate({
-                height : 0,
-                opacity: 0
-            }, {
-                duration: 200,
-                callback: function () {
-                    self.$Toggler.setAttribute(
-                        'icon',
-                        'fa fa-arrow-circle-o-right'
-                    );
+            return new Promise(function (resolve) {
+                moofx(list).animate({
+                    height : 0,
+                    opacity: 0
+                }, {
+                    duration: 200,
+                    callback: function () {
+                        self.$Toggler.setAttribute(
+                            'icon',
+                            'fa fa-arrow-circle-o-right'
+                        );
 
-                    self.$Toggler.setNormal();
-                }
+                        if ("setNormal" in self.$Toggler) {
+                            self.$Toggler.setNormal();
+                        }
+
+                        resolve();
+                    }
+                });
             });
         }
     });
