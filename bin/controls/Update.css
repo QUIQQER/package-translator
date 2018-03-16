@@ -5,13 +5,59 @@
     width: 100%;
 }
 
-.quiqqer-translator-update-entry {
+.quiqqer-translator-entry {
     clear: both;
     float: left;
     overflow: hidden;
     position: relative;
 }
 
-.quiqqer-translator-update-entry img {
+.quiqqer-translator-entry img {
     padding-right: 10px;
+}
+
+/** css for the flexbox tables
+ ======================================  */
+
+.field-container-field > .quiqqer-translator-entry {
+    border-bottom: 1px solid #ddd;
+    overflow: hidden;
+    width: 100%;
+}
+
+.field-container-field > .quiqqer-translator-entry:last-child {
+    border-bottom: 0;
+}
+
+.field-container-field > .quiqqer-translator-entry img {
+    left: 6px;
+    padding: 0;
+    position: absolute;
+    top: 9px;
+}
+
+.field-container-field > .quiqqer-translator-entry input,
+.field-container-field > .quiqqer-translator-entry input:hover,
+.field-container-field > .quiqqer-translator-entry input:focus {
+    border: none;
+    padding-left: 30px;
+    width: 100%;
+}
+
+.field-container-field > .quiqqer-translator-entry input {
+    background-position: 5px center;
+    background-repeat: no-repeat;
+}
+
+.field-container-field > .quiqqer-translator-entry input:focus {
+    background-color: rgba(0, 0, 0, 0.075);
+    box-shadow: none;
+}
+
+.field-container-field.quiqqer-t-entry__minimize .quiqqer-translator-entry {
+    border-bottom: 0;
+}
+
+.field-container-field.quiqqer-t-entry__minimize .quiqqer-translator-entry:nth-child(1n+2) {
+    display: none;
 }

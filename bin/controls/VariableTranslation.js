@@ -3,13 +3,6 @@
  *
  * @package package/quiqqer/translator/bin/controls/VariableTranslation
  * @author www.pcsg.de (Henning Leutz)
- *
- * @require qui/QUI
- * @require qui/controls/Control
- * @require Ajax
- * @require utils/Panels
- * @require package/quiqqer/translator/bin/Panel
- * @require css!package/quiqqer/translator/bin/controls/VariableTranslation.css
  */
 define('package/quiqqer/translator/bin/controls/VariableTranslation', [
 
@@ -133,7 +126,7 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
                         new Element('span', {
                             'class': 'quiqqer-translator-variabletranslation-entry',
                             html   : '<img src="' + path + lang + '.png" />' +
-                                     text
+                            text
                         }).inject(Container);
 
                     } else {
@@ -145,7 +138,7 @@ define('package/quiqqer/translator/bin/controls/VariableTranslation', [
                             new Element('span', {
                                 'class': 'quiqqer-translator-variabletranslation-entry',
                                 html   : '<img src="' + path + lang + '.png" />' +
-                                         text
+                                text
                             }).inject(Container);
                         }
                     }
