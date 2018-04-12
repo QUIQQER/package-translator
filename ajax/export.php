@@ -9,7 +9,7 @@
  */
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_export',
-    function ($group, $langs, $type) {
+    function ($group, $langs, $type, $external) {
         $group = str_replace('/', '!GROUPSEPARATOR!', $group);
         $group = QUI\Utils\Security\Orthos::clear($group);
         $group = str_replace('!GROUPSEPARATOR!', '/', $group);
@@ -20,9 +20,9 @@ QUI::$Ajax->registerFunction(
         $type  = QUI\Utils\Security\Orthos::clear($type);
 
         QUI\Utils\System\File::downloadHeader(
-            QUI\Translator::export($group, $langs, $type)
+            QUI\Translator::export($group, $langs, $type, boolval($external))
         );
     },
-    array('group', 'langs', 'type'),
+    array('group', 'langs', 'type', 'external'),
     'Permission::checkAdminUser'
 );

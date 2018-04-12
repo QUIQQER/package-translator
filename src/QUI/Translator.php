@@ -107,10 +107,12 @@ class Translator
      * @param String $group - which group should be exported? ("all" = Alle)
      * @param array $langs - Sprachen
      * @param string $type - "original" oder "edit"
+     * @param bool $external (optional) - export translations of external groups
+     * that are overwritten by the selected groups ($group) [default: false]
      *
      * @return String
      */
-    public static function export($group, $langs, $type)
+    public static function export($group, $langs, $type, $external = false)
     {
         $exportFolder = VAR_DIR.self::EXPORT_DIR;
 
@@ -134,7 +136,7 @@ class Translator
         $result .= '<locales>'.PHP_EOL;
 
         foreach ($groups as $grp) {
-            $result .= self::createXMLContent($grp, $langs, $type);
+            $result .= self::createXMLContent($grp, $langs, $type, $external);
         }
 
         $result .= '</locales>';
@@ -151,13 +153,20 @@ class Translator
      * @param array $group
      * @param array $langs
      * @param string $editType - original, edit, edit_overwrite
+     * @param bool $external (optional) - include translations of external groups
+     * that are overwritten by the selected groups ($group) [default: false]
      *
      * @return string
      */
-    protected static function createXMLContent($group, $langs, $editType)
+    protected static function createXMLContent($group, $langs, $editType, $external = false)
     {
-        $entries = self::get($group);
-        $pool    = array();
+        if ($external) {
+            $entries = self::get(false, false, $group);
+        } else {
+            $entries = self::get($group);
+        }
+
+        $pool = array();
 
         foreach ($entries as $entry) {
             // Undefinierte Gruppen ausschließen
@@ -165,7 +174,7 @@ class Translator
                 continue;
             }
 
-            if (mb_strpos($entry['groups'], $group) === false) {
+            if (!$external && mb_strpos($entry['groups'], $group) === false) {
                 QUI\System\Log::addError(
                     'Translator Export: xml-Gruppe ('.$entry['groups'].')'.
                     ' passt nicht zur Translator-Gruppe ('.$group.')'
@@ -174,77 +183,89 @@ class Translator
                 continue;
             }
 
-            $type = 'php';
+            $group = $entry['groups'];
+            $type  = 'php';
 
             if (isset($entry['datatype']) && !empty($entry['datatype'])) {
                 $type = $entry['datatype'];
             }
 
-            $pool[$type][] = $entry;
+            if (!isset($pool[$type])) {
+                $pool[$type] = [];
+            }
+
+            if (!isset($pool[$type][$group])) {
+                $pool[$type][$group] = [];
+            }
+
+            $pool[$type][$group][] = $entry;
         }
 
         $result = '';
 
-        foreach ($pool as $type => $entries) {
-            $result .= '<groups name="'.$group.'" datatype="'.$type.'">'.PHP_EOL;
+        foreach ($pool as $type => $groups) {
+            foreach ($groups as $group => $entries) {
+                $result .= '<groups name="'.$group.'" datatype="'.$type.'">'.PHP_EOL;
 
-            foreach ($entries as $entry) {
-                $result .= "\t".'<locale name="'.$entry['var'].'"';
+                foreach ($entries as $entry) {
+                    $result .= "\t".'<locale name="'.$entry['var'].'"';
 
-                if (isset($entry['html']) && $entry['html'] == 1) {
-                    $result .= ' html="true"';
-                }
-
-                if (!empty($entry['priority'])) {
-                    $result .= ' priority="'.(int)$entry['priority'].'"';
-                }
-
-                if (!empty($entry['package'])) {
-                    $result .= ' package="'.$entry['package'].'"';
-                }
-
-                $result .= '>'.PHP_EOL;
-
-                foreach ($langs as $lang) {
-                    $result .= "\t\t".'<'.$lang.'>';
-                    $result .= '<![CDATA[';
-
-                    switch ($editType) {
-                        case 'edit':
-                            if (isset($entry[$lang.'_edit'])
-                                && !empty($entry[$lang.'_edit'])
-                            ) {
-                                $result .= $entry[$lang.'_edit'];
-                            }
-                            break;
-
-                        case 'edit_overwrite':
-                            if (isset($entry[$lang.'_edit'])
-                                && !empty($entry[$lang.'_edit'])
-                            ) {
-                                $result .= $entry[$lang.'_edit'];
-                            } else {
-                                if (isset($entry[$lang])
-                                    && !empty($entry[$lang])
-                                ) {
-                                    $result .= $entry[$lang];
-                                }
-                            }
-                            break;
-
-                        default:
-                            if (isset($entry[$lang]) && !empty($entry[$lang])) {
-                                $result .= $entry[$lang];
-                            }
+                    if (isset($entry['html']) && $entry['html'] == 1) {
+                        $result .= ' html="true"';
                     }
 
-                    $result .= ']]></'.$lang.'>'.PHP_EOL;
+                    if (!empty($entry['priority'])) {
+                        $result .= ' priority="'.(int)$entry['priority'].'"';
+                    }
+
+                    if (!empty($entry['package'])) {
+                        $result .= ' package="'.$entry['package'].'"';
+                    }
+
+                    $result .= '>'.PHP_EOL;
+
+                    foreach ($langs as $lang) {
+                        $var = '';
+
+                        switch ($editType) {
+                            case 'edit':
+                                if (isset($entry[$lang.'_edit'])
+                                    && !empty($entry[$lang.'_edit'])
+                                ) {
+                                    $var = $entry[$lang.'_edit'];
+                                }
+                                break;
+
+                            case 'edit_overwrite':
+                                if (isset($entry[$lang.'_edit'])
+                                    && !empty($entry[$lang.'_edit'])
+                                ) {
+                                    $var = $entry[$lang.'_edit'];
+                                } else {
+                                    if (isset($entry[$lang])
+                                        && !empty($entry[$lang])
+                                    ) {
+                                        $var = $entry[$lang];
+                                    }
+                                }
+                                break;
+
+                            default:
+                                if (isset($entry[$lang]) && !empty($entry[$lang])) {
+                                    $var = $entry[$lang];
+                                }
+                        }
+
+                        $result .= "\t\t".'<'.$lang.'>';
+                        $result .= '<![CDATA[' . $var . ']]>';
+                        $result .= '</'.$lang.'>'.PHP_EOL;
+                    }
+
+                    $result .= "\t".'</locale>'.PHP_EOL;
                 }
 
-                $result .= "\t".'</locale>'.PHP_EOL;
+                $result .= '</groups>'.PHP_EOL;
             }
-
-            $result .= '</groups>'.PHP_EOL;
         }
 
         return $result;
