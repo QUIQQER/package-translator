@@ -17,6 +17,7 @@ class Setup
 {
     /**
      * @param Package $Package
+     * @throws QUI\Exception
      */
     public static function onPackageSetup(Package $Package)
     {
