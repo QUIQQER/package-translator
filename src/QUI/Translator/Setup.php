@@ -3,6 +3,7 @@
 /**
  * This file contains QUI\Translator\Setup
  */
+
 namespace QUI\Translator;
 
 use QUI;
@@ -31,13 +32,14 @@ class Setup
         if (!empty($exists)) {
             QUI::getDataBase()->table()->setPrimaryKey($table, 'id');
             self::patchForEmptyLocales();
+
             return;
         }
 
         // create id column for old translation table
-        QUI::getDataBase()->table()->addColumn($table, array(
+        QUI::getDataBase()->table()->addColumn($table, [
             'id' => 'INT(11) DEFAULT NULL'
-        ));
+        ]);
 
         $PDO = QUI::getDataBase()->getPDO();
         $PDO->query(
@@ -59,12 +61,12 @@ class Setup
         $table = QUI\Translator::table();
 
         // update empty package fields
-        $emptyLocales = QUI::getDataBase()->fetch(array(
+        $emptyLocales = QUI::getDataBase()->fetch([
             'from'  => $table,
-            'where' => array(
+            'where' => [
                 'package' => null
-            )
-        ));
+            ]
+        ]);
 
         foreach ($emptyLocales as $entry) {
             if (!isset($entry['id'])) {
@@ -73,8 +75,8 @@ class Setup
 
             QUI::getDataBase()->update(
                 $table,
-                array('package' => $entry['groups']),
-                array('id' => $entry['id'])
+                ['package' => $entry['groups']],
+                ['id' => $entry['id']]
             );
         }
     }
