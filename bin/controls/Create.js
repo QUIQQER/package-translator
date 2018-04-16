@@ -211,7 +211,6 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     self.setAttribute('data', self.getData());
                     self.fireEvent('change', [self]);
                 });
-
             }, {
                 'package': 'quiqqer/translator'
             });
@@ -220,7 +219,11 @@ define('package/quiqqer/translator/bin/controls/Create', [
         /**
          * Toggle the open status
          */
-        toggle: function () {
+        toggle: function (event) {
+            if (typeOf(event) === 'domevent') {
+                event.stop();
+            }
+
             if (this.$Toggler.nodeName === 'SPAN') {
                 if (this.getElm().hasClass('quiqqer-t-entry__minimize')) {
                     this.getElm().removeClass('quiqqer-t-entry__minimize');
@@ -266,10 +269,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
             }, {
                 duration: 200,
                 callback: function () {
-                    self.$Toggler.setAttribute(
-                        'icon',
-                        'fa fa-arrow-circle-o-down'
-                    );
+                    self.$Toggler.setAttribute('icon', 'fa fa-arrow-circle-o-down');
 
                     if ("setActive" in self.$Toggler) {
                         self.$Toggler.setActive();
