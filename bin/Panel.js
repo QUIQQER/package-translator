@@ -231,6 +231,10 @@ define('package/quiqqer/translator/bin/Panel', [
                     '<label for="qui-translator-export-group-all">' +
                     Locale.get('quiqqer/translator', 'export.window.group.all.label', {count: this.$groupcount}) +
                     '</label>' +
+                    '<input id="qui-translator-export-group-external" type="checkbox" name="export_external"/>' +
+                    '<label for="qui-translator-export-group-external">' +
+                    Locale.get('quiqqer/translator', 'export.window.group.external.label') +
+                    '</label>' +
                     '</div>' +
                     '<div class="qui-translator-export-language">' +
                     '<h3>' + Locale.get('quiqqer/translator', 'export.window.language') + '</h3>' +
@@ -264,6 +268,7 @@ define('package/quiqqer/translator/bin/Panel', [
                             langs     = Body.getElements('.qui-translator-export-language input'),
                             type      = Body.getElement('#qui-translator-export-type-original'),
                             overwrite = Body.getElement('#qui-translator-export-type-edit-overwrite'),
+                            external  = Body.getElement('#qui-translator-export-group-external'),
                             groupTmp  = 'all',
                             langsTmp  = [],
                             typeTmp   = 'original';
@@ -296,7 +301,8 @@ define('package/quiqqer/translator/bin/Panel', [
                                 'package': 'quiqqer/translator',
                                 group    : groupTmp,
                                 langs    : JSON.encode(langsTmp),
-                                type     : typeTmp
+                                type     : typeTmp,
+                                external : external.checked ? 1 : 0
                             });
                         });
                     }
@@ -921,7 +927,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 dev    = (QUIQQER_CONFIG.globals.development).toInt();
 
             if (!dev && (Column.dataIndex === 'html' ||
-                    Column.dataIndex === 'datatype')
+                Column.dataIndex === 'datatype')
             ) {
                 return;
             }

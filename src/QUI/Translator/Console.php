@@ -22,13 +22,14 @@ class Console extends QUI\System\Console\Tool
     public function __construct()
     {
         $this->setName('package:translator')
-             ->setDescription('Compile and publish the translations');
+            ->setDescription('Compile and publish the translations');
     }
 
     /**
      * (non-PHPdoc)
      *
      * @see \QUI\System\Console\Tool::execute()
+     * @throws QUI\Exception
      */
     public function execute()
     {
@@ -36,8 +37,8 @@ class Console extends QUI\System\Console\Tool
             $this->writeLn('Start translator setup... ');
 
             QUI::getPackageManager()
-               ->getInstalledPackage('quiqqer/translator')
-               ->setup();
+                ->getInstalledPackage('quiqqer/translator')
+                ->setup();
 
             $this->write(' [ok]');
             $this->writeLn('');

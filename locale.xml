@@ -235,6 +235,10 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <de><![CDATA[Alle Gruppen (Anzahl: [count])]]></de>
             <en><![CDATA[All groups (count: [count])]]></en>
         </locale>
+        <locale name="export.window.group.external.label">
+            <de><![CDATA[Sprachvariablen aus anderen Gruppen, die von den gewählte(n) Export-Gruppe(n) überschrieben werden, mitexportieren]]></de>
+            <en><![CDATA[Export translations of other groups that are overwritten by the selected export group(s)]]></en>
+        </locale>
         <locale name="export.window.language">
             <de><![CDATA[Sprachenwahl]]></de>
             <en><![CDATA[Language choice]]></en>

@@ -90,10 +90,10 @@ class Translator
 
         QUI::getDataBase()->table()->addColumn(
             self::table(),
-            array(
-                $lang => 'text NULL',
+            [
+                $lang         => 'text NULL',
                 $lang.'_edit' => 'text NULL'
-            )
+            ]
         );
 
         if (file_exists(VAR_DIR.'locale/localefiles')) {
@@ -107,10 +107,12 @@ class Translator
      * @param String $group - which group should be exported? ("all" = Alle)
      * @param array $langs - Sprachen
      * @param string $type - "original" oder "edit"
+     * @param bool $external (optional) - export translations of external groups
+     * that are overwritten by the selected groups ($group) [default: false]
      *
      * @return String
      */
-    public static function export($group, $langs, $type)
+    public static function export($group, $langs, $type, $external = false)
     {
         $exportFolder = VAR_DIR.self::EXPORT_DIR;
 
@@ -124,7 +126,7 @@ class Translator
             $groups   = self::getGroupList();
             $fileName .= '_all';
         } else {
-            $groups   = array($group);
+            $groups   = [$group];
             $fileName .= '_'.str_replace('/', '_', $group);
         }
 
@@ -134,7 +136,7 @@ class Translator
         $result .= '<locales>'.PHP_EOL;
 
         foreach ($groups as $grp) {
-            $result .= self::createXMLContent($grp, $langs, $type);
+            $result .= self::createXMLContent($grp, $langs, $type, $external);
         }
 
         $result .= '</locales>';
@@ -151,13 +153,20 @@ class Translator
      * @param array $group
      * @param array $langs
      * @param string $editType - original, edit, edit_overwrite
+     * @param bool $external (optional) - include translations of external groups
+     * that are overwritten by the selected groups ($group) [default: false]
      *
      * @return string
      */
-    protected static function createXMLContent($group, $langs, $editType)
+    protected static function createXMLContent($group, $langs, $editType, $external = false)
     {
-        $entries = self::get($group);
-        $pool    = array();
+        if ($external) {
+            $entries = self::get(false, false, $group);
+        } else {
+            $entries = self::get($group);
+        }
+
+        $pool = [];
 
         foreach ($entries as $entry) {
             // Undefinierte Gruppen ausschließen
@@ -165,7 +174,7 @@ class Translator
                 continue;
             }
 
-            if (mb_strpos($entry['groups'], $group) === false) {
+            if (!$external && mb_strpos($entry['groups'], $group) === false) {
                 QUI\System\Log::addError(
                     'Translator Export: xml-Gruppe ('.$entry['groups'].')'.
                     ' passt nicht zur Translator-Gruppe ('.$group.')'
@@ -174,77 +183,89 @@ class Translator
                 continue;
             }
 
-            $type = 'php';
+            $group = $entry['groups'];
+            $type  = 'php';
 
             if (isset($entry['datatype']) && !empty($entry['datatype'])) {
                 $type = $entry['datatype'];
             }
 
-            $pool[$type][] = $entry;
+            if (!isset($pool[$type])) {
+                $pool[$type] = [];
+            }
+
+            if (!isset($pool[$type][$group])) {
+                $pool[$type][$group] = [];
+            }
+
+            $pool[$type][$group][] = $entry;
         }
 
         $result = '';
 
-        foreach ($pool as $type => $entries) {
-            $result .= '<groups name="'.$group.'" datatype="'.$type.'">'.PHP_EOL;
+        foreach ($pool as $type => $groups) {
+            foreach ($groups as $group => $entries) {
+                $result .= '<groups name="'.$group.'" datatype="'.$type.'">'.PHP_EOL;
 
-            foreach ($entries as $entry) {
-                $result .= "\t".'<locale name="'.$entry['var'].'"';
+                foreach ($entries as $entry) {
+                    $result .= "\t".'<locale name="'.$entry['var'].'"';
 
-                if (isset($entry['html']) && $entry['html'] == 1) {
-                    $result .= ' html="true"';
-                }
-
-                if (!empty($entry['priority'])) {
-                    $result .= ' priority="'.(int)$entry['priority'].'"';
-                }
-
-                if (!empty($entry['package'])) {
-                    $result .= ' package="'.$entry['package'].'"';
-                }
-
-                $result .= '>'.PHP_EOL;
-
-                foreach ($langs as $lang) {
-                    $result .= "\t\t".'<'.$lang.'>';
-                    $result .= '<![CDATA[';
-
-                    switch ($editType) {
-                        case 'edit':
-                            if (isset($entry[$lang.'_edit'])
-                                && !empty($entry[$lang.'_edit'])
-                            ) {
-                                $result .= $entry[$lang.'_edit'];
-                            }
-                            break;
-
-                        case 'edit_overwrite':
-                            if (isset($entry[$lang.'_edit'])
-                                && !empty($entry[$lang.'_edit'])
-                            ) {
-                                $result .= $entry[$lang.'_edit'];
-                            } else {
-                                if (isset($entry[$lang])
-                                    && !empty($entry[$lang])
-                                ) {
-                                    $result .= $entry[$lang];
-                                }
-                            }
-                            break;
-
-                        default:
-                            if (isset($entry[$lang]) && !empty($entry[$lang])) {
-                                $result .= $entry[$lang];
-                            }
+                    if (isset($entry['html']) && $entry['html'] == 1) {
+                        $result .= ' html="true"';
                     }
 
-                    $result .= ']]></'.$lang.'>'.PHP_EOL;
+                    if (!empty($entry['priority'])) {
+                        $result .= ' priority="'.(int)$entry['priority'].'"';
+                    }
+
+                    if (!empty($entry['package'])) {
+                        $result .= ' package="'.$entry['package'].'"';
+                    }
+
+                    $result .= '>'.PHP_EOL;
+
+                    foreach ($langs as $lang) {
+                        $var = '';
+
+                        switch ($editType) {
+                            case 'edit':
+                                if (isset($entry[$lang.'_edit'])
+                                    && !empty($entry[$lang.'_edit'])
+                                ) {
+                                    $var = $entry[$lang.'_edit'];
+                                }
+                                break;
+
+                            case 'edit_overwrite':
+                                if (isset($entry[$lang.'_edit'])
+                                    && !empty($entry[$lang.'_edit'])
+                                ) {
+                                    $var = $entry[$lang.'_edit'];
+                                } else {
+                                    if (isset($entry[$lang])
+                                        && !empty($entry[$lang])
+                                    ) {
+                                        $var = $entry[$lang];
+                                    }
+                                }
+                                break;
+
+                            default:
+                                if (isset($entry[$lang]) && !empty($entry[$lang])) {
+                                    $var = $entry[$lang];
+                                }
+                        }
+
+                        $result .= "\t\t".'<'.$lang.'>';
+                        $result .= '<![CDATA['.$var.']]>';
+                        $result .= '</'.$lang.'>'.PHP_EOL;
+                    }
+
+                    $result .= "\t".'</locale>'.PHP_EOL;
                 }
 
-                $result .= "\t".'</locale>'.PHP_EOL;
+                $result .= '</groups>'.PHP_EOL;
             }
-
-            $result .= '</groups>'.PHP_EOL;
         }
 
         return $result;
@@ -283,10 +304,10 @@ class Translator
 
         // nothing has changed
         if ($force === false && isset($filemtimes[$file]) && filemtime($file) <= $filemtimes[$file]) {
-            return array();
+            return [];
         }
 
-        $result  = array();
+        $result  = [];
         $devMode = QUI::conf('globals', 'development');
 
         if ($devModeIgnore) {
@@ -303,7 +324,7 @@ class Translator
                 QUI::getLocale()->get(
                     'quiqqer/translator',
                     'exception.import.wrong.format',
-                    array('file' => $file)
+                    ['file' => $file]
                 )
             );
         }
@@ -311,7 +332,7 @@ class Translator
         if (empty($groups)) {
             self::setLocaleFileModifyTime($file);
 
-            return array();
+            return [];
         }
 
         set_time_limit(ini_get('max_execution_time'));
@@ -372,12 +393,12 @@ class Translator
                     self::update($group, $var, $localePackageName, $locale);
                 } else {
                     // update only _edit fields
-                    $_locale = array(
+                    $_locale = [
                         'datatype' => $datatype,
-                        'html' => $locale['html'],
+                        'html'     => $locale['html'],
                         'priority' => $locale['priority'],
-                        'package' => $localePackageName
-                    );
+                        'package'  => $localePackageName
+                    ];
 
                     unset($locale['html']);
                     unset($locale['priority']);
@@ -390,11 +411,11 @@ class Translator
                     self::edit($group, $var, $localePackageName, $_locale);
                 }
 
-                $result[] = array(
-                    'group' => $group,
-                    'var' => $var,
+                $result[] = [
+                    'group'  => $group,
+                    'var'    => $var,
                     'locale' => $locale,
-                );
+                ];
             }
         }
 
@@ -486,7 +507,7 @@ class Translator
                 QUI::getLocale()->get(
                     'quiqqer/translator',
                     'exception.import.wrong.format',
-                    array('file' => $file)
+                    ['file' => $file]
                 )
             );
         }
@@ -504,7 +525,7 @@ class Translator
         $PDO = QUI::getDataBase()->getPDO();
         set_time_limit(ini_get('max_execution_time'));
 
-        $localeVariables = array();
+        $localeVariables = [];
 
         foreach ($groups as $locales) {
             $group    = $locales['group'];
@@ -542,14 +563,14 @@ class Translator
                 }
 
                 // Add locale variable to the batch
-                $localeVariable = array(
-                    'group' => $group,
-                    'var' => $var,
+                $localeVariable = [
+                    'group'    => $group,
+                    'var'      => $var,
                     'datatype' => $datatype,
-                    'html' => $locale['html'],
+                    'html'     => $locale['html'],
                     'priority' => $locale['priority'],
-                    'package' => $localePackageName
-                );
+                    'package'  => $localePackageName
+                ];
 
                 foreach (self::langs() as $lang) {
                     if (isset($locale[$lang])) {
@@ -566,17 +587,17 @@ class Translator
         // ************************** //
         //           Update
         // ************************** //
-        $currentRows = QUI::getDataBase()->fetch(array(
-            "select" => array(
+        $currentRows = QUI::getDataBase()->fetch([
+            "select" => [
                 "id",
                 "groups",
                 "var",
-            ),
-            "from" => self::table(),
-            "where" => array(
+            ],
+            "from"   => self::table(),
+            "where"  => [
                 "package" => $packageName
-            )
-        ));
+            ]
+        ]);
 
         foreach ($currentRows as $currentRow) {
             $varGroup = trim($currentRow['groups']);
@@ -673,10 +694,10 @@ class Translator
 
         if ($result === false) {
             throw new QUI\Exception(
-                QUI::getLocale()->get('quiqqer/translator', 'exception.batch.query.error', array(
-                    'file' => $file,
+                QUI::getLocale()->get('quiqqer/translator', 'exception.batch.query.error', [
+                    'file'  => $file,
                     'error' => $PDO->errorInfo()[2]
-                ))
+                ])
             );
         }
 
@@ -819,11 +840,11 @@ class Translator
     public static function getJSTranslationFiles($lang)
     {
         if (strlen($lang) !== 2) {
-            return array();
+            return [];
         }
 
-        $require = array();
-        $result  = array();
+        $require = [];
+        $result  = [];
 
         $jsdir       = self::dir().'bin/';
         $cacheFile   = $jsdir.'_cache/'.$lang.'.js';
@@ -832,7 +853,7 @@ class Translator
         QUIFile::mkdir($jsdir.'_cache/');
 
         if (file_exists($cacheFile) && !$development) {
-            return array('locale/_cache' => $cacheFile);
+            return ['locale/_cache' => $cacheFile];
         }
 
         $dirs      = QUIFile::readDir($jsdir);
@@ -878,7 +899,7 @@ class Translator
 
         file_put_contents($cacheFile, $cacheData);
 
-        return array('locale/_cache' => $cacheFile);
+        return ['locale/_cache' => $cacheFile];
     }
 
     /**
@@ -890,7 +911,7 @@ class Translator
      */
     public static function getAvailableLanguages()
     {
-        $langs    = array();
+        $langs    = [];
         $projects = QUI::getProjectManager()->getProjects(true);
 
         /* @var $Project QUI\Projects\Project */
@@ -952,7 +973,7 @@ class Translator
         $dir   = self::dir();
 
         // Sprach Ordner erstellen
-        $folders = array();
+        $folders = [];
 
         foreach ($langs as $lang) {
             $lcMessagePath = $dir.'/'.StringHelper::toLower($lang);
@@ -965,7 +986,7 @@ class Translator
             QUIFile::mkdir($folders[$lang]);
         }
 
-        $js_langs = array();
+        $js_langs = [];
         $Output   = false;
 
         if (class_exists('QUI\Output')) {
@@ -980,8 +1001,8 @@ class Translator
                 continue;
             }
 
-            $result = QUI::getDataBase()->fetch(array(
-                'select' => array(
+            $result = QUI::getDataBase()->fetch([
+                'select' => [
                     $lang,
                     $lang.'_edit',
                     'groups',
@@ -990,10 +1011,10 @@ class Translator
                     'datadefine',
                     'html',
                     'priority'
-                ),
-                'from' => self::table(),
-                'order' => 'priority ASC'
-            ));
+                ],
+                'from'   => self::table(),
+                'order'  => 'priority ASC'
+            ]);
 
             // priority ASC Erklärung:
             // Wir müssen den kleinsten zuerst nehmen,
@@ -1070,7 +1091,7 @@ class Translator
 
             foreach ($js_langs as $group => $groupentry) {
                 foreach ($groupentry as $lang => $entries) {
-                    $vars = array();
+                    $vars = [];
 
                     foreach ($entries as $entry) {
                         $value = $entry[$lang];
@@ -1149,8 +1170,8 @@ class Translator
 
             QUIFile::mkdir($folder);
 
-            $result = QUI::getDataBase()->fetch(array(
-                'select' => array(
+            $result = QUI::getDataBase()->fetch([
+                'select' => [
                     $lang,
                     $lang.'_edit',
                     'groups',
@@ -1158,20 +1179,20 @@ class Translator
                     'datatype',
                     'datadefine',
                     'html'
-                ),
-                'from' => self::table(),
-                'where' => array(
+                ],
+                'from'   => self::table(),
+                'where'  => [
                     'groups' => $group
-                ),
-                'order' => 'priority ASC'
-            ));
+                ],
+                'order'  => 'priority ASC'
+            ]);
 
             // priority ASC Erklärung:
             // Wir müssen den kleinsten zuerst nehmen,
             // damit die höchste Priorität zu letzt kommt und die davor überschreibt
             // Ist verwirrend, aber somit sparen wir ein Query
 
-            $javaScriptValues = array();
+            $javaScriptValues = [];
 
             $iniContent = '';
             $poContent  = '';
@@ -1283,7 +1304,7 @@ class Translator
      */
     public static function get($group = false, $var = false, $package = false)
     {
-        $where = array();
+        $where = [];
 
         if ($group) {
             $where['groups'] = $group;
@@ -1297,10 +1318,10 @@ class Translator
             $where['package'] = $package;
         }
 
-        return QUI::getDataBase()->fetch(array(
-            'from' => self::table(),
+        return QUI::getDataBase()->fetch([
+            'from'  => self::table(),
             'where' => $where
-        ));
+        ]);
     }
 
     /**
@@ -1312,7 +1333,7 @@ class Translator
      *
      * @return array
      */
-    public static function getData($groups, $params = array(), $search = false)
+    public static function getData($groups, $params = [], $search = false)
     {
         $table     = self::table();
         $db_fields = self::langs();
@@ -1334,14 +1355,14 @@ class Translator
         // PDO search emptyTranslations
         if ($search && isset($search['emptyTranslations']) && $search['emptyTranslations']) {
             $PDO    = QUI::getPDO();
-            $fields = array();
+            $fields = [];
 
             // search empty translations
             if (isset($search['fields']) && !empty($search['fields'])) {
                 $fields = array_flip($search['fields']);
             }
 
-            $whereParts = array();
+            $whereParts = [];
 
             foreach ($db_fields as $field) {
                 if (!empty($fields) && !isset($fields[$field])) {
@@ -1377,29 +1398,29 @@ class Translator
             $Statement->execute();
             $count = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
-            return array(
-                'data' => $result,
-                'page' => $page + 1,
+            return [
+                'data'  => $result,
+                'page'  => $page + 1,
                 'count' => $count[0]['count'],
                 'total' => $count[0]['count']
-            );
+            ];
         }
 
         if ($search && isset($search['search'])) {
             // search translations
-            $where  = array();
-            $search = array(
-                'type' => '%LIKE%',
+            $where  = [];
+            $search = [
+                'type'  => '%LIKE%',
                 'value' => trim($search['search'])
-            );
+            ];
 
             // default fields
-            $default = array(
-                'groups' => $search,
-                'var' => $search,
-                'datatype' => $search,
+            $default = [
+                'groups'     => $search,
+                'var'        => $search,
+                'datatype'   => $search,
                 'datadefine' => $search
-            );
+            ];
 
             foreach ($db_fields as $lang) {
                 if (strlen($lang) == 2) {
@@ -1409,7 +1430,7 @@ class Translator
             }
 
             // search
-            $fields = array();
+            $fields = [];
 
             if (isset($search['fields']) && !empty($search['fields'])) {
                 $fields = $search['fields'];
@@ -1425,20 +1446,20 @@ class Translator
                 $where = $default;
             }
 
-            $data = array(
-                'from' => $table,
+            $data = [
+                'from'     => $table,
                 'where_or' => $where,
-                'limit' => $limit
-            );
+                'limit'    => $limit
+            ];
         } else {
             // search complete group
-            $data = array(
-                'from' => $table,
-                'where' => array(
+            $data = [
+                'from'  => $table,
+                'where' => [
                     'groups' => $groups
-                ),
+                ],
                 'limit' => $limit
-            );
+            ];
         }
 
         // result mit limit
@@ -1453,12 +1474,12 @@ class Translator
 
         $count = QUI::getDataBase()->fetch($data);
 
-        return array(
-            'data' => $result,
-            'page' => $page + 1,
+        return [
+            'data'  => $result,
+            'page'  => $page + 1,
             'count' => $count[0]['groups'],
             'total' => $count[0]['groups']
-        );
+        ];
     }
 
     /**
@@ -1472,22 +1493,22 @@ class Translator
      */
     public static function getVarData($group, $var, $package = false)
     {
-        $where = array(
+        $where = [
             'groups' => $group,
-            'var' => $var
-        );
+            'var'    => $var
+        ];
 
         if (!empty($package)) {
             $where['package'] = $package;
         }
 
-        $result = QUI::getDataBase()->fetch(array(
-            'from' => self::table(),
+        $result = QUI::getDataBase()->fetch([
+            'from'  => self::table(),
             'where' => $where
-        ));
+        ]);
 
         if (!isset($result[0])) {
-            return array();
+            return [];
         }
 
         return $result[0];
@@ -1500,13 +1521,13 @@ class Translator
      */
     public static function getGroupList()
     {
-        $result = QUI::getDataBase()->fetch(array(
+        $result = QUI::getDataBase()->fetch([
             'select' => 'groups',
-            'from' => self::table(),
-            'group' => 'groups'
-        ));
+            'from'   => self::table(),
+            'group'  => 'groups'
+        ]);
 
-        $list = array();
+        $list = [];
 
         foreach ($result as $entry) {
             $list[] = $entry['groups'];
@@ -1541,21 +1562,21 @@ class Translator
 
         if (isset($result[0])) {
             throw new QUI\Exception(
-                array(
+                [
                     'quiqqer/translator',
                     'exception.var.exists',
-                    array(
-                        'group' => $group,
-                        'var' => $var,
+                    [
+                        'group'   => $group,
+                        'var'     => $var,
                         'package' => $package
-                    )
-                ),
+                    ]
+                ],
                 self::ERROR_CODE_VAR_EXISTS
             );
         }
 
         // cleanup datatype
-        $types    = array();
+        $types    = [];
         $dataType = explode(',', $dataType);
 
         foreach ($dataType as $type) {
@@ -1568,19 +1589,19 @@ class Translator
         }
 
         if (empty($types)) {
-            $types = array('php', 'js');
+            $types = ['php', 'js'];
         }
 
         // insert data
         QUI::getDataBase()->insert(
             self::table(),
-            array(
-                'groups' => $group,
-                'var' => $var,
-                'package' => !empty($package) ? $package : '',
+            [
+                'groups'   => $group,
+                'var'      => $var,
+                'package'  => !empty($package) ? $package : '',
                 'datatype' => implode(',', $types),
-                'html' => $html ? 1 : 0
-            )
+                'html'     => $html ? 1 : 0
+            ]
         );
     }
 
@@ -1627,7 +1648,7 @@ class Translator
     public static function update($group, $var, $packageName, $data)
     {
         $langs = self::langs();
-        $_data = array();
+        $_data = [];
 
         foreach ($langs as $lang) {
             if (!isset($data[$lang])) {
@@ -1660,11 +1681,11 @@ class Translator
             $_data['priority'] = (int)$data['priority'];
         }
 
-        QUI::getDataBase()->update(self::table(), $_data, array(
-            'groups' => $group,
-            'var' => $var,
+        QUI::getDataBase()->update(self::table(), $_data, [
+            'groups'  => $group,
+            'var'     => $var,
             'package' => $packageName
-        ));
+        ]);
     }
 
     /**
@@ -1677,11 +1698,11 @@ class Translator
      */
     public static function edit($group, $var, $packageName, $data)
     {
-        QUI::getDataBase()->update(self::table(), self::getEditData($data), array(
-            'groups' => $group,
-            'var' => $var,
+        QUI::getDataBase()->update(self::table(), self::getEditData($data), [
+            'groups'  => $group,
+            'var'     => $var,
             'package' => $packageName
-        ));
+        ]);
     }
 
     /**
@@ -1692,9 +1713,9 @@ class Translator
      */
     public static function editById($id, $data)
     {
-        QUI::getDataBase()->update(self::table(), self::getEditData($data), array(
+        QUI::getDataBase()->update(self::table(), self::getEditData($data), [
             'id' => $id
-        ));
+        ]);
     }
 
     /**
@@ -1707,7 +1728,7 @@ class Translator
     protected static function getEditData($data)
     {
         $langs = self::langs();
-        $_data = array();
+        $_data = [];
 
         $development = QUI::conf('globals', 'development');
 
@@ -1769,10 +1790,10 @@ class Translator
 
         QUI::getDataBase()->delete(
             self::table(),
-            array(
+            [
                 'groups' => $group,
-                'var' => $var
-            )
+                'var'    => $var
+            ]
         );
     }
 
@@ -1789,7 +1810,7 @@ class Translator
 
         QUI::getDataBase()->delete(
             self::table(),
-            array('id' => $id)
+            ['id' => $id]
         );
     }
 
@@ -1804,7 +1825,7 @@ class Translator
             self::table()
         );
 
-        $langs = array();
+        $langs = [];
 
         foreach ($fields as $entry) {
             if ($entry == 'groups'
@@ -1836,10 +1857,10 @@ class Translator
      */
     public static function getNeedles()
     {
-        $result = QUI::getDataBase()->fetch(array(
-            'from' => self::table(),
+        $result = QUI::getDataBase()->fetch([
+            'from'  => self::table(),
             'where' => implode(' = "" OR ', self::langs()).' = ""'
-        ));
+        ]);
 
         return $result;
     }
@@ -1848,7 +1869,7 @@ class Translator
      * Parser Methoden
      */
 
-    protected static $tmp = array();
+    protected static $tmp = [];
 
     /**
      * T Blöcke in einem String finden
@@ -1860,17 +1881,17 @@ class Translator
     public static function getTBlocksFromString($string)
     {
         if (strpos($string, '{/t}') === false) {
-            return array();
+            return [];
         }
 
-        self::$tmp = array();
+        self::$tmp = [];
 
         preg_replace_callback(
             '/{t([^}]*)}([^[{]*){\/t}/im',
             function ($params) {
                 if (isset($params[1]) && !empty($params[1])) {
                     $_params = explode(' ', trim($params[1]));
-                    $_params = str_replace(array('"', "'"), '', $_params);
+                    $_params = str_replace(['"', "'"], '', $_params);
 
                     $group = '';
                     $var   = '';
@@ -1887,10 +1908,10 @@ class Translator
                         }
                     }
 
-                    self::$tmp[] = array(
+                    self::$tmp[] = [
                         'groups' => $group,
-                        'var' => $var
-                    );
+                        'var'    => $var
+                    ];
 
                     return;
                 }
@@ -1900,15 +1921,15 @@ class Translator
                 if (strpos($_param[0], '/') === false
                     || strpos($_param[1], ' ') !== false
                 ) {
-                    self::$tmp[] = array(
+                    self::$tmp[] = [
                         'var' => $params[2]
-                    );
+                    ];
                 }
 
-                self::$tmp[] = array(
+                self::$tmp[] = [
                     'groups' => $_param[0],
-                    'var' => $_param[1],
-                );
+                    'var'    => $_param[1],
+                ];
             },
             $string
         );
@@ -1928,10 +1949,10 @@ class Translator
         if (strpos($string, '$L->get(') === false
             && strpos($string, '$Locale->get(') === false
         ) {
-            return array();
+            return [];
         }
 
-        self::$tmp = array();
+        self::$tmp = [];
 
         preg_replace_callback(
             '/\$L(ocale)?->get\s*\(\s*\'([^)]*)\'\s*,\s*\'([^[)]*)\'\s*\)/im',
@@ -1940,10 +1961,10 @@ class Translator
                     && !empty($params[3])
                     && strpos($params[2], '/') === false
                 ) {
-                    self::$tmp[] = array(
+                    self::$tmp[] = [
                         'groups' => $params[2],
-                        'var' => $params[3],
-                    );
+                        'var'    => $params[3],
+                    ];
                 }
             },
             $string
@@ -1962,7 +1983,7 @@ class Translator
     public static function deleteDoubleEntries($array)
     {
         // Doppelte Einträge löschen
-        $new_tmp = array();
+        $new_tmp = [];
 
         foreach ($array as $tmp) {
             if (!isset($new_tmp[$tmp['groups'].$tmp['var']])) {
@@ -1970,7 +1991,7 @@ class Translator
             }
         }
 
-        $array = array();
+        $array = [];
 
         foreach ($new_tmp as $tmp) {
             $array[] = $tmp;
@@ -2055,10 +2076,10 @@ class Translator
         }
 
         // results array
-        $hash = array();
+        $hash = [];
 
         // temporary array
-        $temp = array();
+        $temp = [];
 
         // state
         $state = null;
@@ -2093,7 +2114,7 @@ class Translator
                             $hash[] = $temp;
                         }
 
-                        $temp  = array();
+                        $temp  = [];
                         $state = null;
                         $fuzzy = false;
                     }
@@ -2150,7 +2171,7 @@ class Translator
 
         // Cleanup data, merge multiline entries, reindex hash for ksort
         $temp = $hash;
-        $hash = array();
+        $hash = [];
 
         foreach ($temp as $entry) {
             foreach ($entry as $v) {
@@ -2185,7 +2206,7 @@ class Translator
         $mo = '';
 
         // header data
-        $offsets = array();
+        $offsets = [];
         $ids     = '';
         $strings = '';
 
@@ -2205,12 +2226,12 @@ class Translator
             $str = implode("\x00", $entry['msgstr']);
 
             // keep track of offsets
-            $offsets[] = array(
+            $offsets[] = [
                 strlen($ids),
                 strlen($id),
                 strlen($strings),
                 strlen($str)
-            );
+            ];
             // plural msgids are not stored (?)
             $ids     .= $id."\x00";
             $strings .= $str."\x00";
@@ -2223,8 +2244,8 @@ class Translator
         $value_start = $key_start + strlen($ids);
 
         // first all key offsets, then all value offsets
-        $key_offsets   = array();
-        $value_offsets = array();
+        $key_offsets   = [];
+        $value_offsets = [];
 
         // calculate
         foreach ($offsets as $v) {
