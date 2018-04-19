@@ -8,13 +8,13 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_refreshLocale',
     function () {
-        $result       = array();
+        $result       = [];
         $translations = QUI\Translator::get();
 
         $langs = QUI\Translator::getAvailableLanguages();
 
         foreach ($translations as $entry) {
-            if (strpos($entry['datatype'], 'js') === false) {
+            if (strpos($entry['datatype'], 'js') === false && !empty($entry['datatype'])) {
                 continue;
             }
 
@@ -22,16 +22,14 @@ QUI::$Ajax->registerFunction(
             $var   = $entry['var'];
 
             foreach ($langs as $lang) {
-                if (!isset($entry[$lang])) {
-                    continue;
+                $value = '';
+
+                if (isset($entry[$lang])) {
+                    $value = $entry[$lang];
                 }
 
-                $value = $entry[$lang];
-
-                if (isset($entry[$lang . '_edit'])
-                    && !empty($entry[$lang . '_edit'])
-                ) {
-                    $value = $entry[$lang . '_edit'];
+                if (isset($entry[$lang.'_edit']) && !empty($entry[$lang.'_edit'])) {
+                    $value = $entry[$lang.'_edit'];
                 }
 
                 $result[$lang][$group][$var] = $value;

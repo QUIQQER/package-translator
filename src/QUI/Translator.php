@@ -1504,7 +1504,8 @@ class Translator
 
         $result = QUI::getDataBase()->fetch([
             'from'  => self::table(),
-            'where' => $where
+            'where' => $where,
+            'limit' => 1
         ]);
 
         if (!isset($result[0])) {
