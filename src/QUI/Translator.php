@@ -620,6 +620,7 @@ class Translator
                 }
             }
 
+            $updateFieldString .= "datatype=".$PDO->quote($var['datatype']).", ";
             $updateFieldString = trim($updateFieldString, ", ");
 
             if (empty($updateFieldString)) {
