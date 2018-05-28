@@ -247,10 +247,16 @@ define('package/quiqqer/translator/bin/controls/Create', [
 
         /**
          * shows all translation entries
+         *
+         * @return {Promise}
          */
         open: function () {
             var self = this,
                 list = this.getElm().getElements('.quiqqer-translator-entry');
+
+            if (!list || !list.length) {
+                return Promise.resolve();
+            }
 
             var First = list.shift();
 
@@ -259,22 +265,26 @@ define('package/quiqqer/translator/bin/controls/Create', [
                 height : 0
             });
 
-            moofx(First).animate({
-                height: 34
-            });
+            return new Promise(function (resolve) {
+                moofx(First).animate({
+                    height: 34
+                });
 
-            moofx(list).animate({
-                height : 34,
-                opacity: 1
-            }, {
-                duration: 200,
-                callback: function () {
-                    self.$Toggler.setAttribute('icon', 'fa fa-arrow-circle-o-down');
+                moofx(list).animate({
+                    height : 34,
+                    opacity: 1
+                }, {
+                    duration: 200,
+                    callback: function () {
+                        self.$Toggler.setAttribute('icon', 'fa fa-arrow-circle-o-down');
 
-                    if ("setActive" in self.$Toggler) {
-                        self.$Toggler.setActive();
+                        if ("setActive" in self.$Toggler) {
+                            self.$Toggler.setActive();
+                        }
+
+                        resolve();
                     }
-                }
+                });
             });
         },
 
@@ -286,6 +296,10 @@ define('package/quiqqer/translator/bin/controls/Create', [
         close: function () {
             var self = this,
                 list = this.getElm().getElements('.quiqqer-translator-entry');
+
+            if (!list || !list.length) {
+                return Promise.resolve();
+            }
 
             var First = list.shift();
 
