@@ -254,7 +254,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
             var self = this,
                 list = this.getElm().getElements('.quiqqer-translator-entry');
 
-            if (!list) {
+            if (!list || !list.length) {
                 return Promise.resolve();
             }
 
@@ -297,7 +297,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
             var self = this,
                 list = this.getElm().getElements('.quiqqer-translator-entry');
 
-            if (!list.length) {
+            if (!list || !list.length) {
                 return Promise.resolve();
             }
 
