@@ -595,11 +595,12 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton(
                 new QUISelect({
-                    name  : 'translater/group/begin',
-                    styles: {
+                    name      : 'translater/group/begin',
+                    searchable: true,
+                    styles    : {
                         width: '17%'
                     },
-                    events: {
+                    events    : {
                         onChange: function (value) {
                             var ButtonBar = self.getButtonBar(),
                                 ImportBtn = ButtonBar.getChildren('import'),
@@ -626,11 +627,12 @@ define('package/quiqqer/translator/bin/Panel', [
 
             this.addButton(
                 new QUISelect({
-                    name  : 'translater/group/end',
-                    styles: {
+                    name      : 'translater/group/end',
+                    searchable: true,
+                    styles    : {
                         width: '17%'
                     },
-                    events: {
+                    events    : {
                         onChange: function () {
                             var ButtonBar = self.getButtonBar(),
                                 ImportBtn = ButtonBar.getChildren('import'),
