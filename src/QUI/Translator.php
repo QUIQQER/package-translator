@@ -1686,7 +1686,7 @@ class Translator
         QUI::getDataBase()->update(self::table(), $_data, [
             'groups'  => $group,
             'var'     => $var,
-            'package' => $packageName
+            'package' => $packageName ?: $group
         ]);
     }
 
@@ -1703,7 +1703,7 @@ class Translator
         QUI::getDataBase()->update(self::table(), self::getEditData($data), [
             'groups'  => $group,
             'var'     => $var,
-            'package' => $packageName
+            'package' => $packageName ?: $group
         ]);
     }
 
