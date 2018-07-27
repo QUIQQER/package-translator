@@ -22,10 +22,7 @@ QUI::$Ajax->registerFunction(
         if (!QUI::conf('globals', 'development')) {
             foreach ($data['data'] as $key => $entry) {
                 foreach ($langs as $lang) {
-                    if (isset($entry[$lang])
-                        && isset($entry[$lang . '_edit'])
-                        && !empty($entry[$lang . '_edit'])
-                    ) {
+                    if (!empty($entry[$lang . '_edit'])) {
                         $data['data'][$key][$lang] = $entry[$lang . '_edit'];
                     }
                 }
