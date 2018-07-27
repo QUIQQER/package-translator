@@ -10,6 +10,7 @@ use QUI;
 use QUI\Utils\Text\XML;
 use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
+use QUI\Cache\Manager as CacheManager;
 
 /**
  * QUIQQER Translator
@@ -912,6 +913,14 @@ class Translator
      */
     public static function getAvailableLanguages()
     {
+        $cacheName = 'quiqqer/translator/availableLanguages';
+
+        try {
+            return CacheManager::get($cacheName);
+        } catch (\Exception $Exception) {
+            // nothing, retrieve languages normally
+        }
+
         $langs    = [];
         $projects = QUI::getProjectManager()->getProjects(true);
 
@@ -922,6 +931,9 @@ class Translator
 
         $langs = array_unique($langs);
         $langs = array_values($langs);
+        $langs = array_unique(array_merge($langs, self::langs()));
+
+        CacheManager::set($cacheName, $langs);
 
         return $langs;
     }
