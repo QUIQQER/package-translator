@@ -930,8 +930,8 @@ class Translator
         }
 
         $langs = array_unique($langs);
-        $langs = array_values($langs);
         $langs = array_unique(array_merge($langs, self::langs()));
+        $langs = array_values($langs);
 
         CacheManager::set($cacheName, $langs);
 
