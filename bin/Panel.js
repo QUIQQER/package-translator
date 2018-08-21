@@ -937,9 +937,15 @@ define('package/quiqqer/translator/bin/Panel', [
 
             Grid.setHeight(300);
 
+            var cellContent = Cell.get('text').trim();
+
+            if (cellContent === '&nbsp;') {
+                cellContent = '';
+            }
+
             if (this.$Editor) {
                 this.$gridDblClickHeaderCreate(localeData, Column, row);
-                this.$Editor.setContent(Cell.get('text'));
+                this.$Editor.setContent(cellContent);
 
                 if ((localeData.html).toInt() === 1) {
                     this.$Editor.switchToWYSIWYG();
@@ -954,7 +960,6 @@ define('package/quiqqer/translator/bin/Panel', [
 
                 return;
             }
-
 
             this.Loader.show();
 
@@ -987,7 +992,6 @@ define('package/quiqqer/translator/bin/Panel', [
                     if ((localeData.html).toInt() === 1) {
                         self.$Editor.switchToWYSIWYG();
                         self.$Editor.showToolbar();
-
                     } else {
                         self.$Editor.switchToSource();
                         self.$Editor.hideToolbar();
@@ -998,7 +1002,7 @@ define('package/quiqqer/translator/bin/Panel', [
                 });
 
                 self.$Editor.inject(EditorContainer);
-                self.$Editor.setContent(Cell.get('text'));
+                self.$Editor.setContent(cellContent);
             });
         },
 

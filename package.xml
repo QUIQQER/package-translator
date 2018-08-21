@@ -8,7 +8,7 @@
             <locale group="quiqqer/translator" var="package.description"/>
         </description>
 
-        <image src="URL_OPT_DIR/quiqqer/package-translator/bin/images/Logo.jpg"/>
+        <image src="URL_OPT_DIR/quiqqer/translator/bin/images/Logo.jpg"/>
 
         <preview>
             <image src="URL_OPT_DIR/quiqqer/quiqqer/bin/images/screenshot1.png"/>
