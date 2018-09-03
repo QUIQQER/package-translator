@@ -439,6 +439,13 @@ define('package/quiqqer/translator/bin/Panel', [
                         width    : 150
                     });
 
+                    cols.push({
+                        header   : Locale.get('quiqqer/translator', 'grid.title.origin_package'),
+                        dataIndex: 'package',
+                        dataType : 'string',
+                        width    : 150
+                    });
+
                     self.$attentionBox();
                 }
 
