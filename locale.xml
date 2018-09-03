@@ -275,6 +275,10 @@ Klicken Sie auf OK, um die neue Sprachvariable anzulegen.]]></de>
             <de><![CDATA[HTML]]></de>
             <en><![CDATA[HTML]]></en>
         </locale>
+        <locale name="grid.title.origin_package">
+            <de><![CDATA[Quell-Paket]]></de>
+            <en><![CDATA[Package of origin]]></en>
+        </locale>
         <locale name="btn.add.var.text">
             <de><![CDATA[Variable(n) hinzufügen]]></de>
             <en><![CDATA[Add variables]]></en>
