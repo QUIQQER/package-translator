@@ -927,36 +927,64 @@ class Translator
     }
 
     /**
-     * remove all dublicate entres from the translation table
+     * Remove all duplicate entries in `translate`
      *
-     * because:
-     * #1071 - Specified key was too long; max key length is 1000 bytes
+     * Duplicate = identical regarding `groups`, `var` and `package`
      *
-     * we cannot use unique keys :/
+     * When a duplicate is found, the entry with the LOWEST id is kept and all other
+     * entries are deleted!
+     *
+     * @return void
      */
     public static function cleanup()
     {
-        $PDO       = QUI::getDataBase()->getPDO();
-        $bad_table = self::table();
+        $PDO   = QUI::getDataBase()->getPDO();
+        $table = self::table();
 
         // check if dublicate entries exist
         $Statement = $PDO->prepare(
-            'SELECT `groups`, `var`
-            FROM '.$bad_table.'
-            GROUP BY `groups`, `var`
+            'SELECT `groups`, `var`, `package`
+            FROM '.$table.'
+            GROUP BY `groups`, `var`, `package`
             HAVING count( * ) > 1'
         );
 
         $Statement->execute();
+        $result = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        if (!$Statement->fetch()) {
+        if (empty($result)) {
             return;
         }
 
-        $PDO->prepare('DROP TABLE IF EXISTS bad_temp_translation')->execute();
-        $PDO->prepare('CREATE TEMPORARY TABLE bad_temp_translation AS SELECT DISTINCT * FROM '.$bad_table)->execute();
-        $PDO->prepare('DELETE FROM '.$bad_table)->execute();
-        $PDO->prepare('INSERT INTO '.$bad_table.' SELECT * FROM bad_temp_translation')->execute();
+        $DB = QUI::getDataBase();
+
+        foreach ($result as $row) {
+            $duplicates = $DB->fetch([
+                'select' => ['id'],
+                'from'   => $table,
+                'where'  => [
+                    'groups'  => $row['groups'],
+                    'var'     => $row['var'],
+                    'package' => $row['package']
+                ]
+            ]);
+
+            $duplicateIds = [];
+
+            foreach ($duplicates as $duplicate) {
+                $duplicateIds[] = $duplicate['id'];
+            }
+
+            $DB->delete($table, [
+                'groups'  => $row['groups'],
+                'var'     => $row['var'],
+                'package' => $row['package'],
+                'id'      => [
+                    'type'  => 'NOT',
+                    'value' => min($duplicateIds)
+                ]
+            ]);
+        }
     }
 
     /**
