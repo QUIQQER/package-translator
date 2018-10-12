@@ -20,13 +20,13 @@
  ======================================  */
 
 .field-container-field > .quiqqer-translator-entry {
-    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
     overflow: hidden;
     width: 100%;
 }
 
-.field-container-field > .quiqqer-translator-entry:last-child {
-    border-bottom: 0;
+.field-container-field > .quiqqer-translator-entry:first-child {
+    border-top: 0;
 }
 
 .field-container-field > .quiqqer-translator-entry img {

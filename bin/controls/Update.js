@@ -65,8 +65,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
             var Elm = this.parent();
 
             Elm.set({
-                'class': 'quiqqer-translator-update',
-                html   : ''
+                'class': 'quiqqer-translator-update'
             });
 
             return Elm;
@@ -83,6 +82,12 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 path = URL_BIN_DIR + '16x16/flags/';
 
             Elm.set('html', '');
+
+            if (Elm.getParent().hasClass('field-container-field')) {
+                Elm.addClass('field-container-field');
+                Elm.addClass('field-container-field-no-padding');
+                Elm.getParent().addClass('field-container-field-no-padding');
+            }
 
             return new Promise(function (resolve) {
                 QUIAjax.get([
@@ -217,7 +222,6 @@ define('package/quiqqer/translator/bin/controls/Update', [
                     }
                 }).inject(self.getElm(), 'after');
             });
-
         },
 
         /**
