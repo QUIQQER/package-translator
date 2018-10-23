@@ -15,7 +15,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
     'Locale',
     'package/quiqqer/translator/bin/classes/Translator',
 
-    'css!package/quiqqer/translator/bin/controls/Create.css'
+    'css!package/quiqqer/translator/bin/controls/Update.css'
 
 ], function (QUI, QUIControl, QUIButton, QUIAjax, QUILocale, Translator) {
     "use strict";
@@ -75,7 +75,6 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * @returns {Promise}
          */
         createTranslation: function () {
-
             var self = this,
                 data = this.getData();
 
@@ -95,21 +94,17 @@ define('package/quiqqer/translator/bin/controls/Create', [
                 );
             }).then(function () {
                 return Translate.refreshLocale();
-
             }).then(function () {
                 return Translate.publish(
                     self.getAttribute('group')
                 );
-
             }).catch(function () {
-
                 return Translate.setTranslation(
                     self.getAttribute('group'),
                     self.getAttribute('var'),
                     data
                 ).then(function () {
                     return Translate.refreshLocale();
-
                 }).then(function () {
                     return Translate.publish(
                         self.getAttribute('group')
@@ -207,7 +202,13 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     }
                 }).inject(Elm);
 
-                Elm.getElements('input').addEvent('change', function () {
+                if (languages.length <= 1) {
+                    self.$Toggler.destroy();
+                }
+
+                var Input = Elm.getElements('input');
+
+                Input.addEvent('change', function () {
                     self.setAttribute('data', self.getData());
                     self.fireEvent('change', [self]);
                 });
@@ -254,7 +255,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
             var self = this,
                 list = this.getElm().getElements('.quiqqer-translator-entry');
 
-            if (!list || !list.length) {
+            if (!list || !list.length || list.length === 1) {
                 return Promise.resolve();
             }
 
@@ -277,6 +278,12 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     duration: 200,
                     callback: function () {
                         self.$Toggler.setAttribute('icon', 'fa fa-arrow-circle-o-down');
+
+                        if (self.$Toggler.nodeName === 'SPAN') {
+                            self.$Toggler.getElement('span')
+                                .addClass('fa-arrow-circle-o-down')
+                                .removeClass('fa-arrow-circle-o-right');
+                        }
 
                         if ("setActive" in self.$Toggler) {
                             self.$Toggler.setActive();
@@ -305,6 +312,10 @@ define('package/quiqqer/translator/bin/controls/Create', [
 
             First.setStyle('height', null);
 
+            if (!list || !list.length) {
+                return Promise.resolve();
+            }
+
             return new Promise(function (resolve) {
                 moofx(list).animate({
                     height : 0,
@@ -316,6 +327,12 @@ define('package/quiqqer/translator/bin/controls/Create', [
                             'icon',
                             'fa fa-arrow-circle-o-right'
                         );
+
+                        if (self.$Toggler.nodeName === 'SPAN') {
+                            self.$Toggler.getElement('span')
+                                .addClass('fa-arrow-circle-o-right')
+                                .removeClass('fa-arrow-circle-o-down');
+                        }
 
                         if ("setNormal" in self.$Toggler) {
                             self.$Toggler.setNormal();

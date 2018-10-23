@@ -65,7 +65,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
             var Elm = this.parent();
 
             Elm.set({
-                'class': 'quiqqer-translator-update'
+                'class': 'quiqqer-translator-update',
+                html   : ''
             });
 
             return Elm;
@@ -83,10 +84,13 @@ define('package/quiqqer/translator/bin/controls/Update', [
 
             Elm.set('html', '');
 
-            if (Elm.getParent().hasClass('field-container-field')) {
-                Elm.addClass('field-container-field');
-                Elm.addClass('field-container-field-no-padding');
-                Elm.getParent().addClass('field-container-field-no-padding');
+
+            var flexField = this.$Elm.getParent().hasClass('field-container-field');
+
+            if (flexField) {
+                this.$Elm.addClass('field-container-field');
+                this.$Elm.addClass('quiqqer-t-entry__minimize');
+                this.$Elm.replaces(this.$Elm.getParent());
             }
 
             return new Promise(function (resolve) {
@@ -134,18 +138,42 @@ define('package/quiqqer/translator/bin/controls/Update', [
                         }
                     }
 
-                    self.$Toggler = new QUIButton({
-                        icon  : 'fa fa-arrow-circle-o-right',
-                        styles: {
-                            position: 'absolute',
-                            right   : 0
-                        },
-                        events: {
-                            onClick: self.toggle
-                        }
-                    }).inject(Elm);
+                    if (!flexField) {
+                        self.$Toggler = new QUIButton({
+                            icon  : 'fa fa-arrow-circle-o-right',
+                            styles: {
+                                position: 'absolute',
+                                right   : 0
+                            },
+                            events: {
+                                onClick: self.toggle
+                            }
+                        }).inject(Elm);
+                    } else {
+                        self.$Toggler = new Element('span.field-container-item', {
+                            html  : '<span class="fa fa-arrow-circle-o-right"></span>',
+                            styles: {
+                                cursor    : 'pointer',
+                                lineHeight: 28,
+                                textAlign : 'center',
+                                width     : 50
+                            },
+                            events: {
+                                click: function (event) {
+                                    event.stop();
+                                    self.toggle();
+                                }
+                            }
+                        }).inject(self.getElm(), 'after');
+                    }
 
-                    Elm.getElements('input').addEvent('change', function () {
+                    if (languages.length <= 1) {
+                        self.$Toggler.destroy(); // needed because of css bug -> not last child
+                    }
+
+                    var Input = Elm.getElements('input');
+
+                    Input.addEvent('change', function () {
                         self.setAttribute('data', self.getData());
                         self.fireEvent('change', [self]);
                     });
