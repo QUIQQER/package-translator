@@ -25,6 +25,10 @@
             <de><![CDATA[Übersetzung wurde nicht gefunden und konnte nicht aktualisiert werden]]></de>
             <en><![CDATA[Translation was not found and could not be updated.]]></en>
         </locale>
+        <locale name="exception.translation.var.not.found.update">
+            <de><![CDATA[Die Sprachvariable '[var]' in der Gruppe '[group]' wurde nicht gefunden und konnte nicht aktualisiert werden.]]></de>
+            <en><![CDATA[The locale variable '[var]' in group '[group]' was not found and could not be updated.]]></en>
+        </locale>
         <locale name="exception.lang.shortcut.not.allowed">
             <de><![CDATA[Sprachkürzel nicht erlaubt]]></de>
             <en><![CDATA[Lang shortcut not allowed]]></en>
