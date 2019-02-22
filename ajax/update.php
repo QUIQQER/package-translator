@@ -31,7 +31,7 @@ QUI::$Ajax->registerFunction(
                     'quiqqer/translator',
                     'exception.translation.var.not.found.update',
                     [
-                        'var' => $data['var'],
+                        'var'   => $data['var'],
                         'group' => $groups
                     ]
                 ),
@@ -58,6 +58,6 @@ QUI::$Ajax->registerFunction(
             )
         );
     },
-    array('groups', 'data'),
+    ['groups', 'data'],
     'Permission::checkAdminUser'
 );

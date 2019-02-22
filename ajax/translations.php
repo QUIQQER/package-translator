@@ -22,20 +22,20 @@ QUI::$Ajax->registerFunction(
         if (!QUI::conf('globals', 'development')) {
             foreach ($data['data'] as $key => $entry) {
                 foreach ($langs as $lang) {
-                    if (!empty($entry[$lang . '_edit'])) {
-                        $data['data'][$key][$lang] = $entry[$lang . '_edit'];
+                    if (!empty($entry[$lang.'_edit'])) {
+                        $data['data'][$key][$lang] = $entry[$lang.'_edit'];
                     }
                 }
             }
         }
 
-        $result = array(
+        $result = [
             'data'  => $data,
             'langs' => $langs
-        );
+        ];
 
         return $result;
     },
-    array('groups', 'params', 'search'),
+    ['groups', 'params', 'search'],
     'Permission::checkAdminUser'
 );

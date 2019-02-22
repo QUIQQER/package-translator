@@ -22,11 +22,11 @@ QUI::$Ajax->registerFunction(
                     QUI::getLocale()->get(
                         'quiqqer/translator',
                         'message.translation.delete.id.successfully',
-                        array(
+                        [
                             'groups' => $entry['groups'],
                             'var'    => $entry['var'],
                             'id'     => $entry['id']
-                        )
+                        ]
                     )
                 );
 
@@ -50,14 +50,14 @@ QUI::$Ajax->registerFunction(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
                     'message.translation.delete.successfully',
-                    array(
+                    [
                         'groups' => $entry['groups'],
                         'var'    => $entry['var']
-                    )
+                    ]
                 )
             );
         }
     },
-    array('data'),
+    ['data'],
     'Permission::checkAdminUser'
 );

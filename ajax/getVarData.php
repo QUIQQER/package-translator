@@ -13,6 +13,6 @@ QUI::$Ajax->registerFunction(
     function ($group, $var, $pkg) {
         return QUI\Translator::getVarData($group, $var, $pkg);
     },
-    array('group', 'var', 'pkg'),
+    ['group', 'var', 'pkg'],
     'Permission::checkAdminUser'
 );

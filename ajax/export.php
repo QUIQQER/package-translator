@@ -23,6 +23,6 @@ QUI::$Ajax->registerFunction(
             QUI\Translator::export($group, $langs, $type, boolval($external))
         );
     },
-    array('group', 'langs', 'type', 'external'),
+    ['group', 'langs', 'type', 'external'],
     'Permission::checkAdminUser'
 );

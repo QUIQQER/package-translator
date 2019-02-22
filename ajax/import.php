@@ -16,6 +16,6 @@ QUI::$Ajax->registerFunction(
             $overwriteOriginal
         );
     },
-    array('overwriteOriginal', 'File'),
+    ['overwriteOriginal', 'File'],
     'Permission::checkAdminUser'
 );

@@ -21,7 +21,7 @@ QUI::$Ajax->registerFunction(
                 )
             );
 
-            return array();
+            return [];
         }
 
         if ($overwrite == 1) {
@@ -36,6 +36,6 @@ QUI::$Ajax->registerFunction(
             true
         );
     },
-    array('File', 'overwrite'),
+    ['File', 'overwrite'],
     'Permission::checkAdminUser'
 );
