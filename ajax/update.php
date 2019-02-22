@@ -29,7 +29,11 @@ QUI::$Ajax->registerFunction(
             throw new QUI\Exception(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
-                    'exception.translation.not.found.update'
+                    'exception.translation.var.not.found.update',
+                    [
+                        'var'   => $data['var'],
+                        'group' => $groups
+                    ]
                 ),
                 404
             );
@@ -54,6 +58,6 @@ QUI::$Ajax->registerFunction(
             )
         );
     },
-    array('groups', 'data'),
+    ['groups', 'data'],
     'Permission::checkAdminUser'
 );

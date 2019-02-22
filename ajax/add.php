@@ -29,14 +29,14 @@ QUI::$Ajax->registerFunction(
             QUI::getLocale()->get(
                 'quiqqer/translator',
                 'message.var.add.successful',
-                array(
+                [
                     'groups'  => $group,
                     'var'     => $var,
                     'package' => $pkg
-                )
+                ]
             )
         );
     },
-    array('group', 'var', 'pkg', 'datatype', 'html'),
+    ['group', 'var', 'pkg', 'datatype', 'html'],
     'Permission::checkAdminUser'
 );

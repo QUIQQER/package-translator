@@ -10,7 +10,7 @@ QUI::$Ajax->registerFunction(
     function () {
         $Engine = QUI::getTemplateManager()->getEngine(true);
 
-        $languages = array();
+        $languages = [];
         $result    = \QUI\Translator::langs();
 
         foreach ($result as $lang) {
@@ -19,13 +19,13 @@ QUI::$Ajax->registerFunction(
             }
         }
 
-        $Engine->assign(array(
+        $Engine->assign([
             'languages' => $languages
-        ));
+        ]);
 
         return $Engine->fetch(
             str_replace('/ajax/template', '', dirname(__FILE__))
-            . '/template/search.html'
+            .'/template/search.html'
         );
     },
     false,
