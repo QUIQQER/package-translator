@@ -152,6 +152,14 @@ define('package/quiqqer/translator/bin/controls/Create', [
 
             Elm.set('html', '');
 
+            var flexField = this.$Elm.getParent().hasClass('field-container-field');
+
+            if (flexField) {
+                this.$Elm.addClass('field-container-field');
+                this.$Elm.addClass('quiqqer-t-entry__minimize');
+                this.$Elm.replaces(this.$Elm.getParent());
+            }
+
             QUIAjax.get('ajax_system_getAvailableLanguages', function (languages) {
                 var i, len, lang, Container;
 
@@ -191,16 +199,34 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     }
                 }
 
-                self.$Toggler = new QUIButton({
-                    icon  : 'fa fa-arrow-circle-o-right',
-                    styles: {
-                        position: 'absolute',
-                        right   : 0
-                    },
-                    events: {
-                        onClick: self.toggle
-                    }
-                }).inject(Elm);
+                if (!flexField) {
+                    self.$Toggler = new QUIButton({
+                        icon  : 'fa fa-arrow-circle-o-right',
+                        styles: {
+                            position: 'absolute',
+                            right   : 0
+                        },
+                        events: {
+                            onClick: self.toggle
+                        }
+                    }).inject(Elm);
+                } else {
+                    self.$Toggler = new Element('span.field-container-item', {
+                        html  : '<span class="fa fa-arrow-circle-o-right"></span>',
+                        styles: {
+                            cursor    : 'pointer',
+                            lineHeight: 28,
+                            textAlign : 'center',
+                            width     : 50
+                        },
+                        events: {
+                            click: function (event) {
+                                event.stop();
+                                self.toggle();
+                            }
+                        }
+                    }).inject(self.getElm(), 'after');
+                }
 
                 if (languages.length <= 1) {
                     self.$Toggler.destroy();
