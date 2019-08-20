@@ -909,8 +909,6 @@ class Translator
      * Return all available languages
      *
      * @return array
-     *
-     * @throws QUi\Exception
      */
     public static function getAvailableLanguages()
     {
@@ -922,21 +920,28 @@ class Translator
             // nothing, retrieve languages normally
         }
 
-        $langs    = [];
-        $projects = QUI::getProjectManager()->getProjects(true);
+        try {
+            $projects = QUI::getProjectManager()->getProjects(true);
+        } catch (QUI\Exception $Exception) {
+            QUI\System\Log::writeException($Exception);
+
+            return [];
+        }
+
+        $languages = [];
 
         /* @var $Project QUI\Projects\Project */
         foreach ($projects as $Project) {
-            $langs = array_merge($langs, $Project->getAttribute('langs'));
+            $languages = \array_merge($languages, $Project->getAttribute('langs'));
         }
 
-        $langs = array_unique($langs);
-        $langs = array_unique(array_merge($langs, self::langs()));
-        $langs = array_values($langs);
+        $languages = \array_unique($languages);
+        $languages = \array_unique(\array_merge($languages, self::langs()));
+        $languages = \array_values($languages);
 
-        CacheManager::set($cacheName, $langs);
+        CacheManager::set($cacheName, $languages);
 
-        return $langs;
+        return $languages;
     }
 
     /**
