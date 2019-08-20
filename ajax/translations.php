@@ -15,8 +15,8 @@ QUI::$Ajax->registerFunction(
         $langs = QUI\Translator::langs();
         $data  = QUI\Translator::getData(
             $groups,
-            json_decode($params, true),
-            json_decode($search, true)
+            \json_decode($params, true),
+            \json_decode($search, true)
         );
 
         if (!QUI::conf('globals', 'development')) {

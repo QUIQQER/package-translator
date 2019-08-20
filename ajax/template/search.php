@@ -14,7 +14,7 @@ QUI::$Ajax->registerFunction(
         $result    = \QUI\Translator::langs();
 
         foreach ($result as $lang) {
-            if (strlen($lang) == 2) {
+            if (\strlen($lang) == 2) {
                 $languages[] = $lang;
             }
         }
@@ -24,7 +24,7 @@ QUI::$Ajax->registerFunction(
         ]);
 
         return $Engine->fetch(
-            str_replace('/ajax/template', '', dirname(__FILE__))
+            \str_replace('/ajax/template', '', \dirname(__FILE__))
             .'/template/search.html'
         );
     },

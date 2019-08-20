@@ -10,17 +10,17 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_export',
     function ($group, $langs, $type, $external) {
-        $group = str_replace('/', '!GROUPSEPARATOR!', $group);
+        $group = \str_replace('/', '!GROUPSEPARATOR!', $group);
         $group = QUI\Utils\Security\Orthos::clear($group);
-        $group = str_replace('!GROUPSEPARATOR!', '/', $group);
+        $group = \str_replace('!GROUPSEPARATOR!', '/', $group);
 
         $langs = QUI\Utils\Security\Orthos::clearArray(
-            json_decode($langs, true)
+            \json_decode($langs, true)
         );
         $type  = QUI\Utils\Security\Orthos::clear($type);
 
         QUI\Utils\System\File::downloadHeader(
-            QUI\Translator::export($group, $langs, $type, boolval($external))
+            QUI\Translator::export($group, $langs, $type, \boolval($external))
         );
     },
     ['group', 'langs', 'type', 'external'],
