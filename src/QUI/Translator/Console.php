@@ -28,8 +28,8 @@ class Console extends QUI\System\Console\Tool
     /**
      * (non-PHPdoc)
      *
-     * @see \QUI\System\Console\Tool::execute()
      * @throws QUI\Exception
+     * @see \QUI\System\Console\Tool::execute()
      */
     public function execute()
     {

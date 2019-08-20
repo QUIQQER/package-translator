@@ -8,9 +8,9 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_delete',
     function ($data) {
-        $data = json_decode($data, true);
+        $data = \json_decode($data, true);
 
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return;
         }
 
