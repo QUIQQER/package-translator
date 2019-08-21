@@ -6,7 +6,6 @@
 
 namespace QUI;
 
-use function GuzzleHttp\Promise\queue;
 use QUI;
 use QUI\Utils\Text\XML;
 use QUI\Utils\StringHelper;
@@ -113,6 +112,8 @@ class Translator
      * that are overwritten by the selected groups ($group) [default: false]
      *
      * @return String
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function export($group, $langs, $type, $external = false)
     {
@@ -159,6 +160,8 @@ class Translator
      * that are overwritten by the selected groups ($group) [default: false]
      *
      * @return string
+     *
+     * @throws QUI\DataBase\Exception
      */
     protected static function createXMLContent($group, $langs, $editType, $external = false)
     {
@@ -717,7 +720,7 @@ class Translator
         $devModeIgnore = false,
         $force = false
     ) {
-        $file = $Package->getXMLFile('locale.xml');
+        $file = $Package->getXMLFilePath('locale.xml');
 
         if (!file_exists($file)) {
             return;
@@ -947,6 +950,8 @@ class Translator
      * entries are deleted!
      *
      * @return void
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function cleanup()
     {
@@ -1342,6 +1347,8 @@ class Translator
      * @param string|boolean $package - optional, package name
      *
      * @return array
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function get($group = false, $var = false, $package = false)
     {
@@ -1504,7 +1511,19 @@ class Translator
         }
 
         // result mit limit
-        $result = QUI::getDataBase()->fetch($data);
+        try {
+            $result = QUI::getDataBase()->fetch($data);
+        } catch (QUI\DataBase\Exception $Exception) {
+            QUI\System\Log::writeException($Exception);
+
+            return [
+                'data'  => [],
+                'page'  => 1,
+                'count' => 0,
+                'total' => 0
+            ];
+        }
+
 
         // count
         $data['count'] = 'groups';
@@ -1513,7 +1532,18 @@ class Translator
             unset($data['limit']);
         }
 
-        $count = QUI::getDataBase()->fetch($data);
+        try {
+            $count = QUI::getDataBase()->fetch($data);
+        } catch (QUI\DataBase\Exception $Exception) {
+            QUI\System\Log::writeException($Exception);
+
+            return [
+                'data'  => [],
+                'page'  => 1,
+                'count' => 0,
+                'total' => 0
+            ];
+        }
 
         return [
             'data'  => $result,
@@ -1543,11 +1573,17 @@ class Translator
             $where['package'] = $package;
         }
 
-        $result = QUI::getDataBase()->fetch([
-            'from'  => self::table(),
-            'where' => $where,
-            'limit' => 1
-        ]);
+        try {
+            $result = QUI::getDataBase()->fetch([
+                'from'  => self::table(),
+                'where' => $where,
+                'limit' => 1
+            ]);
+        } catch (QUI\DataBase\Exception $Exception) {
+            QUI\System\Log::writeException($Exception);
+
+            return [];
+        }
 
         if (!isset($result[0])) {
             return [];
@@ -1563,11 +1599,17 @@ class Translator
      */
     public static function getGroupList()
     {
-        $result = QUI::getDataBase()->fetch([
-            'select' => 'groups',
-            'from'   => self::table(),
-            'group'  => 'groups'
-        ]);
+        try {
+            $result = QUI::getDataBase()->fetch([
+                'select' => 'groups',
+                'from'   => self::table(),
+                'group'  => 'groups'
+            ]);
+        } catch (QUI\DataBase\Exception $Exception) {
+            QUI\System\Log::writeException($Exception);
+
+            return [];
+        }
 
         $list = [];
 
@@ -1680,12 +1722,19 @@ class Translator
     }
 
     /**
-     * Eintrag aktualisieren
+     * Updates an translation var entry
+     *
+     * Is used directly when DEV Mode is on. This has the sense that a developer does not have to work in locale.xml
+     * but can work directly in the translator. He can then export this again and gets a modified locale.xml
+     *
+     * IS DIFFERENT TO edit() => edit() = Normal behaviour
      *
      * @param string $group
      * @param string $var
      * @param string $packageName
      * @param array $data
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function update($group, $var, $packageName, $data)
     {
@@ -1731,12 +1780,19 @@ class Translator
     }
 
     /**
-     * User Edit
+     * User Edit - Updates an translation var entry
+     *  edit() = normal behaviour
+     *
+     *  IS DIFFERENT TO update() =>
+     *      update() used directly when DEV Mode is on. This has the sense that a developer does not have to work in locale.xml
+     *      but can work directly in the translator. He can then export this again and gets a modified locale.xml
      *
      * @param string $group
      * @param string $var
      * @param string $packageName
      * @param array $data
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function edit($group, $var, $packageName, $data)
     {
@@ -1752,6 +1808,8 @@ class Translator
      *
      * @param integer $id
      * @param array $data
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function editById($id, $data)
     {
@@ -1823,6 +1881,8 @@ class Translator
      *
      * @param String $group
      * @param String $var
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function delete($group, $var)
     {
@@ -1843,6 +1903,8 @@ class Translator
      * Einen Übersetzungseintrag löschen
      *
      * @param integer $id
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function deleteById($id)
     {
@@ -1896,6 +1958,8 @@ class Translator
      * Gibt die zu übersetzenden Variablen zurück
      *
      * @return array
+     *
+     * @throws QUI\DataBase\Exception
      */
     public static function getNeedles()
     {
@@ -2263,7 +2327,7 @@ class Translator
             }
 
             // plural msgstrs are NUL-separated
-            $str = implode("\x00", $entry['msgstr']);
+            $str = \implode("\x00", $entry['msgstr']);
 
             // keep track of offsets
             $offsets[] = [
