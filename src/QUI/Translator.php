@@ -46,6 +46,11 @@ class Translator
     protected static $localeModifyTimes = null;
 
     /**
+     * @var null
+     */
+    protected static $availableLanguages = null;
+
+    /**
      * Return the real table name
      *
      * @return String
@@ -911,8 +916,14 @@ class Translator
     {
         $cacheName = 'quiqqer/translator/availableLanguages';
 
+        if (self::$availableLanguages !== null) {
+            return self::$availableLanguages;
+        }
+
         try {
-            return CacheManager::get($cacheName);
+            self::$availableLanguages = CacheManager::get($cacheName);
+
+            return self::$availableLanguages;
         } catch (\Exception $Exception) {
             // nothing, retrieve languages normally
         }
@@ -937,6 +948,7 @@ class Translator
         $languages = \array_values($languages);
 
         CacheManager::set($cacheName, $languages);
+        self::$availableLanguages = $languages;
 
         return $languages;
     }
