@@ -644,7 +644,12 @@ class Translator
         //           Insert
         // ************************** //
 
-        $langColumns = \implode(",", self::langs());
+        // Add backticks to all languages
+        $langColumns = array_map(function ($lang) {
+            return "`{$lang}`";
+        }, self::langs());
+
+        $langColumns = \implode(",", $langColumns);
 
         foreach ($localeVariables as $var) {
             //Check if at least one active language will be inserted
@@ -676,7 +681,7 @@ class Translator
             $langValues = trim($langValues, ", ");
 
             $sql .= "INSERT INTO `".self::table()."` ";
-            $sql .= " (groups, var, datatype, html, priority, package, ".$langColumns.")";
+            $sql .= " (`groups`, `var`, `datatype`, `html`, `priority`, `package`, ".$langColumns.")";
 
             // Build the value clause VALUES('','',[...])
             $sql .= " VALUES (";
