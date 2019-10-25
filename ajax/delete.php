@@ -14,7 +14,15 @@ QUI::$Ajax->registerFunction(
             return;
         }
 
+        // Stores the modified groups which should later be published
+        $groups = [];
+
         foreach ($data as $entry) {
+            if (isset($entry['groups'])) {
+                // Add current group to the later published groups
+                $groups[$entry['groups']] = true;
+            }
+
             if (isset($entry['id'])) {
                 QUI\Translator::deleteById($entry['id']);
 
@@ -56,6 +64,10 @@ QUI::$Ajax->registerFunction(
                     ]
                 )
             );
+        }
+
+        foreach ($groups as $group => $value) {
+            QUI\Translator::publish($group);
         }
     },
     ['data'],
