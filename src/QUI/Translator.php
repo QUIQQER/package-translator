@@ -1734,7 +1734,14 @@ class Translator
             }
         }
 
-        QUI\Translator::add($group, $var, $package);
+        try {
+            QUI\Translator::add($group, $var, $package);
+        } catch (QUI\Exception $Exception) {
+            if ($Exception->getCode() !== self::ERROR_CODE_VAR_EXISTS) {
+                throw $Exception;
+            }
+        }
+
         QUI\Translator::edit($group, $var, $package, $data);
     }
 
