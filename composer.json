@@ -1,29 +1,28 @@
 {
-  "name": "quiqqer\/translator",
-  "type": "quiqqer-module",
-  "description": "QUIQQER's translator helps you to offer your site multilingual.",
-  "version": "dev-dev",
-  "license": "GPL-3.0+",
-  "authors": [
-    {
-      "name": "Henning Leutz",
-      "email": "leutz@pcsg.de",
-      "homepage": "http:\/\/www.pcsg.de",
-      "role": "Developer"
+    "name": "quiqqer\/translator",
+    "type": "quiqqer-module",
+    "description": "QUIQQER's translator helps you to offer your site multilingual.",
+    "license": "GPL-3.0+",
+    "authors": [
+        {
+            "name": "Henning Leutz",
+            "email": "leutz@pcsg.de",
+            "homepage": "http:\/\/www.pcsg.de",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "support@pcsg.de"
+    },
+    "require": {
+        "quiqqer\/quiqqer": ">=1.3|dev-master|dev-dev",
+        "quiqqer\/utils": ">=1.10|dev-master|dev-dev",
+        "quiqqer\/qui": ">=1|dev-master|dev-dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "QUI\\": "src\/QUI",
+            "QUI\\Translator\\": "src\/QUI\/Translator"
+        }
     }
-  ],
-  "support": {
-    "email": "support@pcsg.de"
-  },
-  "require": {
-    "quiqqer\/quiqqer": ">=1.3|dev-master|dev-dev",
-    "quiqqer\/utils": ">=1.10|dev-master|dev-dev",
-    "quiqqer\/qui": ">=1|dev-master|dev-dev"
-  },
-  "autoload": {
-    "psr-4": {
-      "QUI\\": "src\/QUI",
-      "QUI\\Translator\\": "src\/QUI\/Translator"
-    }
-  }
 }
