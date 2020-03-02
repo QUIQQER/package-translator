@@ -1202,7 +1202,7 @@ class Translator
             QUI::getLocale()->refresh();
         }
 
-        Cache\Manager::clearAll();
+        QUI\Cache\Manager::clearCompleteQuiqqerCache();
     }
 
     /**
@@ -1349,7 +1349,7 @@ class Translator
 
         // clean cache dir of js files
         QUI::getTemp()->moveToTemp($dir.'/bin/_cache/');
-        Cache\Manager::clearAll();
+        QUI\Cache\Manager::clearCompleteQuiqqerCache();
 
         if (\method_exists(QUI::getLocale(), 'refresh')) {
             QUI::getLocale()->refresh();
