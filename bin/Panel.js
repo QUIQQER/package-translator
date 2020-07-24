@@ -975,8 +975,8 @@ define('package/quiqqer/translator/bin/Panel', [
 
                 var height = Content.getSize().y - 410;
 
-                if (height < 100) {
-                    height = 100;
+                if (height < 250) {
+                    height = 250;
                 }
 
                 self.$EditorHeader = new Element('div', {
