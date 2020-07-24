@@ -152,6 +152,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
 
             Elm.set('html', '');
 
+            var dev       = parseInt(QUIQQER_CONFIG.globals.development);
             var flexField = this.$Elm.getParent().hasClass('field-container-field');
 
             if (flexField) {
@@ -194,7 +195,9 @@ define('package/quiqqer/translator/bin/controls/Create', [
                         });
                     }
 
-                    if (lang in data) {
+                    if (!dev && typeof data[lang + '_edit'] !== 'undefined' && data[lang + '_edit'] !== '') {
+                        Container.getElement('input').value = data[lang + '_edit'];
+                    } else if (lang in data) {
                         Container.getElement('input').value = data[lang];
                     }
                 }
