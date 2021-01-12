@@ -5,6 +5,9 @@
  * @author www.pcsg.de (Henning Leutz)
  *
  * @event onChange
+ * @event onSaveBegin [self]
+ * @event onSave [self]
+ * @event onSaveEnd [self]
  */
 define('package/quiqqer/translator/bin/controls/Update', [
 
@@ -258,6 +261,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
          * @returns {Promise}
          */
         save: function () {
+            this.fireEvent('saveBegin', [this]);
+
             var self = this,
                 data = this.getData();
 
@@ -295,6 +300,9 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 }
 
                 throw err;
+            }).then(function () {
+                self.fireEvent('save', [this]);
+                self.fireEvent('saveEnd', [this]);
             });
         },
 

@@ -1,0 +1,20 @@
+.quiqqer-translator-updateContent {
+    float: left;
+    width: 100%;
+}
+
+.quiqqer-translator-updateContent-langselect {
+    float: left;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.quiqqer-translator-updateContent .qui-select {
+    width: 100%;
+}
+
+.quiqqer-translator-updateContent-content {
+    float: left;
+    height: calc(100% - 40px);
+    width: 100%;
+}
