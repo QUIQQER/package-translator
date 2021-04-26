@@ -181,6 +181,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
                         self.fireEvent('change', [self]);
                     });
 
+                    self.fireEvent('load', [self]);
                     resolve();
                 }, {
                     'package': 'quiqqer/translator',
