@@ -1813,6 +1813,8 @@ class Translator
             'var'     => $var,
             'package' => $packageName ?: $group
         ]);
+
+        QUI::getEvents()->fireEvent('quiqqerTranslatorUpdate', [$group, $var, $packageName, $data]);
     }
 
     /**
@@ -1837,6 +1839,8 @@ class Translator
             'var'     => $var,
             'package' => $packageName ?: $group
         ]);
+
+        QUI::getEvents()->fireEvent('quiqqerTranslatorEdit', [$group, $var, $packageName, $data]);
     }
 
     /**
@@ -1852,6 +1856,8 @@ class Translator
         QUI::getDataBase()->update(self::table(), self::getEditData($data), [
             'id' => $id
         ]);
+
+        QUI::getEvents()->fireEvent('quiqqerTranslatorEditById', [$id, $data]);
     }
 
     /**
