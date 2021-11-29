@@ -128,7 +128,7 @@ define('package/quiqqer/translator/bin/controls/UpdateContent', [
                 this.$Elm.removeClass('field-container-field');
             }
 
-            Editors.getEditor().then(function (Editor) {
+            return Editors.getEditor().then(function (Editor) {
                 Editor.addEvent('onLoaded', function () {
                     self.Loader.hide();
                     self.fireEvent('load', [self]);
@@ -228,6 +228,8 @@ define('package/quiqqer/translator/bin/controls/UpdateContent', [
             if (!this.getAttribute('package')) {
                 this.setAttribute('package', this.getAttribute('group'));
             }
+
+            this.create();
 
 
             this.$onInject().then(function () {
