@@ -1,5 +1,6 @@
 .quiqqer-translator-updateContent {
     float: left;
+    min-height: 340px;
     width: 100%;
 }
 
