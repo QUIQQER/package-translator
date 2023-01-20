@@ -8,10 +8,10 @@ namespace QUI;
 
 use DOMElement;
 use QUI;
-use QUI\Utils\Text\XML;
+use QUI\Cache\Manager as CacheManager;
 use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
-use QUI\Cache\Manager as CacheManager;
+use QUI\Utils\Text\XML;
 
 use function array_flip;
 use function array_key_exists;
@@ -75,17 +75,17 @@ class Translator
     /**
      * @var string
      */
-    protected static $cacheName = 'translator';
+    protected static string $cacheName = 'translator';
 
     /**
      * @var null
      */
-    protected static $localeModifyTimes = null;
+    protected static ?array $localeModifyTimes = null;
 
     /**
      * @var null
      */
-    protected static $availableLanguages = null;
+    protected static ?array $availableLanguages = null;
 
     /**
      * Return the real table name
@@ -108,7 +108,7 @@ class Translator
     /**
      * Add / create a new language
      *
-     * @param String $lang - lang code, length must be 2 signs
+     * @param string $lang - lang code, length must be 2 signs
      *
      * @throws QUI\Exception
      * @throws \Exception
@@ -147,17 +147,17 @@ class Translator
     /**
      * Export locale groups as xml
      *
-     * @param String $group - which group should be exported? ("all" = Alle)
-     * @param array $langs - Sprachen
+     * @param string $group - which group should be exported? ("all" = Alle)
+     * @param array $langs - languages
      * @param string $type - "original" oder "edit"
      * @param bool $external (optional) - export translations of external groups
      * that are overwritten by the selected groups ($group) [default: false]
      *
-     * @return String
+     * @return string
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function export($group, $langs, $type, $external = false)
+    public static function export(string $group, array $langs, string $type, bool $external = false): string
     {
         $exportFolder = VAR_DIR . self::EXPORT_DIR;
 
@@ -193,7 +193,7 @@ class Translator
     }
 
     /**
-     * Erstellt den Inhalt für eine locale.xml für eine oder mehrere Gruppen/Sprachen
+     * Creates the content for a locale.xml for one or more groups/languages
      *
      * @param array $group
      * @param array $langs
@@ -205,8 +205,12 @@ class Translator
      *
      * @throws QUI\DataBase\Exception
      */
-    protected static function createXMLContent($group, $langs, $editType, $external = false)
-    {
+    protected static function createXMLContent(
+        array $group,
+        array $langs,
+        string $editType,
+        bool $external = false
+    ): string {
         if ($external) {
             $entries = self::get(false, false, $group);
         } else {
@@ -527,7 +531,7 @@ class Translator
      *
      * @todo prepared statements
      */
-    public static function batchImport($file, $packageName = '')
+    public static function batchImport($file, string $packageName = '')
     {
         if (!file_exists($file)) {
             throw new QUI\Exception(
@@ -683,7 +687,7 @@ class Translator
 
         // Add backticks to all languages
         $langColumns = array_map(function ($lang) {
-            return "`{$lang}`";
+            return "`$lang`";
         }, self::langs());
 
         $langColumns = implode(",", $langColumns);
@@ -763,9 +767,9 @@ class Translator
      */
     public static function importFromPackage(
         QUI\Package\Package $Package,
-        $overwriteOriginal = 0,
-        $devModeIgnore = false,
-        $force = false
+        int $overwriteOriginal = 0,
+        bool $devModeIgnore = false,
+        bool $force = false
     ) {
         $file = $Package->getXMLFilePath('locale.xml');
 
@@ -866,8 +870,8 @@ class Translator
     /**
      * Übersetzungs Datei
      *
-     * @param String $lang
-     * @param String $group
+     * @param string $lang
+     * @param string $group
      *
      * @return String
      */
@@ -880,7 +884,7 @@ class Translator
      * Return the list of the translation files for a language
      * it combines the language files in none development mode
      *
-     * @param String $lang - Language -> eq: "de" or "en" ... and so on
+     * @param string $lang - Language -> eq: "de" or "en" ... and so on
      *
      * @return array
      */
@@ -1069,7 +1073,7 @@ class Translator
     public static function create()
     {
         // first step, a cleanup
-        // so we get no errors in gettext
+        // so, we get no errors in gettext
         self::cleanup();
 
         $langs = self::langs();
@@ -1125,6 +1129,10 @@ class Translator
             // Ist verwirrend, aber somit sparen wir ein Query
 
             foreach ($result as $entry) {
+                if (empty($entry[$lang]) && empty($entry[$lang . '_edit'])) {
+                    continue;
+                }
+
                 if ($entry['datatype'] == 'js') {
                     $js_langs[$entry['groups']][$lang][] = $entry;
                     continue;
@@ -1192,12 +1200,12 @@ class Translator
             }
 
             // create javascript lang files
-            $jsdir = $dir . '/bin/';
+            $jsDir = $dir . '/bin/';
 
-            QUIFile::mkdir($jsdir);
+            QUIFile::mkdir($jsDir);
 
-            foreach ($js_langs as $group => $groupentry) {
-                foreach ($groupentry as $lang => $entries) {
+            foreach ($js_langs as $group => $groupEntry) {
+                foreach ($groupEntry as $lang => $entries) {
                     $vars = [];
 
                     foreach ($entries as $entry) {
@@ -1219,13 +1227,13 @@ class Translator
                     $js .= '});';
 
                     // create package dir
-                    QUIFile::mkdir($jsdir . $group);
+                    QUIFile::mkdir($jsDir . $group);
 
-                    if (file_exists($jsdir . $group . '/' . $lang . '.js')) {
-                        unlink($jsdir . $group . '/' . $lang . '.js');
+                    if (file_exists($jsDir . $group . '/' . $lang . '.js')) {
+                        unlink($jsDir . $group . '/' . $lang . '.js');
                     }
 
-                    file_put_contents($jsdir . $group . '/' . $lang . '.js', $js);
+                    file_put_contents($jsDir . $group . '/' . $lang . '.js', $js);
                 }
             }
 
@@ -1309,6 +1317,10 @@ class Translator
             foreach ($result as $data) {
                 // value select
                 $value = $data[$lang];
+
+                if (empty($value)) {
+                    continue;
+                }
 
                 if (isset($data[$lang . '_edit']) && !empty($data[$lang . '_edit'])) {
                     $value = $data[$lang . '_edit'];
@@ -1409,17 +1421,17 @@ class Translator
     }
 
     /**
-     * Übersetzung bekommen
+     * Returns a translation
      *
-     * @param string|boolean $group - Gruppe
-     * @param string|boolean $var - Übersetzungsvariable, optional
+     * @param string|boolean $group - group
+     * @param string|boolean $var - variable, optional
      * @param string|boolean $package - optional, package name
      *
      * @return array
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function get($group = false, $var = false, $package = false)
+    public static function get($group = false, $var = false, $package = false): array
     {
         $where = [];
 
@@ -1442,15 +1454,15 @@ class Translator
     }
 
     /**
-     * Daten für die Tabelle bekommen
+     * Get data for the table
      *
-     * @param String $groups - Gruppe
+     * @param string $groups - Group
      * @param array $params - optional array(limit => 10, page => 1)
      * @param array|Bool $search - optional array(search => '%str%', fields => '')
      *
      * @return array
      */
-    public static function getData($groups, $params = [], $search = false)
+    public static function getData(string $groups, array $params = [], $search = false): array
     {
         $table     = self::table();
         $db_fields = self::langs();
@@ -1496,15 +1508,15 @@ class Translator
 
             $querySelect = "
                 SELECT *
-                FROM {$table}
-                WHERE {$where}
-                LIMIT {$limit}
+                FROM $table
+                WHERE $where
+                LIMIT $limit
             ";
 
             $queryCount = "
                 SELECT COUNT(*) as count
-                FROM {$table}
-                WHERE {$where}
+                FROM $table
+                WHERE $where
             ";
 
             $Statement = $PDO->prepare($querySelect);
@@ -1631,7 +1643,7 @@ class Translator
      *
      * @return array
      */
-    public static function getVarData($group, $var, $package = false)
+    public static function getVarData(string $group, string $var, $package = false): array
     {
         $where = [
             'groups' => $group,
@@ -1662,11 +1674,11 @@ class Translator
     }
 
     /**
-     * Liste aller vorhandenen Gruppen
+     * List of all existing groups
      *
      * @return array
      */
-    public static function getGroupList()
+    public static function getGroupList(): array
     {
         try {
             $result = QUI::getDataBase()->fetch([
@@ -1700,7 +1712,7 @@ class Translator
      *
      * @throws QUI\Exception
      */
-    public static function add($group, $var, $package = false, $dataType = 'php,js', $html = false)
+    public static function add(string $group, string $var, $package = false, string $dataType = 'php,js', $html = false)
     {
         if (empty($var) || empty($group)) {
             throw new QUI\Exception(
@@ -1767,7 +1779,7 @@ class Translator
      *
      * @throws QUI\Exception
      */
-    public static function addUserVar($group, $var, $data)
+    public static function addUserVar(string $group, string $var, array $data)
     {
         $package     = false;
         $development = QUI::conf('globals', 'development');
@@ -1777,9 +1789,9 @@ class Translator
         }
 
         if ($development) {
-            $langs = self::langs();
+            $languages = self::langs();
 
-            foreach ($langs as $lang) {
+            foreach ($languages as $lang) {
                 if (!isset($data[$lang . '_edit']) && isset($data[$lang])) {
                     $data[$lang . '_edit'] = $data[$lang];
                 }
@@ -1798,7 +1810,7 @@ class Translator
     }
 
     /**
-     * Updates an translation var entry
+     * Updates a translation var entry
      *
      * Is used directly when DEV Mode is on. This has the sense that a developer does not have to work in locale.xml
      * but can work directly in the translator. He can then export this again and gets a modified locale.xml
@@ -1810,14 +1822,15 @@ class Translator
      * @param string $packageName
      * @param array $data
      *
+     * @throws QUI\Exception
      * @throws QUI\DataBase\Exception
      */
-    public static function update($group, $var, $packageName, $data)
+    public static function update(string $group, string $var, string $packageName, array $data)
     {
-        $langs = self::langs();
-        $_data = [];
+        $languages = self::langs();
+        $_data     = [];
 
-        foreach ($langs as $lang) {
+        foreach ($languages as $lang) {
             if (!isset($data[$lang])) {
                 continue;
             }
@@ -1858,7 +1871,7 @@ class Translator
     }
 
     /**
-     * User Edit - Updates an translation var entry
+     * User Edit - Updates a translation var entry
      *  edit() = normal behaviour
      *
      *  IS DIFFERENT TO update() =>
@@ -1870,9 +1883,10 @@ class Translator
      * @param string $packageName
      * @param array $data
      *
+     * @throws QUI\Exception
      * @throws QUI\DataBase\Exception
      */
-    public static function edit($group, $var, $packageName, $data)
+    public static function edit(string $group, string $var, string $packageName, array $data)
     {
         QUI::getDataBase()->update(self::table(), self::getEditData($data), [
             'groups'  => $group,
@@ -1889,9 +1903,10 @@ class Translator
      * @param integer $id
      * @param array $data
      *
+     * @throws QUI\Exception
      * @throws QUI\DataBase\Exception
      */
-    public static function editById($id, $data)
+    public static function editById(int $id, array $data)
     {
         QUI::getDataBase()->update(self::table(), self::getEditData($data), [
             'id' => $id
@@ -1907,14 +1922,14 @@ class Translator
      *
      * @return array
      */
-    protected static function getEditData($data)
+    protected static function getEditData(array $data): array
     {
-        $langs = self::langs();
-        $_data = [];
+        $languages = self::langs();
+        $_data     = [];
 
         $development = QUI::conf('globals', 'development');
 
-        foreach ($langs as $lang) {
+        foreach ($languages as $lang) {
             if ($development) {
                 if (isset($data[$lang])) {
                     $_data[$lang] = trim($data[$lang]);
@@ -1959,14 +1974,14 @@ class Translator
     }
 
     /**
-     * Einen Übersetzungseintrag löschen
+     * Deletes a translation group/var pair
      *
-     * @param String $group
-     * @param String $var
+     * @param string $group
+     * @param string $var
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function delete($group, $var)
+    public static function delete(string $group, string $var)
     {
         if (file_exists(VAR_DIR . 'locale/localefiles')) {
             unlink(VAR_DIR . 'locale/localefiles');
@@ -1982,13 +1997,13 @@ class Translator
     }
 
     /**
-     * Einen Übersetzungseintrag löschen
+     * Delete a translation entry
      *
      * @param integer $id
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function deleteById($id)
+    public static function deleteById(int $id)
     {
         if (file_exists(VAR_DIR . 'locale/localefiles')) {
             unlink(VAR_DIR . 'locale/localefiles');
@@ -2001,17 +2016,17 @@ class Translator
     }
 
     /**
-     * Welche Sprachen existieren
+     * Which languages are there
      *
      * @return array
      */
-    public static function langs()
+    public static function langs(): array
     {
         $fields = QUI::getDataBase()->table()->getColumns(
             self::table()
         );
 
-        $langs = [];
+        $languages = [];
 
         foreach ($fields as $entry) {
             if ($entry == 'groups'
@@ -2030,27 +2045,25 @@ class Translator
                 continue;
             }
 
-            $langs[] = $entry;
+            $languages[] = $entry;
         }
 
-        return $langs;
+        return $languages;
     }
 
     /**
-     * Gibt die zu übersetzenden Variablen zurück
+     * Returns the variables to be translated
      *
      * @return array
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function getNeedles()
+    public static function getNeedles(): array
     {
-        $result = QUI::getDataBase()->fetch([
+        return QUI::getDataBase()->fetch([
             'from'  => self::table(),
             'where' => implode(' = "" OR ', self::langs()) . ' = ""'
         ]);
-
-        return $result;
     }
 
     /**
@@ -2062,11 +2075,11 @@ class Translator
     /**
      * T Blöcke in einem String finden
      *
-     * @param String $string
+     * @param string $string
      *
      * @return array
      */
-    public static function getTBlocksFromString($string)
+    public static function getTBlocksFromString(string $string): array
     {
         if (strpos($string, '{/t}') === false) {
             return [];
@@ -2126,7 +2139,7 @@ class Translator
     /**
      * PHP Blöcke in einem String finden
      *
-     * @param String $string
+     * @param string $string
      *
      * @return array
      */
@@ -2195,12 +2208,12 @@ class Translator
     /**
      * The main .po to .mo function
      *
-     * @param String $input
-     * @param String|Bool $output
+     * @param string $input
+     * @param string|Bool $output
      *
      * @return boolean
      */
-    public static function phpmoConvert($input, $output = false)
+    public static function phpmoConvert(string $input, $output = false): bool
     {
         if (!$output) {
             $output = str_replace('.po', '.mo', $input);
@@ -2220,9 +2233,9 @@ class Translator
     /**
      * Clean helper
      *
-     * @param array|String $x
+     * @param array|string $x
      *
-     * @return mixed
+     * @return array|string|string[]
      */
     public static function phpmoCleanHelper($x)
     {
@@ -2251,7 +2264,7 @@ class Translator
      *
      * @return bool|array
      */
-    public static function phpmoParsePoFile($in)
+    public static function phpmoParsePoFile(string $in)
     {
         // read .po file
         $fh = fopen($in, 'r');
@@ -2384,7 +2397,7 @@ class Translator
      * @param array $hash
      * @param string $out - file path
      */
-    public static function phpmoWriteMoFile($hash, $out)
+    public static function phpmoWriteMoFile(array $hash, string $out)
     {
         // sort by msgid
         ksort($hash, SORT_STRING);
