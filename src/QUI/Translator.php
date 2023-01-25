@@ -1239,7 +1239,7 @@ class Translator
      */
     protected static function isEmpty($str): bool
     {
-        if (str_contains($str, ' ') && empty($str)) {
+        if (str_contains($str, ' ') && strlen($str) === 1) {
             return false;
         }
 
@@ -1905,7 +1905,7 @@ class Translator
         $development = QUI::conf('globals', 'development');
 
         $isSpace = function ($str) {
-            return str_contains($str, ' ') && empty($str);
+            return str_contains($str, ' ') && strlen($str) === 1;
         };
 
         foreach ($languages as $lang) {
