@@ -11,7 +11,7 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_update',
     function ($groups, $data) {
-        $data = \json_decode($data, true);
+        $data = json_decode($data, true);
 
         if (!isset($data['var'])) {
             throw new QUI\Exception(
@@ -31,7 +31,7 @@ QUI::$Ajax->registerFunction(
                     'quiqqer/translator',
                     'exception.translation.var.not.found.update',
                     [
-                        'var'   => $data['var'],
+                        'var' => $data['var'],
                         'group' => $groups
                     ]
                 ),
