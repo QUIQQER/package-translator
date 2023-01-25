@@ -1289,12 +1289,12 @@ class Translator
                 // value select
                 $value = $data[$lang];
 
-                if (empty($value)) {
-                    continue;
-                }
-
                 if (isset($data[$lang . '_edit']) && !empty($data[$lang . '_edit'])) {
                     $value = $data[$lang . '_edit'];
+                }
+
+                if (empty($value)) {
+                    continue;
                 }
 
                 if ($Output) {
