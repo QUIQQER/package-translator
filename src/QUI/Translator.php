@@ -1120,7 +1120,7 @@ class Translator
             // Ist verwirrend, aber somit sparen wir ein Query
 
             foreach ($result as $entry) {
-                if (empty($entry[$lang]) && empty($entry[$lang . '_edit'])) {
+                if (self::isEmpty($entry[$lang]) && self::isEmpty($entry[$lang . '_edit'])) {
                     continue;
                 }
 
@@ -1136,7 +1136,8 @@ class Translator
 
                 $value = $entry[$lang];
 
-                if (isset($entry[$lang . '_edit']) && !empty($entry[$lang . '_edit'])) {
+                if (isset($entry[$lang . '_edit'])
+                    && !self::isEmpty($entry[$lang . '_edit'])) {
                     $value = $entry[$lang . '_edit']; // benutzer übersetzung
                 }
 
@@ -1160,7 +1161,7 @@ class Translator
                 $iniVar = $entry['var'];
 
                 // in php some keywords are not allowed, so we rewrite the key in `
-                // its better than destroy the ini file
+                // it's better than destroy the ini file
                 switch ($iniVar) {
                     case 'null':
                     case 'yes':
@@ -1233,6 +1234,19 @@ class Translator
     }
 
     /**
+     * @param $str
+     * @return bool
+     */
+    protected static function isEmpty($str): bool
+    {
+        if (str_contains($str, ' ') && empty($str)) {
+            return false;
+        }
+
+        return empty($str);
+    }
+
+    /**
      * Publish a language group
      *
      * @param string $group
@@ -1289,7 +1303,7 @@ class Translator
                 // value select
                 $value = $data[$lang];
 
-                if (isset($data[$lang . '_edit']) && !empty($data[$lang . '_edit'])) {
+                if (isset($data[$lang . '_edit']) && !self::isEmpty($data[$lang . '_edit'])) {
                     $value = $data[$lang . '_edit'];
                 }
 
@@ -1890,14 +1904,26 @@ class Translator
 
         $development = QUI::conf('globals', 'development');
 
+        $isSpace = function ($str) {
+            return str_contains($str, ' ') && empty($str);
+        };
+
         foreach ($languages as $lang) {
             if ($development) {
                 if (isset($data[$lang])) {
-                    $_data[$lang] = trim($data[$lang]);
+                    if ($isSpace($data[$lang])) {
+                        $_data[$lang] = $data[$lang];
+                    } else {
+                        $_data[$lang] = trim($data[$lang]);
+                    }
                 }
 
                 if (isset($data[$lang . '_edit'])) {
-                    $_data[$lang . '_edit'] = trim($data[$lang . '_edit']);
+                    if ($isSpace($data[$lang . '_edit'])) {
+                        $_data[$lang . '_edit'] = $data[$lang . '_edit'];
+                    } else {
+                        $_data[$lang . '_edit'] = trim($data[$lang . '_edit']);
+                    }
                 }
 
                 continue;
@@ -1908,11 +1934,20 @@ class Translator
             }
 
             if (isset($data[$lang])) {
-                $_data[$lang . '_edit'] = trim($data[$lang]);
+                if ($isSpace($data[$lang])) {
+                    $_data[$lang . '_edit'] = $data[$lang];
+                } else {
+                    $_data[$lang . '_edit'] = trim($data[$lang]);
+                }
+
                 continue;
             }
 
-            $_data[$lang . '_edit'] = trim($data[$lang . '_edit']);
+            if ($isSpace($data[$lang . '_edit'])) {
+                $_data[$lang . '_edit'] = $data[$lang . '_edit'];
+            } else {
+                $_data[$lang . '_edit'] = trim($data[$lang . '_edit']);
+            }
         }
 
         $_data['html']     = 0;
