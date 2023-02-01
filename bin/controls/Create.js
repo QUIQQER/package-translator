@@ -20,7 +20,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
 ], function (QUI, QUIControl, QUIButton, QUIAjax, QUILocale, Translator) {
     "use strict";
 
-    var Translate = new Translator();
+    const Translate = new Translator();
 
     return new Class({
 
@@ -59,7 +59,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * @returns {HTMLElement}
          */
         create: function () {
-            var Elm = this.parent();
+            const Elm = this.parent();
 
             Elm.set({
                 'class': 'quiqqer-translator-create',
@@ -75,12 +75,12 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * @returns {Promise}
          */
         createTranslation: function () {
-            var self = this,
-                data = this.getData();
+            const self = this,
+                  data = this.getData();
 
-            data.package  = this.getAttribute('package');
+            data.package = this.getAttribute('package');
             data.datatype = this.getAttribute('datatype');
-            data.html     = this.getAttribute('html') ? 1 : 0;
+            data.html = this.getAttribute('html') ? 1 : 0;
 
             return Translate.add(
                 this.getAttribute('group'),
@@ -90,25 +90,23 @@ define('package/quiqqer/translator/bin/controls/Create', [
                 return Translate.setTranslation(
                     self.getAttribute('group'),
                     self.getAttribute('var'),
-                    data
+                    data,
+                    false
                 );
             }).then(function () {
                 return Translate.refreshLocale();
             }).then(function () {
-                return Translate.publish(
-                    self.getAttribute('group')
-                );
+                return Translate.publish(self.getAttribute('group'), false);
             }).catch(function () {
                 return Translate.setTranslation(
                     self.getAttribute('group'),
                     self.getAttribute('var'),
-                    data
+                    data,
+                    false
                 ).then(function () {
                     return Translate.refreshLocale();
                 }).then(function () {
-                    return Translate.publish(
-                        self.getAttribute('group')
-                    );
+                    return Translate.publish(self.getAttribute('group'), false);
                 });
             });
         },
@@ -127,11 +125,11 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * @return {Object} - {en: '', de: ''}
          */
         getData: function () {
-            var result = {},
-                list   = this.getElm().getElements('input'),
-                dev    = parseInt(QUIQQER_CONFIG.globals.development);
+            const result = {},
+                  list   = this.getElm().getElements('input'),
+                  dev    = parseInt(QUIQQER_CONFIG.globals.development);
 
-            for (var i = 0, len = list.length; i < len; i++) {
+            for (let i = 0, len = list.length; i < len; i++) {
                 result[list[i].name] = list[i].value;
 
                 if (dev) {
@@ -146,14 +144,14 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * event : on inject
          */
         $onInject: function () {
-            var self = this,
-                Elm  = this.getElm(),
-                path = URL_BIN_DIR + '16x16/flags/';
+            const self = this,
+                  Elm  = this.getElm(),
+                  path = URL_BIN_DIR + '16x16/flags/';
 
             Elm.set('html', '');
 
-            var dev       = parseInt(QUIQQER_CONFIG.globals.development);
-            var flexField = this.$Elm.getParent().hasClass('field-container-field');
+            const dev = parseInt(QUIQQER_CONFIG.globals.development);
+            const flexField = this.$Elm.getParent().hasClass('field-container-field');
 
             if (flexField) {
                 this.$Elm.addClass('field-container-field');
@@ -162,10 +160,10 @@ define('package/quiqqer/translator/bin/controls/Create', [
             }
 
             QUIAjax.get('ajax_system_getAvailableLanguages', function (languages) {
-                var i, len, lang, Container;
+                let i, len, lang, Container;
 
-                var current = QUILocale.getCurrent(),
-                    data    = self.getAttribute('data');
+                const current = QUILocale.getCurrent(),
+                      data    = self.getAttribute('data');
 
                 // current language to the top
                 languages.sort(function (a, b) {
@@ -235,7 +233,7 @@ define('package/quiqqer/translator/bin/controls/Create', [
                     self.$Toggler.destroy();
                 }
 
-                var Input = Elm.getElements('input');
+                const Input = Elm.getElements('input');
 
                 Input.addEvent('change', function () {
                     self.setAttribute('data', self.getData());
@@ -281,14 +279,14 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * @return {Promise}
          */
         open: function () {
-            var self = this,
-                list = this.getElm().getElements('.quiqqer-translator-entry');
+            const self = this,
+                  list = this.getElm().getElements('.quiqqer-translator-entry');
 
             if (!list || !list.length || list.length === 1) {
                 return Promise.resolve();
             }
 
-            var First = list.shift();
+            const First = list.shift();
 
             list.setStyles({
                 display: null,
@@ -330,14 +328,14 @@ define('package/quiqqer/translator/bin/controls/Create', [
          * @return {Promise}
          */
         close: function () {
-            var self = this,
-                list = this.getElm().getElements('.quiqqer-translator-entry');
+            const self = this,
+                  list = this.getElm().getElements('.quiqqer-translator-entry');
 
             if (!list || !list.length) {
                 return Promise.resolve();
             }
 
-            var First = list.shift();
+            const First = list.shift();
 
             First.setStyle('height', null);
 

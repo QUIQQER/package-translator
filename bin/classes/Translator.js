@@ -124,17 +124,26 @@ define('package/quiqqer/translator/bin/classes/Translator', [
          * @param {String} group
          * @param {String} varName
          * @param {Object} data - {'en' : 'English text', 'de' : 'German text', package : ''}
+         * @param [showSuccessMessage]
          * @return {Promise}
          */
-        setTranslation: function (group, varName, data) {
+        setTranslation: function (group, varName, data, showSuccessMessage) {
             return new Promise(function (resolve, reject) {
                 data.var = varName;
+
+                if (typeof showSuccessMessage === 'undefined') {
+                    showSuccessMessage = 1;
+                }
+
+                showSuccessMessage = showSuccessMessage ? 1 : 0;
 
                 QUIAjax.post('package_quiqqer_translator_ajax_update', resolve, {
                     'package': 'quiqqer/translator',
                     onError  : reject,
                     groups   : group,
-                    data     : JSON.encode(data)
+                    data     : JSON.encode(data),
+                    
+                    showSuccessMessage: showSuccessMessage
                 });
             });
         },
@@ -142,16 +151,25 @@ define('package/quiqqer/translator/bin/classes/Translator', [
         /**
          * Publish the translations
          *
+         * @param [group]
+         * @param [showSuccessMessage]
          * @returns {Promise}
          */
-        publish: function (group) {
+        publish: function (group, showSuccessMessage) {
             group = group || false;
+
+            if (typeof showSuccessMessage === 'undefined') {
+                showSuccessMessage = 1;
+            }
+
+            showSuccessMessage = showSuccessMessage ? 1 : 0;
 
             return new Promise(function (resolve, reject) {
                 QUIAjax.post('package_quiqqer_translator_ajax_create', resolve, {
-                    'package': 'quiqqer/translator',
-                    onError  : reject,
-                    group    : group
+                    'package'         : 'quiqqer/translator',
+                    group             : group,
+                    showSuccessMessage: showSuccessMessage,
+                    onError           : reject
                 });
             });
         }
