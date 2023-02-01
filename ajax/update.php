@@ -10,8 +10,14 @@
  */
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_update',
-    function ($groups, $data) {
+    function ($groups, $data, $showSuccessMessage) {
         $data = json_decode($data, true);
+
+        if (!isset($showSuccessMessage)) {
+            $showSuccessMessage = 1;
+        }
+
+        $showSuccessMessage = (int)$showSuccessMessage;
 
         if (!isset($data['var'])) {
             throw new QUI\Exception(
@@ -50,14 +56,15 @@ QUI::$Ajax->registerFunction(
             QUI\Translator::edit($groups, $data['var'], $data['package'], $data);
         }
 
-
-        QUI::getMessagesHandler()->addSuccess(
-            QUI::getLocale()->get(
-                'quiqqer/translator',
-                'message.translation.update.successful'
-            )
-        );
+        if ($showSuccessMessage) {
+            QUI::getMessagesHandler()->addSuccess(
+                QUI::getLocale()->get(
+                    'quiqqer/translator',
+                    'message.translation.update.successful'
+                )
+            );
+        }
     },
-    ['groups', 'data'],
+    ['groups', 'data', 'showSuccessMessage'],
     'Permission::checkAdminUser'
 );

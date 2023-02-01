@@ -1,24 +1,32 @@
 <?php
 
 /**
- * Übersetzungen erstellen
+ * Publish translations
  */
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_create',
-    function ($group) {
+    function ($group, $showSuccessMessage) {
+        if (!isset($showSuccessMessage)) {
+            $showSuccessMessage = 1;
+        }
+
+        $showSuccessMessage = (int)$showSuccessMessage;
+
         if (isset($group) && !empty($group)) {
             QUI\Translator::publish($group);
         } else {
             QUI\Translator::create();
         }
 
-        QUI::getMessagesHandler()->addSuccess(
-            QUI::getLocale()->get(
-                'quiqqer/translator',
-                'message.translation.create.successful'
-            )
-        );
+        if ($showSuccessMessage) {
+            QUI::getMessagesHandler()->addSuccess(
+                QUI::getLocale()->get(
+                    'quiqqer/translator',
+                    'message.translation.create.successful'
+                )
+            );
+        }
     },
-    ['group'],
+    ['group', 'showSuccessMessage'],
     'Permission::checkAdminUser'
 );

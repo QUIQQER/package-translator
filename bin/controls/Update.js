@@ -24,7 +24,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
 ], function (QUI, QUIControl, QUIButton, QUIAjax, QUILocale, Translator, Create) {
     "use strict";
 
-    var Translate = new Translator();
+    const Translate = new Translator();
 
     return new Class({
 
@@ -65,7 +65,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
          * @returns {HTMLElement}
          */
         create: function () {
-            var Elm = this.parent();
+            const Elm = this.parent();
 
             Elm.set({
                 'class': 'quiqqer-translator-update',
@@ -81,14 +81,13 @@ define('package/quiqqer/translator/bin/controls/Update', [
          * @return {Promise}
          */
         $onInject: function () {
-            var self = this,
-                Elm  = this.getElm(),
-                path = URL_BIN_DIR + '16x16/flags/';
+            const self = this,
+                  Elm  = this.getElm(),
+                  path = URL_BIN_DIR + '16x16/flags/';
 
             Elm.set('html', '');
 
-
-            var flexField = this.$Elm.getParent().hasClass('field-container-field');
+            const flexField = this.$Elm.getParent().hasClass('field-container-field');
 
             if (flexField) {
                 this.$Elm.addClass('field-container-field');
@@ -101,8 +100,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
                     'ajax_system_getAvailableLanguages',
                     'package_quiqqer_translator_ajax_getVarData'
                 ], function (languages, data) {
-                    var i, len, lang, Container;
-                    var current = QUILocale.getCurrent();
+                    let i, len, lang, Container;
+                    const current = QUILocale.getCurrent();
 
                     // current language to the top
                     languages.sort(function (a, b) {
@@ -174,7 +173,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
                         self.$Toggler.destroy(); // needed because of css bug -> not last child
                     }
 
-                    var Input = Elm.getElements('input');
+                    const Input = Elm.getElements('input');
 
                     Input.addEvent('change', function () {
                         self.setAttribute('data', self.getData());
@@ -196,10 +195,10 @@ define('package/quiqqer/translator/bin/controls/Update', [
          * event: on import
          */
         $onImport: function () {
-            var self = this;
+            const self = this;
 
             this.$Input = this.getElm();
-            this.$Elm   = new Element('div').wraps(this.$Input);
+            this.$Elm = new Element('div').wraps(this.$Input);
 
             if (this.$Input.hasClass('field-container-field')) {
                 this.$Elm.addClass('field-container-field');
@@ -264,28 +263,24 @@ define('package/quiqqer/translator/bin/controls/Update', [
         save: function () {
             this.fireEvent('saveBegin', [this]);
 
-            var self = this,
-                data = this.getData();
-
-            data.package  = this.getAttribute('package');
+            const self = this,
+                  data = this.getData();
+            console.log('save');
+            data.package = this.getAttribute('package');
             data.datatype = this.getAttribute('datatype');
-            data.html     = this.getAttribute('html') ? 1 : 0;
+            data.html = this.getAttribute('html') ? 1 : 0;
 
             return Translate.setTranslation(
                 self.getAttribute('group'),
                 self.getAttribute('var'),
-                data
+                data,
+                false
             ).then(function () {
                 return Translate.refreshLocale();
-
             }).then(function () {
-                return Translate.publish(
-                    self.getAttribute('group')
-                );
+                return Translate.publish(self.getAttribute('group'), false);
             }, function (err) {
-                if (err.getCode() === 404 &&
-                    self.getAttribute('createIfNotExists')) {
-
+                if (err.getCode() === 404 && self.getAttribute('createIfNotExists')) {
                     return Translate.add(
                         self.getAttribute('group'),
                         self.getAttribute('var'),
@@ -299,9 +294,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
                     }).then(function () {
                         return Translate.refreshLocale();
                     }).then(function () {
-                        return Translate.publish(
-                            self.getAttribute('group')
-                        );
+                        return Translate.publish(self.getAttribute('group'), false);
                     });
                 }
 
@@ -318,8 +311,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
          * @return {String}
          */
         getValue: function () {
-            var current = QUILocale.getCurrent();
-            var Input   = this.getElm().getElement('[name="' + current + '"]');
+            const current = QUILocale.getCurrent();
+            const Input = this.getElm().getElement('[name="' + current + '"]');
 
             return Input ? Input.value : '';
         }
