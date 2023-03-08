@@ -197,7 +197,7 @@ class Translator
      * @throws QUI\DataBase\Exception
      */
     protected static function createXMLContent(
-        array $group,
+        string $group,
         array $langs,
         string $editType,
         bool $external = false
