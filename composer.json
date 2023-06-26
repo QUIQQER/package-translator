@@ -1,6 +1,7 @@
 {
     "name": "quiqqer\/translator",
     "type": "quiqqer-module",
+    "version": "1.10.0",
     "description": "QUIQQER's translator helps you to offer your site multilingual.",
     "license": "GPL-3.0+",
     "authors": [
