@@ -5,6 +5,7 @@
  *
  * @param string $data - JSON Array
  */
+
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_import',
     function ($overwriteOriginal, $File) {
