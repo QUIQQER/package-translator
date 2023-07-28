@@ -50,7 +50,7 @@ class Console extends QUI\System\Console\Tool
             $language = $this->getArgument('--newLanguage');
             Translator::addLang($language);
 
-            $this->writeLn('Add language to translator: '.$language);
+            $this->writeLn('Add language to translator: ' . $language);
         }
 
         $this->writeLn('Start Translation ...');
