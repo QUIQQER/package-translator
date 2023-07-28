@@ -1239,6 +1239,10 @@ class Translator
      */
     protected static function isEmpty($str): bool
     {
+        if ($str === null) {
+            return false;
+        }
+
         if (str_contains($str, ' ') && strlen($str) === 1) {
             return false;
         }
