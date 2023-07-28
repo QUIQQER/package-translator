@@ -3,6 +3,7 @@
 /**
  * Publish translations
  */
+
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_create',
     function ($group, $showSuccessMessage) {
@@ -12,7 +13,7 @@ QUI::$Ajax->registerFunction(
 
         $showSuccessMessage = (int)$showSuccessMessage;
 
-        if (isset($group) && !empty($group)) {
+        if (!empty($group)) {
             QUI\Translator::publish($group);
         } else {
             QUI\Translator::create();

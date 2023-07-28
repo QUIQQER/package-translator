@@ -63,7 +63,7 @@ class Setup
 
         // update empty package fields
         $emptyLocales = QUI::getDataBase()->fetch([
-            'from'  => $table,
+            'from' => $table,
             'where' => [
                 'package' => null
             ]
