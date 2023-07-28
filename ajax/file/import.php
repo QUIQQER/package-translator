@@ -7,6 +7,7 @@
  * @param integer $overwrite
  * @return mixed
  */
+
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_file_import',
     function ($File, $overwrite) {
