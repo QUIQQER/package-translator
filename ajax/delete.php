@@ -5,12 +5,13 @@
  *
  * @param string $data - JSON Array
  */
+
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_delete',
     function ($data) {
-        $data = \json_decode($data, true);
+        $data = json_decode($data, true);
 
-        if (!\is_array($data)) {
+        if (!is_array($data)) {
             return;
         }
 
@@ -32,8 +33,8 @@ QUI::$Ajax->registerFunction(
                         'message.translation.delete.id.successfully',
                         [
                             'groups' => $entry['groups'],
-                            'var'    => $entry['var'],
-                            'id'     => $entry['id']
+                            'var' => $entry['var'],
+                            'id' => $entry['id']
                         ]
                     )
                 );
@@ -60,7 +61,7 @@ QUI::$Ajax->registerFunction(
                     'message.translation.delete.successfully',
                     [
                         'groups' => $entry['groups'],
-                        'var'    => $entry['var']
+                        'var' => $entry['var']
                     ]
                 )
             );

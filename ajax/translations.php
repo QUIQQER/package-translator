@@ -9,32 +9,31 @@
  *
  * @return array
  */
+
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_translations',
     function ($groups, $params, $search) {
-        $langs = QUI\Translator::langs();
-        $data  = QUI\Translator::getData(
+        $languages = QUI\Translator::langs();
+        $data = QUI\Translator::getData(
             $groups,
-            \json_decode($params, true),
-            \json_decode($search, true)
+            json_decode($params, true),
+            json_decode($search, true)
         );
 
         if (!QUI::conf('globals', 'development')) {
             foreach ($data['data'] as $key => $entry) {
-                foreach ($langs as $lang) {
-                    if (!empty($entry[$lang.'_edit'])) {
-                        $data['data'][$key][$lang] = $entry[$lang.'_edit'];
+                foreach ($languages as $lang) {
+                    if (!empty($entry[$lang . '_edit'])) {
+                        $data['data'][$key][$lang] = $entry[$lang . '_edit'];
                     }
                 }
             }
         }
 
-        $result = [
-            'data'  => $data,
-            'langs' => $langs
+        return [
+            'data' => $data,
+            'langs' => $languages
         ];
-
-        return $result;
     },
     ['groups', 'params', 'search'],
     'Permission::checkAdminUser'

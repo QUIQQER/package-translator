@@ -8,6 +8,7 @@
  *
  * @throws QUI\Exception
  */
+
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_getVarData',
     function ($group, $var, $pkg) {
