@@ -3,7 +3,7 @@
     <item parent="/extras/"
           name="translator"
           require="package/quiqqer/translator/bin/Panel"
-          icon="URL_BIN_DIR/16x16/flags/default.png"
+          icon="fa fa-language"
     >
         <locale group="quiqqer/translator" var="package.menu.title"/>
     </item>

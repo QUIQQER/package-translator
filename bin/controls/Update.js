@@ -29,19 +29,19 @@ define('package/quiqqer/translator/bin/controls/Update', [
     return new Class({
 
         Extends: Create,
-        Type   : 'package/quiqqer/translator/bin/controls/Update',
+        Type: 'package/quiqqer/translator/bin/controls/Update',
 
         Binds: [
             '$onInject'
         ],
 
         options: {
-            'group'  : false,
-            'var'    : false,
+            'group': false,
+            'var': false,
             'package': false,
-            datatype : 'php,js',
-            html     : false,
-            data     : {},
+            datatype: 'php,js',
+            html: false,
+            data: {},
 
             createIfNotExists: false
         },
@@ -69,7 +69,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
 
             Elm.set({
                 'class': 'quiqqer-translator-update',
-                html   : ''
+                html: ''
             });
 
             return Elm;
@@ -82,8 +82,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
          */
         $onInject: function () {
             const self = this,
-                  Elm  = this.getElm(),
-                  path = URL_BIN_DIR + '16x16/flags/';
+                Elm = this.getElm(),
+                path = URL_BIN_DIR + '16x16/flags/';
 
             Elm.set('html', '');
 
@@ -121,7 +121,7 @@ define('package/quiqqer/translator/bin/controls/Update', [
 
                         Container = new Element('div', {
                             'class': 'quiqqer-translator-entry',
-                            html   : '<img src="' + path + lang + '.png" /><input type="text" name="' + lang + '" />'
+                            html: '<img src="' + path + lang + '.png" /><input type="text" name="' + lang + '" />'
                         }).inject(Elm);
 
                         if (i > 0) {
@@ -142,10 +142,10 @@ define('package/quiqqer/translator/bin/controls/Update', [
 
                     if (!flexField) {
                         self.$Toggler = new QUIButton({
-                            icon  : 'fa fa-arrow-circle-o-right',
+                            icon: 'fa fa-arrow-circle-o-right',
                             styles: {
                                 position: 'absolute',
-                                right   : 0
+                                right: 0
                             },
                             events: {
                                 onClick: self.toggle
@@ -153,12 +153,12 @@ define('package/quiqqer/translator/bin/controls/Update', [
                         }).inject(Elm);
                     } else {
                         self.$Toggler = new Element('span.field-container-item', {
-                            html  : '<span class="fa fa-arrow-circle-o-right"></span>',
+                            html: '<span class="fa fa-arrow-circle-o-right"></span>',
                             styles: {
-                                cursor    : 'pointer',
+                                cursor: 'pointer',
                                 lineHeight: 28,
-                                textAlign : 'center',
-                                width     : 50
+                                textAlign: 'center',
+                                width: 50
                             },
                             events: {
                                 click: function (event) {
@@ -184,9 +184,9 @@ define('package/quiqqer/translator/bin/controls/Update', [
                     resolve();
                 }, {
                     'package': 'quiqqer/translator',
-                    'group'  : self.getAttribute('group'),
-                    'var'    : self.getAttribute('var'),
-                    'pkg'    : self.getAttribute('package')
+                    'group': self.getAttribute('group'),
+                    'var': self.getAttribute('var'),
+                    'pkg': self.getAttribute('package')
                 });
             });
         },
@@ -239,11 +239,11 @@ define('package/quiqqer/translator/bin/controls/Update', [
                 self.$Toggler.destroy();
 
                 self.$Toggler = new Element('span.field-container-item', {
-                    html  : '<span class="fa fa-arrow-circle-o-right"></span>',
+                    html: '<span class="fa fa-arrow-circle-o-right"></span>',
                     styles: {
-                        cursor   : 'pointer',
+                        cursor: 'pointer',
                         textAlign: 'center',
-                        width    : 50
+                        width: 50
                     },
                     events: {
                         click: function (event) {
@@ -264,8 +264,8 @@ define('package/quiqqer/translator/bin/controls/Update', [
             this.fireEvent('saveBegin', [this]);
 
             const self = this,
-                  data = this.getData();
-            console.log('save');
+                data = this.getData();
+
             data.package = this.getAttribute('package');
             data.datatype = this.getAttribute('datatype');
             data.html = this.getAttribute('html') ? 1 : 0;
