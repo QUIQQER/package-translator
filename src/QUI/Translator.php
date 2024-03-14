@@ -10,7 +10,7 @@ use DOMElement;
 use PDO;
 use QUI;
 use QUI\Cache\Manager as CacheManager;
-use QUI\DataBase\Exception;
+use QUI\Database\Exception;
 use QUI\Utils\StringHelper;
 use QUI\Utils\System\File as QUIFile;
 use QUI\Utils\Text\XML;
@@ -1517,23 +1517,23 @@ class Translator
         if ($search && isset($search['search'])) {
             // search translations
             $where = [];
-            $search = [
+            $whereSearch = [
                 'type' => '%LIKE%',
                 'value' => trim($search['search'])
             ];
 
             // default fields
             $default = [
-                'groups' => $search,
-                'var' => $search,
-                'datatype' => $search,
-                'datadefine' => $search
+                'groups' => $whereSearch,
+                'var' => $whereSearch,
+                'datatype' => $whereSearch,
+                'datadefine' => $whereSearch
             ];
 
             foreach ($db_fields as $lang) {
                 if (strlen($lang) == 2) {
-                    $default[$lang] = $search;
-                    $default[$lang . '_edit'] = $search;
+                    $default[$lang] = $whereSearch;
+                    $default[$lang . '_edit'] = $whereSearch;
                 }
             }
 
@@ -1546,7 +1546,7 @@ class Translator
 
             foreach ($fields as $field) {
                 if (isset($default[$field])) {
-                    $where[$field] = $search;
+                    $where[$field] = $whereSearch;
                 }
             }
 
