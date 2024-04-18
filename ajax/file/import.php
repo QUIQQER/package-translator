@@ -3,10 +3,12 @@
 /**
  * Import the data from a file or a xml string
  *
- * @param \QUI\QDOM $File
+ * @param QDOM $File
  * @param integer $overwrite
  * @return mixed
  */
+
+use QUI\QDOM;
 
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_file_import',

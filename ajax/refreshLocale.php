@@ -15,7 +15,7 @@ QUI::$Ajax->registerFunction(
         $languages = QUI\Translator::getAvailableLanguages();
 
         foreach ($translations as $entry) {
-            if (strpos($entry['datatype'], 'js') === false && !empty($entry['datatype'])) {
+            if (!str_contains($entry['datatype'], 'js') && !empty($entry['datatype'])) {
                 continue;
             }
 
