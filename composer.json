@@ -16,8 +16,8 @@
   },
   "require": {
     "php": "^8.1",
-    "quiqqer\/quiqqer": "^2",
-    "quiqqer\/utils": "^1.10",
+    "quiqqer\/core": "^2",
+    "quiqqer\/utils": "^2",
     "quiqqer\/qui": "^1"
   },
   "autoload": {
