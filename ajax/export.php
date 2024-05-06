@@ -21,7 +21,7 @@ QUI::$Ajax->registerFunction(
         $type = QUI\Utils\Security\Orthos::clear($type);
 
         QUI\Utils\System\File::downloadHeader(
-            QUI\Translator::export($group, $langs, $type, \boolval($external))
+            QUI\Translator::export($group, $langs, $type, boolval($external))
         );
     },
     ['group', 'langs', 'type', 'external'],
