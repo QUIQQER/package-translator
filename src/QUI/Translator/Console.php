@@ -17,7 +17,7 @@ use QUI\Translator;
 class Console extends QUI\System\Console\Tool
 {
     /**
-     * Konstruktor
+     * Constructor
      */
     public function __construct()
     {
@@ -26,12 +26,9 @@ class Console extends QUI\System\Console\Tool
     }
 
     /**
-     * (non-PHPdoc)
-     *
      * @throws QUI\Exception
-     * @see \QUI\System\Console\Tool::execute()
      */
-    public function execute()
+    public function execute(): void
     {
         if ($this->getArgument('--setup')) {
             $this->writeLn('Start translator setup... ');
@@ -41,7 +38,7 @@ class Console extends QUI\System\Console\Tool
                 ->setup();
 
             $this->write(' [ok]');
-            $this->writeLn('');
+            $this->writeLn();
 
             return;
         }
@@ -58,6 +55,6 @@ class Console extends QUI\System\Console\Tool
         Translator::create();
 
         $this->write(' [ok]');
-        $this->writeLn('');
+        $this->writeLn();
     }
 }

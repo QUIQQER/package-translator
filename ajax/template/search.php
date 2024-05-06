@@ -1,10 +1,12 @@
 <?php
 
 /**
- * Template des Translaters bekommen
+ * Search template
  *
  * @return String
  */
+
+use QUI\Translator;
 
 QUI::$Ajax->registerFunction(
     'package_quiqqer_translator_ajax_template_search',
@@ -12,7 +14,7 @@ QUI::$Ajax->registerFunction(
         $Engine = QUI::getTemplateManager()->getEngine(true);
 
         $languages = [];
-        $result = \QUI\Translator::langs();
+        $result = Translator::langs();
 
         foreach ($result as $lang) {
             if (strlen($lang) == 2) {
