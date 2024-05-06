@@ -1,5 +1,5 @@
 {
-  "name": "quiqqer\/translator",
+  "name": "quiqqer/translator",
   "type": "quiqqer-module",
   "description": "QUIQQER's translator helps you to offer your site multilingual.",
   "license": "GPL-3.0+",
@@ -7,7 +7,7 @@
     {
       "name": "Henning Leutz",
       "email": "leutz@pcsg.de",
-      "homepage": "http:\/\/www.pcsg.de",
+      "homepage": "https://www.pcsg.de",
       "role": "Developer"
     }
   ],
@@ -16,14 +16,14 @@
   },
   "require": {
     "php": "^8.1",
-    "quiqqer\/core": "^2",
-    "quiqqer\/utils": "^2",
-    "quiqqer\/qui": "^1"
+    "quiqqer/core": "^2",
+    "quiqqer/utils": "^2",
+    "quiqqer/qui": "^1"
   },
   "autoload": {
     "psr-4": {
-      "QUI\\": "src\/QUI",
-      "QUI\\Translator\\": "src\/QUI\/Translator"
+      "QUI\\": "src/QUI",
+      "QUI\\Translator\\": "src/QUI/Translator"
     }
   }
 }
