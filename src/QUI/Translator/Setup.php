@@ -7,6 +7,7 @@
 namespace QUI\Translator;
 
 use QUI;
+use QUI\Database\Exception;
 use QUI\Package\Package;
 
 /**
@@ -19,7 +20,7 @@ class Setup
      * @param Package $Package
      * @throws QUI\Exception
      */
-    public static function onPackageSetup(Package $Package)
+    public static function onPackageSetup(Package $Package): void
     {
         if ($Package->getName() !== 'quiqqer/translator') {
             return;
@@ -45,7 +46,7 @@ class Setup
         $PDO = QUI::getDataBase()->getPDO();
         $PDO->query(
             "SET @count = 0;
-            UPDATE `{$table}` SET `{$table}`.`id` = @count:= @count + 1;"
+            UPDATE `$table` SET `$table`.`id` = @count:= @count + 1;"
         );
 
         QUI::getDataBase()->table()->setPrimaryKey($table, 'id');
@@ -56,8 +57,9 @@ class Setup
 
     /**
      * packages empty package fields
+     * @throws Exception
      */
-    protected static function patchForEmptyLocales()
+    protected static function patchForEmptyLocales(): void
     {
         $table = QUI\Translator::table();
 

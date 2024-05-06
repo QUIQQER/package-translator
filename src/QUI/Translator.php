@@ -39,7 +39,6 @@ use function preg_replace_callback;
 use function set_time_limit;
 use function str_replace;
 use function strlen;
-use function strpos;
 use function trim;
 use function unlink;
 
@@ -107,7 +106,7 @@ class Translator
      * @throws QUI\Exception
      * @throws \Exception
      */
-    public static function addLang(string $lang)
+    public static function addLang(string $lang): void
     {
         if (strlen($lang) !== 2) {
             throw new QUI\Exception(
@@ -325,7 +324,7 @@ class Translator
      */
     public static function import(
         string $file,
-        $overwriteOriginal = 0,
+        bool|int $overwriteOriginal = 0,
         bool $devModeIgnore = false,
         string $packageName = '',
         bool $force = false
@@ -358,7 +357,7 @@ class Translator
             $groups = XML::getLocaleGroupsFromDom(
                 XML::getDomFromXml($file)
             );
-        } catch (\Exception $Exception) {
+        } catch (\Exception) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
@@ -475,9 +474,9 @@ class Translator
      *
      * @param Package\Package $Package
      *
-     * @throws Exception
+     * @throws Exception|\QUI\Exception
      */
-    public static function batchImportFromPackage(QUI\Package\Package $Package)
+    public static function batchImportFromPackage(QUI\Package\Package $Package): void
     {
         $file = $Package->getXMLFilePath('locale.xml');
 
@@ -506,7 +505,7 @@ class Translator
 
                 self::batchImport($filePath, $packageName);
             }
-        } catch (QUI\Exception $Exception) {
+        } catch (QUI\Exception) {
         }
     }
 
@@ -520,14 +519,12 @@ class Translator
      * @param $file - Full system filepath to the locale.xml
      * @param string $packageName - The package name of the locale.xml
      *
-     * @return bool - Returns true on success
+     * @return bool|int - Returns true on success
      *
-     * @throws Exception
-     * @throws QUI\Exception
-     *
+     * @throws Exception|\QUI\Exception
      * @todo prepared statements
      */
-    public static function batchImport($file, string $packageName = '')
+    public static function batchImport($file, string $packageName = ''): bool|int
     {
         if (!file_exists($file)) {
             throw new QUI\Exception(
@@ -543,7 +540,7 @@ class Translator
             $groups = XML::getLocaleGroupsFromDom(
                 XML::getDomFromXml($file)
             );
-        } catch (\Exception $Exception) {
+        } catch (\Exception) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
                     'quiqqer/translator',
@@ -766,7 +763,7 @@ class Translator
         int $overwriteOriginal = 0,
         bool $devModeIgnore = false,
         bool $force = false
-    ) {
+    ): void {
         $file = $Package->getXMLFilePath('locale.xml');
 
         if (!file_exists($file)) {
@@ -806,7 +803,7 @@ class Translator
                     $force
                 );
             }
-        } catch (QUI\Exception $Exception) {
+        } catch (QUI\Exception) {
         }
     }
 
@@ -815,7 +812,7 @@ class Translator
      *
      * @param string $file - path to the locale file
      */
-    protected static function setLocaleFileModifyTime(string $file)
+    protected static function setLocaleFileModifyTime(string $file): void
     {
         if (!file_exists($file)) {
             return;
@@ -832,7 +829,7 @@ class Translator
     /**
      * Return modify times of all imported locale xml files
      *
-     * @return array
+     * @return array|null
      */
     protected static function getLocaleModifyTimes(): ?array
     {
@@ -944,7 +941,7 @@ class Translator
         $cacheData .= "\n\n
             require($requireEncode);
             \n\n
-            define('locale/_cache/{$lang}', $requireEncode, function(Locale) {return Locale})
+            define('locale/_cache/$lang', $requireEncode, function(Locale) {return Locale})
         ";
 
         file_put_contents($cacheFile, $cacheData);
@@ -955,7 +952,7 @@ class Translator
     /**
      * Return all available languages
      *
-     * @return array
+     * @return array|null
      */
     public static function getAvailableLanguages(): ?array
     {
@@ -969,7 +966,7 @@ class Translator
             self::$availableLanguages = CacheManager::get($cacheName);
 
             return self::$availableLanguages;
-        } catch (\Exception $Exception) {
+        } catch (\Exception) {
             // nothing, retrieve languages normally
         }
 
@@ -1003,7 +1000,7 @@ class Translator
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function cleanup()
+    public static function cleanup(): void
     {
         $PDO = QUI::getDataBase()->getPDO();
         $table = self::table();
@@ -1059,7 +1056,7 @@ class Translator
      *
      * @throws QUI\Exception
      */
-    public static function create()
+    public static function create(): void
     {
         // first step, a cleanup
         // so, we get no errors in gettext
@@ -1128,7 +1125,7 @@ class Translator
                 }
 
                 // if php,js
-                if (strpos($entry['datatype'], 'js') !== false || empty($entry['datatype'])) {
+                if (str_contains($entry['datatype'], 'js') || empty($entry['datatype'])) {
                     $js_languages[$entry['groups']][$lang][] = $entry;
                 }
 
@@ -1201,8 +1198,7 @@ class Translator
                         $vars[$entry['var']] = $value;
                     }
 
-                    $js = '';
-                    $js .= "define('locale/" . $group . "/" . $lang . "', ['Locale'], function(Locale)";
+                    $js = "define('locale/" . $group . "/" . $lang . "', ['Locale'], function(Locale)";
                     $js .= '{';
                     $js .= 'Locale.set("' . $lang . '", "' . $group . '", ';
                     $js .= json_encode($vars);
@@ -1257,7 +1253,7 @@ class Translator
      *
      * @throws QUI\Exception
      */
-    public static function publish(string $group)
+    public static function publish(string $group): void
     {
         $languages = self::langs();
         $dir = self::dir();
@@ -1329,7 +1325,7 @@ class Translator
                 }
 
                 // php und js beachten
-                if (strpos($data['datatype'], 'js') !== false || empty($data['datatype'])) {
+                if (str_contains($data['datatype'], 'js') || empty($data['datatype'])) {
                     $javaScriptValues[$data['var']] = $value;
                 }
 
@@ -1345,7 +1341,7 @@ class Translator
                 $iniVar = $data['var'];
 
                 // in php some keywords are not allowed, so we rewrite the key in `
-                // its better than destroy the ini file
+                // it's better than destroy the ini file
                 switch ($iniVar) {
                     case 'null':
                     case 'yes':
@@ -1377,8 +1373,7 @@ class Translator
             QUIFile::unlink($jsFile);
             QUIFile::mkfile($jsFile);
 
-            $jsContent = '';
-            $jsContent .= "define('locale/" . $group . "/" . $lang . "', ['Locale'], function(Locale)";
+            $jsContent = "define('locale/" . $group . "/" . $lang . "', ['Locale'], function(Locale)";
             $jsContent .= '{';
             $jsContent .= 'Locale.set("' . $lang . '", "' . $group . '", ';
             $jsContent .= json_encode($javaScriptValues);
@@ -1402,15 +1397,15 @@ class Translator
     /**
      * Returns a translation
      *
-     * @param string|boolean $group - group
-     * @param string|boolean $var - variable, optional
-     * @param string|boolean $package - optional, package name
+     * @param boolean|string $group - group
+     * @param boolean|string $var - variable, optional
+     * @param boolean|string $package - optional, package name
      *
      * @return array
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function get($group = false, $var = false, $package = false): array
+    public static function get(bool|string $group = false, bool|string $var = false, bool|string $package = false): array
     {
         $where = [];
 
@@ -1437,11 +1432,11 @@ class Translator
      *
      * @param string $groups - Group
      * @param array $params - optional array(limit => 10, page => 1)
-     * @param array|Bool $search - optional array(search => '%str%', fields => '')
+     * @param Bool|array $search - optional array(search => '%str%', fields => '')
      *
      * @return array
      */
-    public static function getData(string $groups, array $params = [], $search = false): array
+    public static function getData(string $groups, array $params = [], bool|array $search = false): array
     {
         $table = self::table();
         $db_fields = self::langs();
@@ -1457,7 +1452,7 @@ class Translator
             $page = (int)$params['page'];
         }
 
-        $page = ($page - 1) ? $page - 1 : 0;
+        $page = ($page - 1) ?: 0;
         $limit = ($page * $max) . ',' . $max;
 
         // PDO search emptyTranslations
@@ -1618,11 +1613,11 @@ class Translator
      *
      * @param string $group
      * @param string $var
-     * @param string|bool $package
+     * @param bool|string $package
      *
      * @return array
      */
-    public static function getVarData(string $group, string $var, $package = false): array
+    public static function getVarData(string $group, string $var, bool|string $package = false): array
     {
         $where = [
             'groups' => $group,
@@ -1685,14 +1680,19 @@ class Translator
      *
      * @param string $group
      * @param string $var
-     * @param string|bool $package = default = false
+     * @param bool|string $package = default = false
      * @param string $dataType - default = php,js
-     * @param integer|bool $html - default = false
+     * @param bool|integer $html - default = false
      *
      * @throws QUI\Exception
      */
-    public static function add(string $group, string $var, $package = false, string $dataType = 'php,js', $html = false)
-    {
+    public static function add(
+        string $group,
+        string $var,
+        bool|string $package = false,
+        string $dataType = 'php,js',
+        bool|int $html = false
+    ): void {
         if (empty($var) || empty($group)) {
             throw new QUI\Exception(
                 QUI::getLocale()->get(
@@ -1750,7 +1750,7 @@ class Translator
     }
 
     /**
-     * Add a translation like from an user
+     * Add a translation like from a user
      *
      * @param string $group
      * @param string $var
@@ -1758,7 +1758,7 @@ class Translator
      *
      * @throws QUI\Exception
      */
-    public static function addUserVar(string $group, string $var, array $data)
+    public static function addUserVar(string $group, string $var, array $data): void
     {
         $package = false;
         $development = QUI::conf('globals', 'development');
@@ -1804,7 +1804,7 @@ class Translator
      * @throws QUI\Exception
      * @throws QUI\DataBase\Exception
      */
-    public static function update(string $group, string $var, string $packageName, array $data)
+    public static function update(string $group, string $var, string $packageName, array $data): void
     {
         $languages = self::langs();
         $_data = [];
@@ -1865,7 +1865,7 @@ class Translator
      * @throws QUI\Exception
      * @throws QUI\DataBase\Exception
      */
-    public static function edit(string $group, string $var, string $packageName, array $data)
+    public static function edit(string $group, string $var, string $packageName, array $data): void
     {
         QUI::getDataBase()->update(self::table(), self::getEditData($data), [
             'groups' => $group,
@@ -1885,7 +1885,7 @@ class Translator
      * @throws QUI\Exception
      * @throws QUI\DataBase\Exception
      */
-    public static function editById(int $id, array $data)
+    public static function editById(int $id, array $data): void
     {
         QUI::getDataBase()->update(self::table(), self::getEditData($data), [
             'id' => $id
@@ -1981,7 +1981,7 @@ class Translator
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function delete(string $group, string $var)
+    public static function delete(string $group, string $var): void
     {
         if (file_exists(VAR_DIR . 'locale/localefiles')) {
             unlink(VAR_DIR . 'locale/localefiles');
@@ -2003,7 +2003,7 @@ class Translator
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function deleteById(int $id)
+    public static function deleteById(int $id): void
     {
         if (file_exists(VAR_DIR . 'locale/localefiles')) {
             unlink(VAR_DIR . 'locale/localefiles');
@@ -2042,7 +2042,7 @@ class Translator
                 continue;
             }
 
-            if (strpos($entry, '_edit') !== false) {
+            if (str_contains($entry, '_edit')) {
                 continue;
             }
 
@@ -2082,7 +2082,7 @@ class Translator
      */
     public static function getTBlocksFromString(string $string): array
     {
-        if (strpos($string, '{/t}') === false) {
+        if (!str_contains($string, '{/t}')) {
             return [];
         }
 
@@ -2120,7 +2120,7 @@ class Translator
 
                 $_param = explode(' ', $params[2]);
 
-                if (strpos($_param[0], '/') === false || strpos($_param[1], ' ') !== false) {
+                if (!str_contains($_param[0], '/') || str_contains($_param[1], ' ')) {
                     self::$tmp[] = [
                         'var' => $params[2]
                     ];
@@ -2144,12 +2144,9 @@ class Translator
      *
      * @return array
      */
-    public static function getLBlocksFromString($string)
+    public static function getLBlocksFromString(string $string): array
     {
-        if (
-            strpos($string, '$L->get(') === false
-            && strpos($string, '$Locale->get(') === false
-        ) {
+        if (!str_contains($string, '$L->get(') && !str_contains($string, '$Locale->get(')) {
             return [];
         }
 
@@ -2161,7 +2158,7 @@ class Translator
                 if (
                     !empty($params[2])
                     && !empty($params[3])
-                    && strpos($params[2], '/') === false
+                    && !str_contains($params[2], '/')
                 ) {
                     self::$tmp[] = [
                         'groups' => $params[2],
