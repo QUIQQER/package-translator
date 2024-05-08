@@ -11,8 +11,8 @@
         <image src="URL_OPT_DIR/quiqqer/translator/bin/images/Logo.jpg"/>
 
         <preview>
-            <image src="URL_OPT_DIR/quiqqer/quiqqer/bin/images/screenshot1.png"/>
-            <image src="URL_OPT_DIR/quiqqer/quiqqer/bin/images/screenshot2.png"/>
+            <image src="URL_OPT_DIR/quiqqer/core/bin/images/screenshot1.png"/>
+            <image src="URL_OPT_DIR/quiqqer/core/bin/images/screenshot2.png"/>
         </preview>
 
         <support>
