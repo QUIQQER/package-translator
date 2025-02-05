@@ -14,7 +14,7 @@ QUI::$Ajax->registerFunction(
         /* @var $File QUI\QDOM */
         QUI\Translator::import(
             $File->getAttribute('filepath'),
-            $overwriteOriginal
+            (int)$overwriteOriginal
         );
     },
     ['overwriteOriginal', 'File'],
