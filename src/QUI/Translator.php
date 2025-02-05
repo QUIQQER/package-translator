@@ -324,7 +324,7 @@ class Translator
      */
     public static function import(
         string $file,
-        bool|int $overwriteOriginal = 0,
+        bool | int $overwriteOriginal = 0,
         bool $devModeIgnore = false,
         string $packageName = '',
         bool $force = false
@@ -373,7 +373,7 @@ class Translator
             return [];
         }
 
-        set_time_limit(ini_get('max_execution_time'));
+        set_time_limit((int)ini_get('max_execution_time'));
 
         foreach ($groups as $locales) {
             $group = $locales['group'];
@@ -524,7 +524,7 @@ class Translator
      * @throws Exception|\QUI\Exception
      * @todo prepared statements
      */
-    public static function batchImport($file, string $packageName = ''): bool|int
+    public static function batchImport($file, string $packageName = ''): bool | int
     {
         if (!file_exists($file)) {
             throw new QUI\Exception(
@@ -561,7 +561,7 @@ class Translator
         // *********************************** //
 
         $PDO = QUI::getDataBase()->getPDO();
-        set_time_limit(ini_get('max_execution_time'));
+        set_time_limit((int)ini_get('max_execution_time'));
 
         $localeVariables = [];
 
@@ -1088,7 +1088,7 @@ class Translator
 
         // Sprachdateien erstellen
         foreach ($languages as $lang) {
-            set_time_limit(ini_get('max_execution_time'));
+            set_time_limit((int)ini_get('max_execution_time'));
 
             if (strlen($lang) !== 2) {
                 continue;
@@ -1405,8 +1405,11 @@ class Translator
      *
      * @throws QUI\DataBase\Exception
      */
-    public static function get(bool|string $group = false, bool|string $var = false, bool|string $package = false): array
-    {
+    public static function get(
+        bool | string $group = false,
+        bool | string $var = false,
+        bool | string $package = false
+    ): array {
         $where = [];
 
         if ($group) {
@@ -1436,7 +1439,7 @@ class Translator
      *
      * @return array
      */
-    public static function getData(string $groups, array $params = [], bool|array $search = false): array
+    public static function getData(string $groups, array $params = [], bool | array $search = false): array
     {
         $table = self::table();
         $db_fields = self::langs();
@@ -1568,7 +1571,7 @@ class Translator
         // result mit limit
         try {
             $result = QUI::getDataBase()->fetch($data);
-        } catch (QUI\DataBase\Exception $Exception) {
+        } catch (QUI\Database\Exception $Exception) {
             QUI\System\Log::writeException($Exception);
 
             return [
@@ -1582,14 +1585,11 @@ class Translator
 
         // count
         $data['count'] = 'groups';
-
-        if (isset($data['limit'])) {
-            unset($data['limit']);
-        }
+        unset($data['limit']);
 
         try {
             $count = QUI::getDataBase()->fetch($data);
-        } catch (QUI\DataBase\Exception $Exception) {
+        } catch (QUI\Database\Exception $Exception) {
             QUI\System\Log::writeException($Exception);
 
             return [
@@ -1617,7 +1617,7 @@ class Translator
      *
      * @return array
      */
-    public static function getVarData(string $group, string $var, bool|string $package = false): array
+    public static function getVarData(string $group, string $var, bool | string $package = false): array
     {
         $where = [
             'groups' => $group,
@@ -1634,7 +1634,7 @@ class Translator
                 'where' => $where,
                 'limit' => 1
             ]);
-        } catch (QUI\DataBase\Exception $Exception) {
+        } catch (QUI\Database\Exception $Exception) {
             QUI\System\Log::writeException($Exception);
 
             return [];
@@ -1660,7 +1660,7 @@ class Translator
                 'from' => self::table(),
                 'group' => 'groups'
             ]);
-        } catch (QUI\DataBase\Exception $Exception) {
+        } catch (QUI\Database\Exception $Exception) {
             QUI\System\Log::writeException($Exception);
 
             return [];
@@ -1689,9 +1689,9 @@ class Translator
     public static function add(
         string $group,
         string $var,
-        bool|string $package = false,
+        bool | string $package = false,
         string $dataType = 'php,js',
-        bool|int $html = false
+        bool | int $html = false
     ): void {
         if (empty($var) || empty($group)) {
             throw new QUI\Exception(
@@ -2115,7 +2115,7 @@ class Translator
                         'var' => $var
                     ];
 
-                    return;
+                    return ''; // phpstan
                 }
 
                 $_param = explode(' ', $params[2]);
@@ -2130,6 +2130,8 @@ class Translator
                     'groups' => $_param[0],
                     'var' => $_param[1],
                 ];
+
+                return ''; // phpstan
             },
             $string
         );
@@ -2165,6 +2167,8 @@ class Translator
                         'var' => $params[3],
                     ];
                 }
+
+                return ''; // phpstan
             },
             $string
         );
